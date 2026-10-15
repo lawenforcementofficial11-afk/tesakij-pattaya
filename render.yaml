@@ -1,0 +1,36 @@
+# Render Blueprint — New + > Blueprint > เลือก repo นี้
+# หมายเหตุ: แพ็กเกจฟรีใช้ดิสก์ชั่วคราว (ข้อมูลที่แก้/เรื่องร้องเรียน/แจ้งเหตุ จะรีเซ็ตเมื่อ deploy ใหม่หรือเครื่องหลับ) — เหมาะสำหรับเดโม
+services:
+  - type: web
+    name: tesakij-pattaya
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /api/content
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "1"
+      - key: TRUST_PROXY
+        value: "1"
+      - key: SEED_DEMO_ALERTS
+        value: "1"
+      # ไม่บังคับ:
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: GOOGLE_MAPS_MAP_ID
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_BASE_URL
+        sync: false
+      - key: AI_MODEL
+        sync: false

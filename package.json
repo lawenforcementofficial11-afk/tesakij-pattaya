@@ -1,0 +1,17 @@
+{
+  "name": "tesakij-pattaya",
+  "version": "1.0.0",
+  "private": true,
+  "description": "เว็บไซต์เทศกิจพัทยา + ระบบหลังบ้านผู้ดูแล (single admin)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "hash-password": "node -e \"require('bcryptjs').hash(process.argv[1],12).then(console.log)\""
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}

@@ -1,0 +1,675 @@
+{
+  "site": {
+    "name": "เทศกิจพัทยา",
+    "namePart1": "เทศกิจ",
+    "namePart2": "พัทยา",
+    "subtitle": "สำนักการปกครอง เมืองพัทยา",
+    "englishName": "Pattaya City Law Enforcement",
+    "logo": "assets/logo.png",
+    "favicon": "assets/favicon.png",
+    "hotlineLabel": "สายด่วนเทศกิจ",
+    "hotline": "0X-XXX-XXXX",
+    "hotlineIsPlaceholder": true,
+    "email": "example@domain.go.th",
+    "address": "[ที่อยู่หน่วยงาน — รอข้อมูลจริง]",
+    "hours": "จันทร์–ศุกร์ 08:30–16:30 น.",
+    "lineId": "@xxxxxxxx",
+    "lineQr": "",
+    "noticeBar": "ต้นแบบเว็บไซต์ · ข้อมูลที่มีป้าย “ตัวอย่าง” เป็นข้อมูลสมมติเพื่อการนำเสนอ",
+    "copyright": "© 2569 เทศกิจพัทยา สงวนลิขสิทธิ์"
+  },
+  "royal": {
+    "enabled": true,
+    "ribbonText": "ทรงพระเจริญ · Long Live the King",
+    "heading": "ทรงพระเจริญ",
+    "kingName": "พระบาทสมเด็จพระวชิรเกล้าเจ้าอยู่หัว",
+    "queenName": "สมเด็จพระนางเจ้าสุทิดา พัชรสุธาพิมลลักษณ พระบรมราชินี",
+    "dedication": "ด้วยเกล้าด้วยกระหม่อม ข้าพระพุทธเจ้า คณะผู้บริหารและเจ้าหน้าที่เทศกิจเมืองพัทยา",
+    "kingImage": "assets/king.jpg",
+    "queenImage": "assets/queen.jpg",
+    "imageCredit": "พระบรมฉายาลักษณ์: กรมประชาสัมพันธ์ ผ่าน Wikimedia Commons (CC BY 3.0 TH)"
+  },
+  "hero": {
+    "image": "assets/hero-pattaya-2400.jpg",
+    "imageMobile": "assets/hero-pattaya-1280.jpg",
+    "imageAlt": "ทัศนียภาพอ่าวพัทยายามค่ำคืน",
+    "imageCredit": "ภาพ: PattayaPatrol / Wikimedia Commons (CC BY-SA 4.0)",
+    "eyebrow": "Welcome to Pattaya · ยินดีต้อนรับสู่เมืองพัทยา",
+    "tagline": "ดูแลความเป็นระเบียบเรียบร้อย เพื่อพัทยาที่น่าอยู่และปลอดภัย",
+    "description": "เมืองท่องเที่ยวระดับโลกที่สะอาด ปลอดภัย และเป็นระเบียบ สำหรับประชาชนและนักท่องเที่ยวทุกคน",
+    "ctaPrimary": "แจ้งเรื่องร้องเรียน",
+    "ctaPrimaryLink": "#complaint"
+  },
+  "services": [
+    {
+      "icon": "chat",
+      "title": "แจ้งเรื่องร้องเรียน",
+      "desc": "แจ้งปัญหาในพื้นที่ได้ตลอด 24 ชม.",
+      "link": "#complaint"
+    },
+    {
+      "icon": "clipboard",
+      "title": "ติดตามสถานะเรื่อง",
+      "desc": "ตรวจสอบความคืบหน้าด้วยเลขรับเรื่อง",
+      "link": "#track"
+    },
+    {
+      "icon": "store",
+      "title": "ขออนุญาตตั้งวางสินค้า/จุดผ่อนผัน",
+      "desc": "ข้อมูลการยื่นคำขอและจุดผ่อนผัน",
+      "link": "#laws"
+    },
+    {
+      "icon": "scale",
+      "title": "ข้อบัญญัติและค่าปรับ",
+      "desc": "กฎหมายที่เกี่ยวข้องและอัตราค่าปรับ",
+      "link": "#laws"
+    },
+    {
+      "icon": "megaphone",
+      "title": "ข่าวประกาศ",
+      "desc": "ประกาศ กิจกรรม และข่าวล่าสุด",
+      "link": "#news"
+    },
+    {
+      "icon": "pin",
+      "title": "ติดต่อหน่วยงาน",
+      "desc": "ที่ตั้ง เวลาทำการ และช่องทางติดต่อ",
+      "link": "#contact"
+    }
+  ],
+  "traffic": {
+    "enabled": true,
+    "title": "สภาพการจราจรเมืองพัทยา แบบเรียลไทม์",
+    "titleEn": "Live Pattaya Traffic",
+    "subtitle": "ข้อมูลการจราจรสดจาก Google Maps · มุมมอง 3 มิติรอบอ่าวพัทยา วางแผนการเดินทางก่อนออกจากบ้าน",
+    "googleMapsApiKey": "",
+    "googleMapsMapId": "",
+    "enablePhotorealistic": false,
+    "center": {
+      "lat": 12.9276,
+      "lng": 100.8771
+    },
+    "zoom": 16.5,
+    "tilt": 60,
+    "refreshSeconds": 60,
+    "orbitSpeed": 0.04,
+    "fallbackNotice": "โหมดแผนที่ 3 มิติจาก OpenStreetMap (OpenFreeMap) — กดปุ่ม 🚦 เพื่อดูชั้นข้อมูลจราจรจาก Google · โหมด Google 3D + จราจรสดจะเปิดเมื่อผู้ดูแลระบบตั้งค่า Google Maps API key",
+    "spots": [
+      {
+        "name": "ถนนเลียบชายหาด",
+        "nameEn": "Beach Road",
+        "lat": 12.9365,
+        "lng": 100.8818,
+        "zoom": 17,
+        "heading": 20
+      },
+      {
+        "name": "วอล์คกิ้งสตรีท",
+        "nameEn": "Walking Street",
+        "lat": 12.9268,
+        "lng": 100.8726,
+        "zoom": 17.5,
+        "heading": 330
+      },
+      {
+        "name": "ถนนพัทยาสาย 2",
+        "nameEn": "Second Road",
+        "lat": 12.935,
+        "lng": 100.8862,
+        "zoom": 17,
+        "heading": 15
+      },
+      {
+        "name": "แยกพัทยากลาง–สุขุมวิท",
+        "nameEn": "Sukhumvit–Pattaya Klang Jct.",
+        "lat": 12.9366,
+        "lng": 100.899,
+        "zoom": 16.5,
+        "heading": 270
+      },
+      {
+        "name": "หาดจอมเทียน",
+        "nameEn": "Jomtien Beach Rd",
+        "lat": 12.896,
+        "lng": 100.8685,
+        "zoom": 16.5,
+        "heading": 0
+      }
+    ],
+    "fallbackStyleUrl": "https://tiles.openfreemap.org/styles/liberty"
+  },
+  "tourist": {
+    "heading": "Tourist Help",
+    "headingTh": "ช่วยเหลือนักท่องเที่ยว",
+    "intro": "ข้อมูลสำคัญสำหรับนักท่องเที่ยว · Essential information for visitors · 游客须知 · Информация для туристов",
+    "hotlineLabel": "Tourist Hotline · สายด่วนนักท่องเที่ยว",
+    "hotline": "0X-XXX-XXXX",
+    "languages": [
+      "ไทย",
+      "English",
+      "中文",
+      "Русский"
+    ],
+    "tips": [
+      {
+        "icon": "shield",
+        "title": "ใช้ทางเท้าอย่างปลอดภัย",
+        "titleEn": "Use sidewalks safely",
+        "desc": "ข้ามถนนที่ทางม้าลายและระวังรถจักรยานยนต์"
+      },
+      {
+        "icon": "trash",
+        "title": "ไม่ทิ้งขยะบนชายหาด",
+        "titleEn": "Keep beaches clean",
+        "desc": "ทิ้งขยะในถังที่จัดไว้ อาจมีค่าปรับตามกฎหมาย"
+      },
+      {
+        "icon": "tag",
+        "title": "ตรวจสอบราคาก่อนซื้อ",
+        "titleEn": "Check prices first",
+        "desc": "สอบถามราคาให้ชัดเจนก่อนใช้บริการหรือซื้อสินค้า"
+      },
+      {
+        "icon": "doc",
+        "title": "พกสำเนาหนังสือเดินทาง",
+        "titleEn": "Carry a passport copy",
+        "desc": "เก็บต้นฉบับไว้ในที่ปลอดภัย พกสำเนาติดตัว"
+      }
+    ],
+    "zones": [
+      {
+        "name": "ถนนเลียบชายหาด",
+        "nameEn": "Beach Road",
+        "desc": "ทางเท้าริมหาดพัทยา จุดตรวจตราหลักตลอดวัน",
+        "x": 47,
+        "y": 36
+      },
+      {
+        "name": "วอล์คกิ้งสตรีท",
+        "nameEn": "Walking Street",
+        "desc": "ถนนคนเดินยามค่ำคืน มีเจ้าหน้าที่ประจำจุด",
+        "x": 40,
+        "y": 58
+      },
+      {
+        "name": "หาดจอมเทียน",
+        "nameEn": "Jomtien Beach",
+        "desc": "ชายหาดยอดนิยม จุดบริการและช่วยเหลือนักท่องเที่ยว",
+        "x": 55,
+        "y": 84
+      }
+    ]
+  },
+  "stats": {
+    "title": "ผลการดำเนินงานปี 2569",
+    "isExample": true,
+    "items": [
+      {
+        "value": 12480,
+        "suffix": "",
+        "label": "เรื่องร้องเรียนที่รับแจ้ง"
+      },
+      {
+        "value": 96,
+        "suffix": "%",
+        "label": "ดำเนินการแล้วเสร็จ"
+      },
+      {
+        "value": 48,
+        "suffix": " ชม.",
+        "label": "ระยะเวลาตอบสนองเฉลี่ย"
+      },
+      {
+        "value": 35,
+        "suffix": " กม.",
+        "label": "ทางเท้าที่จัดระเบียบ"
+      }
+    ]
+  },
+  "news": [
+    {
+      "title": "จัดระเบียบทางเท้าถนนเลียบชายหาด",
+      "date": "2026-10-14",
+      "category": "จัดระเบียบเมือง",
+      "excerpt": "เจ้าหน้าที่เทศกิจร่วมกับผู้ประกอบการ จัดระเบียบแผงค้าและสิ่งกีดขวางทางเท้า เพื่อความสะดวกของผู้สัญจร",
+      "image": "",
+      "isExample": true
+    },
+    {
+      "title": "ประกาศจุดผ่อนผันการค้าขายบริเวณถนนคนเดิน",
+      "date": "2026-10-09",
+      "category": "ประกาศ",
+      "excerpt": "แจ้งปรับปรุงพื้นที่และช่วงเวลาผ่อนผันสำหรับผู้ค้า ผู้ประกอบการสามารถยื่นคำขอได้ทางออนไลน์",
+      "image": "",
+      "isExample": true
+    },
+    {
+      "title": "รณรงค์รักษาความสะอาดชายหาดพัทยาร่วมกับชุมชน",
+      "date": "2026-10-02",
+      "category": "กิจกรรม",
+      "excerpt": "เชิญชวนประชาชนและนักท่องเที่ยวร่วมกิจกรรมเก็บขยะและไม่ทิ้งสิ่งของในพื้นที่ชายหาด",
+      "image": "",
+      "isExample": true
+    }
+  ],
+  "laws": {
+    "note": "ตัวอย่างข้อมูล — โปรดตรวจสอบอัตราค่าปรับกับกฎหมายและข้อบัญญัติฉบับจริงก่อนเผยแพร่",
+    "items": [
+      {
+        "title": "ทิ้งขยะหรือสิ่งปฏิกูลในที่สาธารณะ",
+        "fine": "ไม่เกิน X,XXX บาท",
+        "ref": "[อ้างอิงกฎหมาย — รอข้อมูลจริง]"
+      },
+      {
+        "title": "ตั้งวางสินค้ากีดขวางทางเท้าโดยไม่ได้รับอนุญาต",
+        "fine": "ไม่เกิน X,XXX บาท",
+        "ref": "[อ้างอิงกฎหมาย — รอข้อมูลจริง]"
+      },
+      {
+        "title": "ติดตั้งป้ายโฆษณาในที่สาธารณะโดยไม่ได้รับอนุญาต",
+        "fine": "ไม่เกิน X,XXX บาท",
+        "ref": "[อ้างอิงกฎหมาย — รอข้อมูลจริง]"
+      },
+      {
+        "title": "ขีดเขียนพ่นสีบนกำแพงหรือทรัพย์สินสาธารณะ",
+        "fine": "ไม่เกิน X,XXX บาท",
+        "ref": "[อ้างอิงกฎหมาย — รอข้อมูลจริง]"
+      }
+    ]
+  },
+  "faq": [
+    {
+      "q": "แจ้งเรื่องร้องเรียนแล้วจะได้รับการติดต่อกลับเมื่อไร?",
+      "a": "เมื่อส่งเรื่องแล้วจะได้รับเลขติดตามทันที และสามารถตรวจสอบสถานะได้ที่หัวข้อ “ติดตามสถานะ” (ตัวอย่างข้อมูล)"
+    },
+    {
+      "q": "ต้องการขออนุญาตตั้งวางสินค้าต้องทำอย่างไร?",
+      "a": "ติดต่อหน่วยงานตามช่องทางที่ระบุด้านล่าง พร้อมเอกสารประกอบ (ตัวอย่างข้อมูล)"
+    },
+    {
+      "q": "Can tourists report issues in English?",
+      "a": "Yes. You may submit the complaint form in English. (Example content)"
+    }
+  ],
+  "footer": {
+    "about": "ดูแลความเป็นระเบียบเรียบร้อย เพื่อพัทยาที่น่าอยู่และปลอดภัย",
+    "links": [
+      {
+        "label": "สภาพจราจรเรียลไทม์",
+        "href": "#traffic"
+      },
+      {
+        "label": "แจ้งเรื่องร้องเรียน",
+        "href": "#complaint"
+      },
+      {
+        "label": "ติดตามสถานะ",
+        "href": "#track"
+      },
+      {
+        "label": "กฎหมาย/ข้อบัญญัติ",
+        "href": "#laws"
+      },
+      {
+        "label": "ข่าวสาร",
+        "href": "#news"
+      },
+      {
+        "label": "คำถามที่พบบ่อย",
+        "href": "#faq"
+      }
+    ]
+  },
+  "complaintCategories": [
+    "สิ่งกีดขวางทางเท้า",
+    "หาบเร่ แผงลอย ค้าขายในที่ห้ามขาย",
+    "ป้ายโฆษณาผิดกฎหมาย",
+    "ทิ้งขยะ/สิ่งปฏิกูลในที่สาธารณะ",
+    "เสียงดังรบกวน",
+    "อื่น ๆ"
+  ],
+  "chatbot": {
+    "enabled": true,
+    "name": "น้องAIเทศกิจพัทยา",
+    "subtitle": "ผู้ช่วยตอบคำถามอัตโนมัติ · TH / EN",
+    "avatar": "assets/logo.png",
+    "greeting": "สวัสดีครับ 👋 น้องAIเทศกิจพัทยายินดีให้บริการ สอบถามเรื่องการแจ้งร้องเรียน ติดตามสถานะ ข้อบัญญัติ หรือข้อมูลสำหรับนักท่องเที่ยวได้เลยครับ\nHello! Ask me anything about Pattaya City Law Enforcement.",
+    "quickReplies": [
+      "แจ้งเรื่องร้องเรียน",
+      "ติดตามสถานะ",
+      "สภาพจราจร",
+      "เบอร์ฉุกเฉิน",
+      "ข้อบัญญัติ/ค่าปรับ",
+      "เวลาทำการ"
+    ],
+    "fallback": "ขออภัยครับ น้องยังไม่มีข้อมูลเรื่องนี้ 🙏 ลองเลือกหัวข้อด้านล่าง หรือติดต่อสายด่วนเทศกิจ {hotline} ในเวลาทำการ {hours}\nSorry, I don't have that information yet. Please contact our hotline {hotline}.",
+    "fallbackEn": "Sorry, I don't have that information yet 🙏 Please try a topic below or call our hotline {hotline} ({hours}). In an emergency call 191 (Police), 1155 (Tourist Police) or 1669 (Medical).",
+    "disclaimer": "คำตอบจากระบบอัตโนมัติ อาจไม่ครบถ้วน · เหตุฉุกเฉินโทร 191 / 1155 / 1669",
+    "systemPrompt": "คุณคือ \"{botName}\" ผู้ช่วย AI ของเว็บไซต์ {siteName} ({englishName}) {subtitle}\nหน้าที่: ตอบคำถามประชาชนและนักท่องเที่ยวเฉพาะเรื่องที่เกี่ยวกับงานเทศกิจเมืองพัทยา เช่น การแจ้งเรื่องร้องเรียน การติดตามสถานะ ข้อบัญญัติและค่าปรับ การขออนุญาตตั้งวางสินค้า ความสะอาดและความเป็นระเบียบของเมือง และข้อมูลสำหรับนักท่องเที่ยว\nกฎ:\n- ตอบสุภาพ เป็นมิตร กระชับ และตอบเป็นภาษาเดียวกับที่ผู้ใช้ถาม (ไทย อังกฤษ จีน รัสเซีย ฯลฯ)\n- ใช้เฉพาะข้อมูลในฐานความรู้ด้านล่าง ถ้าไม่มีข้อมูลให้บอกตรง ๆ และแนะนำให้ติดต่อสายด่วน ห้ามแต่งข้อมูล ตัวเลขค่าปรับ หรือเบอร์โทรขึ้นเอง\n- เรื่องนอกขอบเขตงานเทศกิจ ให้ปฏิเสธอย่างสุภาพและชวนกลับมาที่หัวข้อที่ช่วยได้\n- เหตุฉุกเฉิน/อันตรายต่อชีวิต ให้แนะนำโทร 191 (ตำรวจ), 1155 (ตำรวจท่องเที่ยว), 1669 (การแพทย์ฉุกเฉิน) ทันที\n- ห้ามขอข้อมูลส่วนบุคคลที่ไม่จำเป็น และห้ามรับเรื่องร้องเรียนแทนแบบฟอร์ม ให้แนะนำแบบฟอร์มบนเว็บไซต์ (#complaint)\n\nฐานความรู้:\n{knowledge}",
+    "kb": [
+      {
+        "keywords": [
+          "ร้องเรียน",
+          "แจ้งเรื่อง",
+          "แจ้งปัญหา",
+          "complain",
+          "complaint",
+          "report"
+        ],
+        "q": "แจ้งเรื่องร้องเรียนอย่างไร",
+        "a": "แจ้งเรื่องได้ที่แบบฟอร์ม “แจ้งเรื่องร้องเรียน” บนหน้าเว็บนี้ครับ กรอกชื่อ เบอร์โทร ประเภท รายละเอียด แนบรูปและตำแหน่ง แล้วกดส่ง จะได้รับเลขรับเรื่อง (TKP-xxxx-xxxxx) ทันที 👉 #complaint",
+        "aEn": "Use the complaint form on this page (#complaint). Fill in your name, phone, category, details, optional photo and location. You'll receive a tracking number (TKP-xxxx-xxxxx) instantly."
+      },
+      {
+        "keywords": [
+          "ติดตาม",
+          "สถานะ",
+          "เลขรับเรื่อง",
+          "track",
+          "status",
+          "tracking"
+        ],
+        "q": "ติดตามสถานะเรื่องร้องเรียน",
+        "a": "กรอกเลขรับเรื่อง (เช่น TKP-2569-00123) ในหัวข้อ “ติดตามสถานะ” ระบบจะแสดงขั้นตอน รับเรื่อง → กำลังดำเนินการ → เสร็จสิ้น 👉 #track",
+        "aEn": "Enter your tracking number (e.g. TKP-2569-00123) in the “Track status” section (#track) to see: Received → In progress → Completed."
+      },
+      {
+        "keywords": [
+          "จราจร",
+          "รถติด",
+          "ถนน",
+          "traffic",
+          "jam",
+          "road",
+          "การเดินทาง"
+        ],
+        "q": "สภาพการจราจรเมืองพัทยา",
+        "a": "🚦 ดูสภาพการจราจรเมืองพัทยาแบบเรียลไทม์ (ข้อมูลจาก Google Maps) ได้ที่หัวข้อ “สภาพการจราจร” บนหน้านี้ 👉 #traffic\nมีปุ่มไปยังถนนเลียบชายหาด วอล์คกิ้งสตรีท พัทยาสาย 2 แยกพัทยากลาง–สุขุมวิท และจอมเทียน",
+        "aEn": "🚦 Check live Pattaya traffic (Google Maps data) in the “Live Traffic” section 👉 #traffic — with quick jumps to Beach Road, Walking Street, Second Road, Sukhumvit junction and Jomtien."
+      },
+      {
+        "keywords": [
+          "แจ้งเหตุ",
+          "อุบัติเหตุ",
+          "น้ำท่วม",
+          "ซ่อมถนน",
+          "ก่อสร้าง",
+          "accident",
+          "flood",
+          "roadwork",
+          "hazard"
+        ],
+        "q": "แจ้งเหตุบนถนน อุบัติเหตุ น้ำท่วม ซ่อมถนน",
+        "a": "📍 แจ้งเหตุบนถนน (อุบัติเหตุ น้ำท่วมขัง ซ่อมถนน สิ่งกีดขวาง รถติด) ได้ที่ปุ่ม “แจ้งเหตุบนแผนที่” ในหัวข้อสภาพการจราจร 👉 #traffic เลือกประเภท ปักหมุดหรือใช้ GPS แล้วกดส่ง ทุกคนจะเห็นทันที\n🚨 หากมีผู้บาดเจ็บ โทร 1669 / 191 ทันที",
+        "aEn": "📍 Report road incidents (accidents, flooding, roadworks, hazards, jams) with “Report on map” in the traffic section 👉 #traffic. 🚨 If anyone is injured call 1669 / 191 immediately."
+      },
+      {
+        "keywords": [
+          "กล้อง",
+          "cctv",
+          "กล้องวงจรปิด",
+          "ภาพสด",
+          "camera",
+          "live cam",
+          "webcam"
+        ],
+        "q": "ดูกล้อง CCTV สด",
+        "a": "📹 ดูกล้องสด CCTV ได้บนแผนที่ 3 มิติในหัวข้อสภาพการจราจร 👉 #cctv แตะไอคอนกล้องเพื่อบินไปยังจุดนั้นและเปิดภาพสด\nภาพสดทั้งหมดของเมืองพัทยาดูได้ที่ livestream.pattaya.go.th (เครดิต: เมืองพัทยา)",
+        "aEn": "📹 Live CCTV is on the 3D map in the traffic section 👉 #cctv — tap a camera icon to fly there and open the live view. All city cameras: livestream.pattaya.go.th (credit: Pattaya City)."
+      },
+      {
+        "keywords": [
+          "ฉุกเฉิน",
+          "เบอร์",
+          "โทร",
+          "ตำรวจ",
+          "emergency",
+          "police",
+          "ambulance",
+          "hotline",
+          "phone"
+        ],
+        "q": "เบอร์โทรฉุกเฉิน",
+        "a": "🚨 เหตุฉุกเฉินโทร 191 (ตำรวจ) · 1155 (ตำรวจท่องเที่ยว) · 1669 (การแพทย์ฉุกเฉิน)\nสายด่วนเทศกิจพัทยา: {hotline} ({hours})",
+        "aEn": "🚨 Emergency: 191 (Police) · 1155 (Tourist Police) · 1669 (Medical emergency).\nPattaya Law Enforcement hotline: {hotline} ({hours})."
+      },
+      {
+        "keywords": [
+          "ค่าปรับ",
+          "ข้อบัญญัติ",
+          "กฎหมาย",
+          "ปรับ",
+          "fine",
+          "law",
+          "penalty",
+          "regulation"
+        ],
+        "q": "ข้อบัญญัติและค่าปรับ",
+        "a": "ดูรายการข้อบัญญัติและอัตราค่าปรับได้ที่หัวข้อ “กฎหมาย/ข้อบัญญัติ” 👉 #laws\n{laws}",
+        "aEn": "See the “Laws & fines” section (#laws).\n{laws}"
+      },
+      {
+        "keywords": [
+          "เวลาทำการ",
+          "เปิด",
+          "ปิด",
+          "กี่โมง",
+          "hours",
+          "open",
+          "office",
+          "time"
+        ],
+        "q": "เวลาทำการ",
+        "a": "🕗 เวลาทำการ: {hours}\n📍 {address}\n☎️ {hotline}",
+        "aEn": "🕗 Office hours: {hours}\n📍 {address}\n☎️ {hotline}"
+      },
+      {
+        "keywords": [
+          "ขออนุญาต",
+          "ตั้งวาง",
+          "แผงลอย",
+          "หาบเร่",
+          "ผ่อนผัน",
+          "ขายของ",
+          "vendor",
+          "permit",
+          "stall"
+        ],
+        "q": "ขออนุญาตตั้งวางสินค้า/จุดผ่อนผัน",
+        "a": "ผู้ค้าที่ต้องการตั้งวางสินค้าในที่สาธารณะต้องขออนุญาตและค้าขายเฉพาะจุดผ่อนผันที่กำหนด ติดต่อหน่วยงานตามช่องทางในหัวข้อ “ติดต่อเรา” 👉 #contact",
+        "aEn": "Vendors must obtain a permit and trade only in designated zones. Please contact us via the details in “Contact” (#contact)."
+      },
+      {
+        "keywords": [
+          "ขยะ",
+          "ชายหาด",
+          "สกปรก",
+          "trash",
+          "litter",
+          "beach",
+          "garbage"
+        ],
+        "q": "ทิ้งขยะบนชายหาด",
+        "a": "กรุณาทิ้งขยะในถังที่จัดไว้ การทิ้งขยะในที่สาธารณะมีความผิดและอาจมีค่าปรับตามกฎหมาย หากพบเห็นสามารถแจ้งได้ที่ #complaint 🌊",
+        "aEn": "Please use the bins provided. Littering in public places is an offence and may be fined. You can report it via #complaint 🌊"
+      },
+      {
+        "keywords": [
+          "ติดต่อ",
+          "อีเมล",
+          "line",
+          "ไลน์",
+          "contact",
+          "email",
+          "address",
+          "ที่อยู่"
+        ],
+        "q": "ติดต่อหน่วยงาน",
+        "a": "☎️ {hotline}\n✉️ {email}\n💬 LINE OA {lineId}\n📍 {address}",
+        "aEn": "☎️ {hotline}\n✉️ {email}\n💬 LINE OA {lineId}\n📍 {address}"
+      }
+    ]
+  },
+  "alerts": {
+    "enabled": true,
+    "title": "แจ้งเหตุบนถนนจากประชาชน",
+    "titleEn": "Road Alerts · Live",
+    "reportButton": "แจ้งเหตุบนแผนที่",
+    "disclaimer": "ข้อมูลแจ้งเหตุมาจากประชาชน อาจไม่ถูกต้องทั้งหมด · ข้อมูลจากหน่วยงานมีป้าย “ประกาศทางการ” · ห้ามถ่ายภาพใบหน้าหรือทะเบียนรถผู้อื่น",
+    "types": [
+      {
+        "key": "construction",
+        "label": "งานก่อสร้าง/ซ่อมถนน",
+        "labelEn": "Roadworks",
+        "emoji": "🚧",
+        "color": "#F59E0B",
+        "ttlHours": 168
+      },
+      {
+        "key": "accident",
+        "label": "อุบัติเหตุ",
+        "labelEn": "Accident",
+        "emoji": "💥",
+        "color": "#EF4444",
+        "ttlHours": 2
+      },
+      {
+        "key": "flood",
+        "label": "น้ำท่วมขัง",
+        "labelEn": "Flooding",
+        "emoji": "🌊",
+        "color": "#0EA0F5",
+        "ttlHours": 6
+      },
+      {
+        "key": "jam",
+        "label": "รถติด",
+        "labelEn": "Traffic jam",
+        "emoji": "🚗",
+        "color": "#DC2626",
+        "ttlHours": 1
+      },
+      {
+        "key": "hazard",
+        "label": "สิ่งกีดขวาง/อันตราย",
+        "labelEn": "Hazard",
+        "emoji": "⚠️",
+        "color": "#F97316",
+        "ttlHours": 4
+      },
+      {
+        "key": "other",
+        "label": "อื่นๆ",
+        "labelEn": "Other",
+        "emoji": "📍",
+        "color": "#64748B",
+        "ttlHours": 3
+      }
+    ],
+    "voteExtendRatio": 0.5,
+    "downvotesToRemove": 3,
+    "maxPhotoMB": 5,
+    "maxNoteLength": 140,
+    "bounds": {
+      "south": 12.78,
+      "west": 100.8,
+      "north": 13.02,
+      "east": 101.02
+    },
+    "nearbyNotifyKm": 2,
+    "tileUrl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "tileAttribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">OpenStreetMap</a> contributors"
+  },
+  "cctv": {
+    "enabled": true,
+    "title": "กล้องสด CCTV เมืองพัทยา",
+    "titleEn": "Live CCTV · 3D",
+    "subtitle": "แตะไอคอนกล้องบนแผนที่ 3 มิติเพื่อบินไปยังจุดนั้นและเปิดภาพสด",
+    "credit": "ภาพสด: ระบบ CCTV Streaming เมืองพัทยา (livestream.pattaya.go.th) · สงวนสิทธิ์โดยเมืองพัทยา",
+    "officialUrl": "https://livestream.pattaya.go.th/",
+    "allowOfficialEmbed": true,
+    "linkNotice": "ภาพสดของเมืองพัทยาใช้ระบบ WebRTC ที่มีระบบป้องกัน จึงเปิดดูได้บนเว็บไซต์ทางการของเมืองพัทยา",
+    "exampleNotice": "จุดกล้องที่แสดงเป็นตำแหน่งโดยประมาณ (ตัวอย่าง) — ผู้ดูแลระบบแก้ไขชื่อ พิกัด และลิงก์สตรีมจริงได้ในหลังบ้าน",
+    "cameras": [
+      {
+        "id": "cam1",
+        "name": "วงเวียนปลาโลมา พัทยาเหนือ",
+        "nameEn": "Dolphin Roundabout, North Pattaya",
+        "lat": 12.9496,
+        "lng": 100.8888,
+        "heading": 120,
+        "approx": true,
+        "isExample": true,
+        "type": "link",
+        "src": "",
+        "url": "https://livestream.pattaya.go.th/"
+      },
+      {
+        "id": "cam2",
+        "name": "ถนนเลียบชายหาด – พัทยากลาง",
+        "nameEn": "Beach Road – Central Pattaya",
+        "lat": 12.9339,
+        "lng": 100.8803,
+        "heading": 70,
+        "approx": true,
+        "isExample": true,
+        "type": "link",
+        "src": "",
+        "url": "https://livestream.pattaya.go.th/"
+      },
+      {
+        "id": "cam3",
+        "name": "ถนนคนเดินวอล์กกิ้งสตรีท",
+        "nameEn": "Walking Street",
+        "lat": 12.9271,
+        "lng": 100.8737,
+        "heading": 110,
+        "approx": true,
+        "isExample": true,
+        "type": "link",
+        "src": "",
+        "url": "https://livestream.pattaya.go.th/"
+      },
+      {
+        "id": "cam4",
+        "name": "แยกพัทยากลาง – สุขุมวิท",
+        "nameEn": "Pattaya Klang – Sukhumvit Junction",
+        "lat": 12.9367,
+        "lng": 100.9047,
+        "heading": 250,
+        "approx": true,
+        "isExample": true,
+        "type": "link",
+        "src": "",
+        "url": "https://livestream.pattaya.go.th/"
+      },
+      {
+        "id": "cam5",
+        "name": "ท่าเรือแหลมบาลีฮาย",
+        "nameEn": "Bali Hai Pier",
+        "lat": 12.9196,
+        "lng": 100.8697,
+        "heading": 40,
+        "approx": true,
+        "isExample": true,
+        "type": "link",
+        "src": "",
+        "url": "https://livestream.pattaya.go.th/"
+      },
+      {
+        "id": "cam6",
+        "name": "หาดจอมเทียน",
+        "nameEn": "Jomtien Beach",
+        "lat": 12.893,
+        "lng": 100.869,
+        "heading": 90,
+        "approx": true,
+        "isExample": true,
+        "type": "link",
+        "src": "",
+        "url": "https://livestream.pattaya.go.th/"
+      }
+    ]
+  }
+}

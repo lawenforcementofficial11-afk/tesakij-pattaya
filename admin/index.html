@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>ระบบจัดการเนื้อหา | เทศกิจพัทยา</title>
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
+<script src="/assets/vendor/leaflet/leaflet.js"></script>
+<script>tailwind.config={theme:{extend:{colors:{navy:{950:'#050f1f',900:'#0B2545',800:'#13315C',700:'#1d4377'},gold:{100:'#FFF6D6',300:'#FBE38A',400:'#F8D347',500:'#F5C518',600:'#C99A06',700:'#8F6B00'}}}}}</script>
+<style>
+  body{font-family:'Sarabun',sans-serif} h1,h2,h3,h4,.font-head{font-family:'Prompt',sans-serif}
+  .inp{width:100%;border:1px solid #cbd5e1;border-radius:.75rem;padding:.55rem .8rem;background:#fff;outline:none;font-size:15px}
+  .inp:focus{border-color:#13315C;box-shadow:0 0 0 4px rgba(19,49,92,.1)}
+  textarea.inp{min-height:84px;resize:vertical;line-height:1.6}
+  .btn{display:inline-flex;align-items:center;gap:.4rem;border-radius:.75rem;padding:.5rem .9rem;font-family:Prompt,sans-serif;font-weight:500;font-size:14px;transition:.15s}
+  .btn-gold{background:#F5C518;color:#050f1f}.btn-gold:hover{background:#F8D347}
+  .btn-navy{background:#0B2545;color:#fff}.btn-navy:hover{background:#13315C}
+  .btn-ghost{background:#f1f5f9;color:#0B2545}.btn-ghost:hover{background:#e2e8f0}
+  .btn-red{background:#fef2f2;color:#b91c1c}.btn-red:hover{background:#fee2e2}
+  .tab.active{background:#0B2545;color:#fff}
+  .sec-link.active{background:#FFF6D6;color:#8F6B00;font-weight:600}
+</style>
+</head>
+<body class="bg-slate-100 text-slate-700 min-h-screen">
+
+<!-- Login -->
+<div id="loginView" class="hidden min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800">
+  <form id="loginForm" class="w-full max-w-sm rounded-3xl bg-white p-8 shadow-2xl">
+    <div class="flex items-center gap-3">
+      <img src="/assets/logo.png" alt="ตราสัญลักษณ์เทศกิจพัทยา" class="w-12 h-14 object-contain">
+      <div><p class="font-head font-bold text-xl text-navy-900">เทศกิจ<span class="text-gold-600">พัทยา</span></p><p class="text-xs text-slate-500">ระบบจัดการเนื้อหาเว็บไซต์ (ผู้ดูแลระบบ)</p></div>
+    </div>
+    <label for="pw" class="block mt-7 font-head font-medium text-navy-900 mb-1.5">รหัสผ่านผู้ดูแล</label>
+    <input id="pw" type="password" autocomplete="current-password" class="inp" required autofocus>
+    <p id="loginErr" class="hidden mt-2 text-sm text-red-600"></p>
+    <button class="btn btn-navy w-full justify-center mt-5 py-3 text-base">เข้าสู่ระบบ</button>
+    <a href="/" class="block text-center mt-4 text-sm text-slate-500 hover:text-navy-900">← กลับหน้าเว็บไซต์</a>
+  </form>
+</div>
+
+<!-- App -->
+<div id="appView" class="hidden min-h-screen flex flex-col">
+  <header class="bg-navy-900 text-white sticky top-0 z-30 shadow">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <img src="/assets/logo.png" alt="" class="w-9 h-10 object-contain">
+        <div class="min-w-0"><p class="font-head font-semibold leading-tight truncate">เทศกิจ<span class="text-gold-400">พัทยา</span> · ผู้ดูแลระบบ</p><p class="text-[11px] text-white/60">Content Management</p></div>
+      </div>
+      <nav class="flex items-center gap-1 bg-white/10 rounded-xl p-1 font-head text-sm">
+        <button class="tab active px-3 py-1.5 rounded-lg" data-tab="content">เนื้อหาเว็บไซต์</button>
+        <button class="tab px-3 py-1.5 rounded-lg" data-tab="complaints">เรื่องร้องเรียน <span id="cCount" class="ml-1 text-[11px] bg-gold-500 text-navy-950 rounded-full px-1.5"></span></button>
+        <button class="tab px-3 py-1.5 rounded-lg" data-tab="alerts">แจ้งเหตุบนถนน <span id="aCount" class="ml-1 text-[11px] bg-gold-500 text-navy-950 rounded-full px-1.5"></span></button>
+        <button class="tab px-3 py-1.5 rounded-lg" data-tab="chat">แชทบอท</button>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="/" target="_blank" rel="noopener" class="btn bg-white/10 hover:bg-white/20 hidden sm:inline-flex">ดูหน้าเว็บ ↗</a>
+        <button id="logoutBtn" class="btn bg-white/10 hover:bg-white/20">ออกจากระบบ</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content editor -->
+  <main id="tab-content" class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 grid lg:grid-cols-[220px_1fr] gap-6">
+    <aside class="lg:sticky lg:top-24 self-start">
+      <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-2">
+        <p class="px-3 pt-2 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">หมวดเนื้อหา</p>
+        <div id="secNav" class="grid gap-0.5 font-head text-sm"></div>
+      </div>
+      <div class="mt-4 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-4 text-xs text-slate-500 leading-relaxed">
+        💡 แก้ไขแล้วกด <b>บันทึก</b> หน้าเว็บจะอัปเดตทันที ระบบสำรองข้อมูลเดิมอัตโนมัติ (30 ฉบับล่าสุด) ที่ <code>data/backups/</code>
+      </div>
+    </aside>
+    <section>
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <div><h1 id="secTitle" class="font-head font-bold text-2xl text-navy-900"></h1><p id="secHint" class="text-sm text-slate-500"></p></div>
+        <div class="flex items-center gap-2">
+          <span id="dirty" class="hidden text-xs text-amber-700 bg-amber-100 rounded-full px-2.5 py-1">ยังไม่ได้บันทึก</span>
+          <button id="saveBtn" class="btn btn-gold shadow">💾 บันทึก</button>
+        </div>
+      </div>
+      <div id="editor" class="space-y-4"></div>
+    </section>
+  </main>
+
+  <!-- Complaints -->
+  <main id="tab-complaints" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h1 class="font-head font-bold text-2xl text-navy-900">เรื่องร้องเรียนจากประชาชน</h1>
+      <div class="flex flex-wrap items-center gap-2">
+        <input id="cSearch" class="inp !w-56" placeholder="ค้นหา เลขรับเรื่อง/ชื่อ/รายละเอียด">
+        <select id="cFilter" class="inp !w-44"><option value="">ทุกสถานะ</option><option value="received">รับเรื่อง</option><option value="in_progress">กำลังดำเนินการ</option><option value="done">เสร็จสิ้น</option></select>
+        <a href="/api/complaints.csv" class="btn btn-navy">⬇ ส่งออก CSV</a>
+        <button id="cReload" class="btn btn-ghost">↻</button>
+      </div>
+    </div>
+    <div id="cSummary" class="grid grid-cols-3 gap-3 mb-4"></div>
+    <div id="cList" class="space-y-3"></div>
+  </main>
+
+  <!-- Road alerts -->
+  <main id="tab-alerts" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div><h1 class="font-head font-bold text-2xl text-navy-900">แจ้งเหตุบนถนน</h1><p class="text-sm text-slate-500">แก้ไข/ลบ/ปักหมุดการแจ้งเหตุ และเพิ่ม “ประกาศทางการ” · ตั้งค่าอายุแต่ละประเภทที่แท็บเนื้อหา → แจ้งเหตุบนถนน</p></div>
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="text-sm flex items-center gap-1.5"><input type="checkbox" id="aShowExpired"> แสดงที่หมดอายุ</label>
+        <button id="aDemo" class="btn btn-ghost" title="เพิ่มข้อมูลตัวอย่าง 5 รายการ (มีป้าย “ตัวอย่าง”)">+ ตัวอย่าง (demo)</button>
+        <button id="aDelDemo" class="btn btn-red">ลบตัวอย่างทั้งหมด</button>
+        <button id="aReload" class="btn btn-ghost">↻</button>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-[1.1fr_1fr] gap-5">
+      <div class="space-y-4">
+        <div class="relative h-[420px] rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-slate-100"><div id="aMap" class="absolute inset-0"></div></div>
+        <form id="aForm" class="bg-white rounded-2xl ring-1 ring-slate-200 p-4 space-y-3">
+          <div class="flex items-center justify-between"><h2 class="font-head font-semibold text-navy-900">+ เพิ่มประกาศทางการ</h2><span class="text-xs text-slate-500">คลิกบนแผนที่เพื่อเลือกตำแหน่ง</span></div>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <label class="text-sm">ประเภท<select id="aType" class="inp mt-1"></select></label>
+            <label class="text-sm">แสดงนาน (ชั่วโมง)<input id="aHours" type="number" min="1" step="1" class="inp mt-1" placeholder="ตามค่าเริ่มต้นของประเภท"></label>
+            <label class="text-sm">ละติจูด<input id="aLat" class="inp mt-1" required></label>
+            <label class="text-sm">ลองจิจูด<input id="aLng" class="inp mt-1" required></label>
+          </div>
+          <label class="text-sm block">รายละเอียด<textarea id="aNote" class="inp mt-1" maxlength="500" placeholder="เช่น ปิดซ่อมท่อระบายน้ำ ถนนเลียบชายหาด ช่วงซอย 6–8 วันที่ 20–24 ต.ค. 69 เวลา 22.00–05.00 น."></textarea></label>
+          <div class="flex flex-wrap items-center gap-3 text-sm">
+            <label class="flex items-center gap-1.5"><input type="checkbox" id="aPinned"> ปักหมุดไว้บนสุด</label>
+            <label class="flex items-center gap-1.5"><input type="file" id="aPhoto" accept="image/png,image/jpeg,image/webp" class="text-xs"></label>
+          </div>
+          <button class="btn btn-gold w-full justify-center">บันทึกประกาศทางการ</button>
+        </form>
+      </div>
+      <div><div id="aList" class="space-y-2"></div></div>
+    </div>
+  </main>
+
+  <!-- Chat -->
+  <main id="tab-chat" class="hidden flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-4">
+    <div class="rounded-2xl bg-white ring-1 ring-slate-200 p-5">
+      <h1 class="font-head font-bold text-2xl text-navy-900">แชทบอท <span class="text-gold-600" id="botNameH"></span></h1>
+      <p class="mt-1 text-sm">โหมดปัจจุบัน: <b id="botMode">-</b></p>
+      <p class="mt-1 text-xs text-slate-500">ตั้งค่า <code>AI_API_KEY</code>, <code>AI_BASE_URL</code>, <code>AI_MODEL</code> ใน .env เพื่อใช้ LLM (OpenAI / xAI / Gemini แบบ OpenAI-compatible) — ถ้าไม่ตั้ง บอทตอบจากฐานความรู้แบบออฟไลน์ แก้ชื่อบอท คำทักทาย ปุ่มลัด ฐานความรู้ และ system prompt ได้ที่ <button class="underline text-navy-800" data-goto="chatbot">เนื้อหาเว็บไซต์ → แชทบอท</button></p>
+    </div>
+    <div class="rounded-2xl bg-white ring-1 ring-slate-200 p-5">
+      <h2 class="font-head font-semibold text-lg text-navy-900">ทดลองถามบอท</h2>
+      <form id="testChat" class="mt-3 flex gap-2"><input id="testMsg" class="inp" placeholder="เช่น ค่าปรับทิ้งขยะเท่าไหร่ / office hours?"><button class="btn btn-gold shrink-0">ถาม</button></form>
+      <pre id="testOut" class="mt-3 whitespace-pre-wrap text-sm bg-slate-50 rounded-xl p-4 ring-1 ring-slate-200 min-h-[60px]"></pre>
+      <p class="mt-1 text-xs text-slate-500">* ทดสอบด้วยเนื้อหาที่ <b>บันทึกแล้ว</b></p>
+    </div>
+    <div class="rounded-2xl bg-white ring-1 ring-slate-200 p-5">
+      <div class="flex items-center justify-between"><h2 class="font-head font-semibold text-lg text-navy-900">System prompt ที่ส่งให้ LLM (สร้างจากเนื้อหาจริง)</h2><button id="loadPrompt" class="btn btn-ghost">แสดง</button></div>
+      <pre id="promptOut" class="hidden mt-3 whitespace-pre-wrap text-xs bg-slate-50 rounded-xl p-4 ring-1 ring-slate-200 max-h-[480px] overflow-auto"></pre>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="fixed z-50 bottom-5 right-5 left-5 sm:left-auto sm:w-96 rounded-2xl bg-navy-900 text-white px-5 py-4 shadow-2xl transition-all duration-300 translate-y-4 opacity-0 pointer-events-none font-head"></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)}, $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+function toast(msg,bad){var t=$('#toast');t.textContent=msg;t.classList.toggle('bg-red-700',!!bad);t.classList.toggle('bg-navy-900',!bad);t.classList.remove('opacity-0','translate-y-4');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.add('opacity-0','translate-y-4')},3500)}
+function api(url,opt){opt=opt||{};opt.credentials='same-origin';return fetch(url,opt).then(function(r){if(r.status===401){showLogin();throw new Error('unauthorized')}return r.headers.get('content-type')&&r.headers.get('content-type').indexOf('json')>=0?r.json().then(function(j){if(!r.ok)throw new Error(j.error||r.status);return j}):r.text()})}
+
+// ---------- labels / schema hints (ขยายได้ง่าย: เพิ่ม key ที่นี่) ----------
+var SECTIONS=[
+ ['site','ข้อมูลหน่วยงาน','ชื่อเว็บไซต์ โลโก้ ช่องทางติดต่อ สายด่วน'],
+ ['royal','ส่วนถวายพระพร','ข้อความถวายพระพร และพระบรมฉายาลักษณ์'],
+ ['hero','ภาพหลัก (Hero)','ภาพพื้นหลัง คำโปรย และปุ่มหลัก'],
+ ['services','บริการ','การ์ดบริการบนหน้าแรก'],
+ ['cctv','กล้องสด CCTV','รายชื่อกล้อง พิกัด ทิศมุมกล้อง และลิงก์สตรีม (hls/youtube/iframe/link)'],
+ ['alerts','แจ้งเหตุบนถนน (ตั้งค่า)','ประเภทเหตุ อายุการแสดงผล (ชม.) โหวต ขนาดรูป ขอบเขตพื้นที่ และแผนที่ OSM'],
+ ['traffic','จราจรเรียลไทม์ (Google Maps)','แผนที่ 3D + ชั้นข้อมูลจราจร · ใส่ API key และ Map ID เพื่อเปิดโหมด 3D'],
+ ['tourist','นักท่องเที่ยว','Tourist Help เคล็ดลับ และพื้นที่สำคัญบนแผนที่'],
+ ['stats','สถิติ','ตัวเลขผลการดำเนินงาน'],
+ ['news','ข่าว/ประกาศ','ข่าวสารล่าสุด (แสดง 6 รายการแรก)'],
+ ['laws','กฎหมาย/ค่าปรับ','ข้อบัญญัติและอัตราค่าปรับ'],
+ ['faq','คำถามที่พบบ่อย','FAQ (บอทใช้เป็นฐานความรู้ด้วย)'],
+ ['complaintCategories','ประเภทเรื่องร้องเรียน','ตัวเลือกในแบบฟอร์ม'],
+ ['footer','ส่วนท้าย','ข้อความและลิงก์ด่วน'],
+ ['chatbot','แชทบอท','ชื่อบอท คำทักทาย ปุ่มลัด ฐานความรู้ และ system prompt']
+];
+var L={name:'ชื่อ',namePart1:'ชื่อส่วนที่ 1 (สีขาว)',namePart2:'ชื่อส่วนที่ 2 (สีทอง)',subtitle:'คำบรรยายรอง',englishName:'ชื่อภาษาอังกฤษ',logo:'โลโก้',favicon:'ไอคอนแท็บ (favicon)',hotlineLabel:'ป้ายสายด่วน',hotline:'เบอร์สายด่วน',hotlineIsPlaceholder:'เบอร์ยังเป็นตัวอย่าง (แสดงป้าย placeholder)',email:'อีเมล',address:'ที่อยู่',hours:'เวลาทำการ',lineId:'LINE ID',lineQr:'รูป QR LINE',noticeBar:'ข้อความแจ้งเตือนท้ายเว็บ',copyright:'ลิขสิทธิ์',
+ enabled:'เปิดใช้งาน',ribbonText:'ข้อความแถบด้านบน',heading:'หัวข้อ',kingName:'พระนาม (ซ้าย)',queenName:'พระนาม (ขวา)',dedication:'ข้อความถวายพระพร',kingImage:'พระบรมฉายาลักษณ์ (ซ้าย)',queenImage:'พระบรมฉายาลักษณ์ (ขวา)',imageCredit:'เครดิตภาพ',
+ image:'รูปภาพ',imageMobile:'รูปภาพ (มือถือ)',imageAlt:'คำอธิบายภาพ (alt)',eyebrow:'ข้อความบนหัวเรื่อง',tagline:'คำขวัญ',description:'คำอธิบาย',ctaPrimary:'ปุ่มหลัก',ctaPrimaryLink:'ลิงก์ปุ่มหลัก',
+ icon:'ไอคอน',title:'หัวข้อ',desc:'คำอธิบาย',link:'ลิงก์',headingTh:'หัวข้อภาษาไทย',intro:'คำนำ',languages:'ภาษาที่รองรับ',tips:'เคล็ดลับ',titleEn:'หัวข้อภาษาอังกฤษ',zones:'พื้นที่บนแผนที่',nameEn:'ชื่อภาษาอังกฤษ',x:'ตำแหน่ง X (%)',y:'ตำแหน่ง Y (%)',
+ isExample:'เป็นข้อมูลตัวอย่าง (แสดงป้าย)',items:'รายการ',value:'ตัวเลข',suffix:'หน่วย',label:'ป้ายกำกับ',date:'วันที่',category:'หมวดหมู่',excerpt:'เนื้อหาย่อ',note:'หมายเหตุ',fine:'ค่าปรับ',ref:'อ้างอิงกฎหมาย',q:'คำถาม',a:'คำตอบ',aEn:'คำตอบภาษาอังกฤษ',about:'ข้อความเกี่ยวกับหน่วยงาน',links:'ลิงก์',href:'ลิงก์ (URL หรือ #section)',
+ avatar:'รูปอวตาร',greeting:'คำทักทาย',quickReplies:'ปุ่มตอบด่วน',fallback:'คำตอบเมื่อไม่พบข้อมูล (ไทย)',fallbackEn:'คำตอบเมื่อไม่พบข้อมูล (อังกฤษ)',disclaimer:'ข้อความกำกับ',systemPrompt:'System prompt สำหรับ LLM',kb:'ฐานความรู้ (Q&A)',keywords:'คำสำคัญ (ใช้จับคู่คำถาม)',googleMapsApiKey:'Google Maps API key',googleMapsMapId:'Map ID (Vector, เปิด Tilt/Rotation)',enablePhotorealistic:'เปิดปุ่ม Photorealistic 3D (ต้องเปิด Map Tiles API)',center:'จุดศูนย์กลาง',lat:'ละติจูด',lng:'ลองจิจูด',zoom:'ระดับซูม',tilt:'มุมเอียง (0–67)',heading:'ทิศทาง (องศา)',refreshSeconds:'รีเฟรชข้อมูลทุก (วินาที)',orbitSpeed:'ความเร็วหมุนอัตโนมัติ',fallbackNotice:'ข้อความเมื่อยังไม่มี API key',spots:'จุดลัดบนแผนที่',reportButton:'ข้อความปุ่มแจ้งเหตุ',types:'ประเภทเหตุ',key:'รหัส (ภาษาอังกฤษ ห้ามซ้ำ)',labelEn:'ชื่อภาษาอังกฤษ',emoji:'อีโมจิ',color:'สี (#hex)',ttlHours:'แสดงนาน (ชั่วโมง) ก่อนหมดอายุ',voteExtendRatio:'กด 👍 ต่ออายุ (สัดส่วนของอายุประเภท)',downvotesToRemove:'จำนวน 👎 ที่ทำให้เหตุหายไป',maxPhotoMB:'ขนาดรูปสูงสุด (MB)',maxNoteLength:'ความยาวข้อความสูงสุด',bounds:'ขอบเขตพื้นที่ที่รับแจ้ง',south:'ใต้ (lat ต่ำสุด)',north:'เหนือ (lat สูงสุด)',west:'ตะวันตก (lng ต่ำสุด)',east:'ตะวันออก (lng สูงสุด)',nearbyNotifyKm:'รัศมีแจ้งเตือนเหตุใกล้ฉัน (กม.)',tileUrl:'URL แผ่นแผนที่ (tile)',tileAttribution:'เครดิตแผนที่ (ต้องมี)',fallbackZoom:'ระดับซูมโหมดสำรอง',fallbackStyleUrl:'สไตล์แผนที่ 3D โหมดไม่มี key (MapLibre)',cameras:'กล้อง',credit:'เครดิตภาพ (ต้องแสดง)',officialUrl:'ลิงก์เว็บไซต์กล้องทางการ',allowOfficialEmbed:'ฝังเว็บทางการเมื่อโฮสต์บน *.pattaya.go.th',linkNotice:'ข้อความเมื่อเปิดได้เฉพาะเว็บทางการ',exampleNotice:'หมายเหตุตำแหน่งตัวอย่าง',approx:'ตำแหน่งโดยประมาณ',type:'ชนิดสตรีม: link / hls / youtube / iframe',src:'URL สตรีม (.m3u8 / YouTube / https iframe)',url:'ลิงก์หน้าเว็บทางการของกล้อง',id:'รหัส'};
+var LONG=/^(fallbackNotice|desc|description|excerpt|a|aEn|greeting|systemPrompt|dedication|intro|fallback|fallbackEn|about|tagline|note|disclaimer)$/;
+var IMG=/(image|logo|avatar|favicon|qr|imageMobile)$/i;
+var ICONS=['chat','clipboard','store','scale','megaphone','pin','phone','clock','mail','search','check','globe','edit','shield','trash','tag','doc','image','home','help'];
+var HINTS={type:'link = ปุ่มเปิดเว็บทางการ · hls = ลิงก์ .m3u8 (ต้องอนุญาต CORS) · youtube = ลิงก์ YouTube Live · iframe = ลิงก์ฝัง https',heading:'ทิศที่กล้องหัน (0=เหนือ, 90=ตะวันออก) ใช้ตอนบินไปยังกล้องบนแผนที่ 3D',systemPrompt:'ตัวแปรที่ใช้ได้: {botName} {siteName} {englishName} {subtitle} {knowledge}',fallback:'ตัวแปร: {hotline} {hours} {address} {email} {lineId}',a:'ตัวแปร: {hotline} {hours} {address} {email} {lineId} {laws} · ใส่ #complaint #track #laws เพื่อทำเป็นลิงก์',keywords:'ถ้าข้อความผู้ใช้มีคำเหล่านี้ จะเลือกคำตอบนี้',googleMapsApiKey:'เปิด Maps JavaScript API และจำกัด key ด้วย HTTP referrer (โดเมนเว็บ) — ดู README · เว้นว่างเพื่อใช้ค่า env GOOGLE_MAPS_API_KEY หรือโหมดแผนที่มาตรฐาน',googleMapsMapId:'สร้างใน Google Cloud → Map Management (JavaScript, Vector, เปิด Tilt และ Rotation)'};
+
+// ---------- road alerts ----------
+var alertsData=[],amap=null,aLayer=null,aPick=null;
+function aTypes(){return ((content&&content.alerts)||{}).types||[]}
+function aT(k){return aTypes().find(function(t){return t.key===k})||{label:k,emoji:'📍',color:'#64748b'}}
+function fmtTH(iso){return new Date(iso).toLocaleString('th-TH',{timeZone:'Asia/Bangkok',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+function loadAlerts(){return api('/api/admin/alerts').then(function(l){alertsData=l;$('#aCount').textContent=l.filter(function(a){return a.active}).length||'';renderAlerts()})}
+function renderAlerts(){
+  var show=$('#aShowExpired').checked, list=alertsData.filter(function(a){return show||a.active});
+  $('#aList').innerHTML=list.length?list.map(function(a){var t=aT(a.type);return '<div class="bg-white rounded-2xl ring-1 ring-slate-200 p-3 '+(a.active?'':'opacity-60')+'" data-aid="'+a.id+'">'+
+   '<div class="flex items-start gap-3"><span class="w-10 h-10 shrink-0 rounded-xl flex items-center justify-center text-xl" style="background:'+esc(t.color)+'22">'+t.emoji+'</span><div class="flex-1 min-w-0">'+
+   '<div class="flex flex-wrap items-center gap-1.5"><b class="font-head text-navy-900">'+esc(t.label)+'</b>'+(a.official?'<span class="text-[10px] rounded-full bg-navy-900 text-gold-300 px-2 py-0.5">ประกาศทางการ</span>':'')+(a.pinned?'<span class="text-[10px] rounded-full bg-gold-100 text-gold-700 px-2 py-0.5">📌 ปักหมุด</span>':'')+(a.isExample?'<span class="text-[10px] rounded-full bg-amber-100 text-amber-800 px-2 py-0.5">ตัวอย่าง</span>':'')+(a.active?'<span class="text-[10px] rounded-full bg-emerald-100 text-emerald-700 px-2 py-0.5">กำลังแสดง</span>':'<span class="text-[10px] rounded-full bg-slate-200 px-2 py-0.5">หมดอายุ</span>')+'</div>'+
+   '<input class="inp !py-1 mt-1 text-sm" data-anote value="'+esc(a.note||'')+'" placeholder="(ไม่มีรายละเอียด)">'+
+   '<p class="text-xs text-slate-500 mt-1">แจ้งเมื่อ '+fmtTH(a.createdAt)+' · หมดอายุ '+fmtTH(a.expiresAt)+' · 👍 '+a.up+' 👎 '+a.down+' · '+a.lat.toFixed(5)+', '+a.lng.toFixed(5)+(a.reporter?' · ผู้แจ้ง #'+esc(String(a.reporter).slice(0,8)):'')+(a.photo?' · <a class="underline" target="_blank" href="/'+esc(a.photo)+'">รูป</a>':'')+'</p>'+
+   '<div class="flex flex-wrap gap-1.5 mt-2"><button class="btn btn-ghost !py-1 !text-xs" data-aact="save">บันทึกข้อความ</button><button class="btn btn-ghost !py-1 !text-xs" data-aact="goto">ดูบนแผนที่</button><button class="btn btn-ghost !py-1 !text-xs" data-aact="pin">'+(a.pinned?'เลิกปักหมุด':'ปักหมุด')+'</button><button class="btn btn-ghost !py-1 !text-xs" data-aact="official">'+(a.official?'เลิกเป็นทางการ':'ตั้งเป็นทางการ')+'</button><button class="btn btn-ghost !py-1 !text-xs" data-aact="extend">+24 ชม.</button>'+(a.active?'<button class="btn btn-ghost !py-1 !text-xs" data-aact="expire">หมดอายุทันที</button>':'')+'<button class="btn btn-red !py-1 !text-xs" data-aact="del">ลบ</button></div>'+
+   '</div></div></div>'}).join(''):'<p class="text-slate-500 text-sm bg-white rounded-2xl ring-1 ring-slate-200 p-6 text-center">ยังไม่มีการแจ้งเหตุ</p>';
+  drawAlertMap(list);
+}
+function drawAlertMap(list){
+  if(!window.L)return;
+  if(!amap){var c=((content.traffic||{}).center)||{lat:12.9276,lng:100.8771};amap=window.L.map('aMap').setView([c.lat,c.lng],14);var ac=content.alerts||{};
+    window.L.tileLayer(ac.tileUrl||'https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:ac.tileAttribution||'&copy; OpenStreetMap contributors'}).addTo(amap);aLayer=window.L.layerGroup().addTo(amap);
+    amap.on('click',function(e){$('#aLat').value=e.latlng.lat.toFixed(6);$('#aLng').value=e.latlng.lng.toFixed(6);setPick()});}
+  setTimeout(function(){amap.invalidateSize()},50);
+  aLayer.clearLayers();
+  list.forEach(function(a){var t=aT(a.type);window.L.marker([a.lat,a.lng],{icon:window.L.divIcon({className:'',html:'<div style="width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:'+(a.active?t.color:'#94a3b8')+';border:3px solid '+(a.official?'#F5C518':'#fff')+';box-shadow:0 3px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:14px">'+t.emoji+'</span></div>',iconSize:[36,36],iconAnchor:[18,43]})}).bindTooltip(esc(t.label)+(a.note?': '+esc(a.note):'')).addTo(aLayer)});
+}
+function setPick(){var la=+$('#aLat').value,ln=+$('#aLng').value;if(!amap||!isFinite(la)||!isFinite(ln)||!la)return;if(aPick)aPick.setLatLng([la,ln]);else aPick=window.L.marker([la,ln],{draggable:true}).addTo(amap).on('dragend',function(e){var p=e.target.getLatLng();$('#aLat').value=p.lat.toFixed(6);$('#aLng').value=p.lng.toFixed(6)})}
+$('#aLat').oninput=$('#aLng').oninput=setPick;
+function aPatch(id,b){return api('/api/admin/alerts/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(loadAlerts)}
+$('#aList').onclick=function(e){var b=e.target.closest('[data-aact]');if(!b)return;var card=b.closest('[data-aid]'),id=card.dataset.aid,a=alertsData.find(function(x){return x.id===id}),act=b.dataset.aact;
+  if(act==='save')aPatch(id,{note:card.querySelector('[data-anote]').value}).then(function(){toast('บันทึกแล้ว')});
+  if(act==='goto'&&amap)amap.flyTo([a.lat,a.lng],17);
+  if(act==='pin')aPatch(id,{pinned:!a.pinned});
+  if(act==='official')aPatch(id,{official:!a.official});
+  if(act==='extend')aPatch(id,{expiresAt:new Date(Math.max(Date.now(),Date.parse(a.expiresAt))+864e5).toISOString()});
+  if(act==='expire')aPatch(id,{expiresAt:new Date().toISOString()});
+  if(act==='del'&&confirm('ลบการแจ้งเหตุนี้ถาวร?'))api('/api/admin/alerts/'+id,{method:'DELETE'}).then(loadAlerts).then(function(){toast('ลบแล้ว')});
+};
+$('#aShowExpired').onchange=renderAlerts;$('#aReload').onclick=loadAlerts;
+$('#aDemo').onclick=function(){api('/api/admin/alerts/demo',{method:'POST'}).then(loadAlerts).then(function(){toast('เพิ่มตัวอย่างแล้ว (มีป้าย “ตัวอย่าง”)')})};
+$('#aDelDemo').onclick=function(){if(confirm('ลบรายการตัวอย่างทั้งหมด?'))api('/api/admin/alerts?examples=1',{method:'DELETE'}).then(function(j){toast('ลบตัวอย่าง '+j.removed+' รายการ');return loadAlerts()})};
+$('#aForm').onsubmit=function(e){e.preventDefault();var body={type:$('#aType').value,lat:$('#aLat').value,lng:$('#aLng').value,note:$('#aNote').value,pinned:$('#aPinned').checked,official:true};if($('#aHours').value)body.hours=+$('#aHours').value;
+  if(!body.lat||!body.lng)return toast('คลิกบนแผนที่เพื่อเลือกตำแหน่ง',true);
+  var f=$('#aPhoto').files[0],up=f?(function(){var fd=new FormData();fd.append('file',f);return api('/api/upload',{method:'POST',body:fd}).then(function(j){body.photo=j.url})})():Promise.resolve();
+  up.then(function(){return api('/api/admin/alerts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}).then(function(){toast('เพิ่มประกาศทางการแล้ว');$('#aForm').reset();if(aPick){amap.removeLayer(aPick);aPick=null}return loadAlerts()}).catch(function(err){toast(err.message,true)})};
+function initAlertsTab(){$('#aType').innerHTML=aTypes().map(function(t){return '<option value="'+esc(t.key)+'">'+t.emoji+' '+esc(t.label)+' ('+t.ttlHours+' ชม.)</option>'}).join('');loadAlerts()}
+
+var content=null, current='site', dirty=false;
+function setDirty(v){dirty=v;$('#dirty').classList.toggle('hidden',!v)}
+window.addEventListener('beforeunload',function(e){if(dirty){e.preventDefault();e.returnValue=''}});
+
+function getAt(path){return path.reduce(function(o,k){return o[k]},content)}
+function setAt(path,v){var o=getAt(path.slice(0,-1));o[path[path.length-1]]=v;setDirty(true)}
+function blank(v){if(Array.isArray(v))return [];if(v&&typeof v==='object'){var o={};Object.keys(v).forEach(function(k){o[k]=blank(v[k])});return o}return typeof v==='number'?0:typeof v==='boolean'?false:''}
+function lab(k){return L[k]||k}
+
+function field(path,key,val){
+  var id='f_'+path.join('_'), p=JSON.stringify(path), hint=HINTS[key]?'<p class="mt-1 text-xs text-slate-400">'+esc(HINTS[key])+'</p>':'';
+  if(typeof val==='boolean') return '<label class="flex items-center gap-2 py-1"><input type="checkbox" data-p=\''+p+'\' data-t="bool" '+(val?'checked':'')+' class="w-4 h-4 accent-[#0B2545]"><span class="font-head text-sm text-navy-900">'+esc(lab(key))+'</span></label>';
+  var head='<label for="'+id+'" class="block font-head text-sm font-medium text-navy-900 mb-1">'+esc(lab(key))+'</label>';
+  if(typeof val==='number') return '<div>'+head+'<input id="'+id+'" type="number" step="any" class="inp" data-p=\''+p+'\' data-t="num" value="'+esc(val)+'">'+hint+'</div>';
+  if(Array.isArray(val)) return arrayField(path,key,val);
+  if(val&&typeof val==='object') return '<fieldset class="rounded-2xl ring-1 ring-slate-200 p-4 bg-slate-50/60"><legend class="px-2 font-head font-semibold text-navy-900">'+esc(lab(key))+'</legend><div class="grid sm:grid-cols-2 gap-4">'+Object.keys(val).map(function(k){return wrap(k,val[k],field(path.concat(k),k,val[k]))}).join('')+'</div></fieldset>';
+  if(key==='icon') return '<div>'+head+'<select id="'+id+'" class="inp" data-p=\''+p+'\'>'+ICONS.map(function(i){return '<option '+(i===val?'selected':'')+'>'+i+'</option>'}).join('')+'</select></div>';
+  if(key==='date') return '<div>'+head+'<input id="'+id+'" type="date" class="inp" data-p=\''+p+'\' value="'+esc(val)+'"></div>';
+  if(IMG.test(key)) return '<div>'+head+'<div class="flex gap-3 items-start"><div class="w-20 h-20 rounded-xl bg-slate-100 ring-1 ring-slate-200 overflow-hidden shrink-0 flex items-center justify-center">'+(val?'<img src="/'+esc(String(val).replace(/^\//,''))+'" class="w-full h-full object-contain" alt="">':'<span class="text-[10px] text-slate-400">ไม่มีรูป</span>')+'</div><div class="flex-1 space-y-2"><input id="'+id+'" class="inp" data-p=\''+p+'\' value="'+esc(val)+'" placeholder="uploads/... หรือ assets/..."><label class="btn btn-ghost cursor-pointer">⬆ อัปโหลดรูป<input type="file" accept="image/*" class="sr-only" data-upload=\''+p+'\'></label></div></div></div>';
+  if(LONG.test(key)||String(val).length>90||String(val).indexOf('\n')>=0) return '<div>'+head+'<textarea id="'+id+'" class="inp" rows="'+(key==='systemPrompt'?12:3)+'" data-p=\''+p+'\'>'+esc(val)+'</textarea>'+hint+'</div>';
+  return '<div>'+head+'<input id="'+id+'" class="inp" data-p=\''+p+'\' value="'+esc(val)+'">'+hint+'</div>';
+}
+function wrap(k,v,html){var full=Array.isArray(v)||(v&&typeof v==='object')||LONG.test(k)||IMG.test(k)||String(v).length>90;return '<div class="'+(full?'sm:col-span-2':'')+'">'+html+'</div>'}
+function arrayField(path,key,arr){
+  var p=JSON.stringify(path), isObj=arr.length&&arr[0]&&typeof arr[0]==='object';
+  var rows=arr.map(function(item,i){
+    var ip=path.concat(i), tools='<div class="flex gap-1 shrink-0"><button type="button" class="btn btn-ghost !px-2 !py-1" data-mv=\''+p+'\' data-i="'+i+'" data-d="-1" title="เลื่อนขึ้น">↑</button><button type="button" class="btn btn-ghost !px-2 !py-1" data-mv=\''+p+'\' data-i="'+i+'" data-d="1" title="เลื่อนลง">↓</button><button type="button" class="btn btn-red !px-2 !py-1" data-del=\''+p+'\' data-i="'+i+'" title="ลบ">✕</button></div>';
+    if(isObj){var title=item.title||item.name||item.q||item.label||item.nameEn||('รายการที่ '+(i+1));
+      return '<details class="rounded-2xl bg-white ring-1 ring-slate-200" '+(arr.length<=2?'open':'')+'><summary class="cursor-pointer list-none px-4 py-3 flex items-center justify-between gap-3"><span class="font-head font-medium text-navy-900 truncate"><span class="text-slate-400 mr-2">#'+(i+1)+'</span>'+esc(title)+'</span>'+tools+'</summary><div class="px-4 pb-4 grid sm:grid-cols-2 gap-4 border-t border-slate-100 pt-4">'+Object.keys(item).map(function(k){return wrap(k,item[k],field(ip.concat(k),k,item[k]))}).join('')+'</div></details>';}
+    return '<div class="flex gap-2 items-center"><input class="inp" data-p=\''+JSON.stringify(ip)+'\' value="'+esc(item)+'">'+tools+'</div>';
+  }).join('');
+  return '<div class="rounded-2xl ring-1 ring-slate-200 p-4 bg-slate-50/60"><div class="flex items-center justify-between mb-3"><p class="font-head font-semibold text-navy-900">'+esc(lab(key))+' <span class="text-xs text-slate-400 font-normal">('+arr.length+' รายการ)</span></p><button type="button" class="btn btn-navy !py-1.5" data-add=\''+p+'\'>＋ เพิ่ม</button></div><div class="space-y-2">'+(rows||'<p class="text-sm text-slate-400">ยังไม่มีรายการ</p>')+'</div></div>';
+}
+
+function renderNav(){$('#secNav').innerHTML=SECTIONS.filter(function(s){return s[0] in content}).map(function(s){return '<button class="sec-link text-left px-3 py-2 rounded-lg hover:bg-slate-100 '+(s[0]===current?'active':'')+'" data-sec="'+s[0]+'">'+s[1]+'</button>'}).join('');
+  $$('[data-sec]').forEach(function(b){b.onclick=function(){current=b.dataset.sec;renderNav();renderEditor();window.scrollTo(0,0)}})}
+function renderEditor(){
+  var s=SECTIONS.find(function(x){return x[0]===current})||[current,current,''], v=content[current];
+  $('#secTitle').textContent=s[1]; $('#secHint').textContent=s[2];
+  $('#editor').innerHTML=(Array.isArray(v)?arrayField([current],current,v):(v&&typeof v==='object')?'<div class="rounded-2xl bg-white ring-1 ring-slate-200 p-5 grid sm:grid-cols-2 gap-4">'+Object.keys(v).map(function(k){return wrap(k,v[k],field([current,k],k,v[k]))}).join('')+'</div>':field([current],current,v));
+  bind();
+}
+function bind(){
+  $$('#editor [data-p]').forEach(function(el){el.addEventListener(el.type==='checkbox'?'change':'input',function(){var path=JSON.parse(el.dataset.p);setAt(path,el.dataset.t==='bool'?el.checked:el.dataset.t==='num'?Number(el.value):el.value)})});
+  $$('#editor [data-add]').forEach(function(b){b.onclick=function(e){e.preventDefault();var arr=getAt(JSON.parse(b.dataset.add));arr.push(arr.length?blank(arr[0]):'');setDirty(true);renderEditor()}});
+  $$('#editor [data-del]').forEach(function(b){b.onclick=function(e){e.preventDefault();if(!confirm('ลบรายการนี้?'))return;getAt(JSON.parse(b.dataset.del)).splice(+b.dataset.i,1);setDirty(true);renderEditor()}});
+  $$('#editor [data-mv]').forEach(function(b){b.onclick=function(e){e.preventDefault();var a=getAt(JSON.parse(b.dataset.mv)),i=+b.dataset.i,j=i+(+b.dataset.d);if(j<0||j>=a.length)return;var t=a[i];a[i]=a[j];a[j]=t;setDirty(true);renderEditor()}});
+  $$('#editor [data-upload]').forEach(function(inp){inp.onchange=function(){var f=inp.files[0];if(!f)return;var fd=new FormData();fd.append('file',f);toast('กำลังอัปโหลด…');
+    api('/api/upload',{method:'POST',body:fd}).then(function(j){setAt(JSON.parse(inp.dataset.upload),j.url);renderEditor();toast('อัปโหลดแล้ว — อย่าลืมกดบันทึก')}).catch(function(e){toast('อัปโหลดไม่สำเร็จ: '+e.message,true)})}});
+}
+$('#saveBtn').onclick=function(){api('/api/content',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(content)}).then(function(){setDirty(false);toast('✔ บันทึกเรียบร้อย หน้าเว็บอัปเดตแล้ว')}).catch(function(e){toast('บันทึกไม่สำเร็จ: '+e.message,true)})};
+document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();$('#saveBtn').click()}});
+
+// ---------- complaints ----------
+var ST={received:['รับเรื่อง','bg-sky-100 text-sky-800'],in_progress:['กำลังดำเนินการ','bg-amber-100 text-amber-800'],done:['เสร็จสิ้น','bg-emerald-100 text-emerald-800']};
+var complaints=[];
+function loadComplaints(){return api('/api/complaints').then(function(l){complaints=l;$('#cCount').textContent=l.filter(function(x){return x.status!=='done'}).length||'';renderComplaints()})}
+function renderComplaints(){
+  var q=$('#cSearch').value.trim().toLowerCase(), f=$('#cFilter').value;
+  $('#cSummary').innerHTML=Object.keys(ST).map(function(k){return '<div class="rounded-2xl bg-white ring-1 ring-slate-200 p-4"><p class="text-sm text-slate-500">'+ST[k][0]+'</p><p class="font-head font-bold text-3xl text-navy-900">'+complaints.filter(function(x){return x.status===k}).length+'</p></div>'}).join('');
+  var list=complaints.filter(function(x){return(!f||x.status===f)&&(!q||[x.id,x.name,x.phone,x.description,x.category,x.location].join(' ').toLowerCase().indexOf(q)>=0)});
+  $('#cList').innerHTML=list.length?list.map(function(x){
+    return '<article class="rounded-2xl bg-white ring-1 ring-slate-200 p-5"><div class="flex flex-wrap items-start justify-between gap-3"><div><p class="font-head font-semibold text-navy-900">'+esc(x.id)+' <span class="ml-2 text-xs rounded-full px-2.5 py-1 '+ST[x.status][1]+'">'+ST[x.status][0]+'</span></p><p class="text-xs text-slate-500 mt-1">'+esc(new Date(x.createdAt).toLocaleString('th-TH'))+' · '+esc(x.category)+'</p></div>'+
+      '<div class="flex flex-wrap gap-2 items-center"><select class="inp !w-44 !py-1.5" data-st="'+esc(x.id)+'">'+Object.keys(ST).map(function(k){return '<option value="'+k+'" '+(k===x.status?'selected':'')+'>'+ST[k][0]+'</option>'}).join('')+'</select><input class="inp !w-64 !py-1.5" data-note="'+esc(x.id)+'" placeholder="หมายเหตุ (แสดงต่อผู้แจ้ง)"><button class="btn btn-navy !py-1.5" data-upd="'+esc(x.id)+'">อัปเดต</button><button class="btn btn-red !py-1.5" data-cdel="'+esc(x.id)+'">ลบ</button></div></div>'+
+      '<p class="mt-3 text-slate-700 whitespace-pre-line">'+esc(x.description)+'</p><div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-500"><span>👤 '+esc(x.name)+'</span><span>📞 '+esc(x.phone)+'</span>'+(x.location?'<span>📍 '+esc(x.location)+'</span>':'')+(x.photo?'<a class="text-navy-800 underline" target="_blank" href="/api/complaints/'+encodeURIComponent(x.id)+'/photo">🖼 ดูรูปภาพ</a>':'')+'</div>'+
+      '<details class="mt-2 text-xs text-slate-500"><summary class="cursor-pointer">ประวัติ ('+x.history.length+')</summary><ul class="mt-1 space-y-0.5">'+x.history.map(function(h){return '<li>'+esc(new Date(h.at).toLocaleString('th-TH'))+' — '+ST[h.status][0]+(h.note?' · '+esc(h.note):'')+'</li>'}).join('')+'</ul></details></article>';
+  }).join(''):'<div class="rounded-2xl bg-white ring-1 ring-slate-200 p-10 text-center text-slate-400">ยังไม่มีเรื่องร้องเรียน</div>';
+  $$('[data-upd]').forEach(function(b){b.onclick=function(){var id=b.dataset.upd;api('/api/complaints/'+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:$('[data-st="'+id+'"]').value,note:$('[data-note="'+id+'"]').value})}).then(function(){toast('อัปเดตสถานะแล้ว');loadComplaints()}).catch(function(e){toast(e.message,true)})}});
+  $$('[data-cdel]').forEach(function(b){b.onclick=function(){if(!confirm('ลบเรื่อง '+b.dataset.cdel+' ถาวร?'))return;api('/api/complaints/'+encodeURIComponent(b.dataset.cdel),{method:'DELETE'}).then(function(){toast('ลบแล้ว');loadComplaints()})}});
+}
+$('#cSearch').oninput=renderComplaints; $('#cFilter').onchange=renderComplaints; $('#cReload').onclick=loadComplaints;
+
+// ---------- chat tab ----------
+$('#testChat').onsubmit=function(e){e.preventDefault();var m=$('#testMsg').value.trim();if(!m)return;$('#testOut').textContent='…';fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})}).then(function(r){return r.json()}).then(function(j){$('#testOut').textContent='['+(j.mode||'?')+(j.matched?' · ตรงกับ: '+j.matched:'')+(j.score!=null?' · score '+j.score:'')+']\n\n'+(j.reply||j.error)})};
+$('#loadPrompt').onclick=function(){api('/api/chat/system-prompt').then(function(t){$('#promptOut').textContent=t;$('#promptOut').classList.remove('hidden')})};
+$$('[data-goto]').forEach(function(b){b.onclick=function(){current=b.dataset.goto;switchTab('content');renderNav();renderEditor()}});
+
+// ---------- tabs / auth ----------
+function switchTab(t){$$('.tab').forEach(function(b){b.classList.toggle('active',b.dataset.tab===t)});['content','complaints','alerts','chat'].forEach(function(x){$('#tab-'+x).classList.toggle('hidden',x!==t)});
+  if(t==='complaints')loadComplaints();
+  if(t==='alerts')initAlertsTab();
+  if(t==='chat'){$('#botNameH').textContent=(content.chatbot||{}).name||'';api('/api/chat/mode').then(function(m){$('#botMode').textContent=m.mode==='llm'?'LLM ('+m.model+' @ '+m.baseUrl+')':'ออฟไลน์ (ฐานความรู้ใน content.json)'})}}
+$$('.tab').forEach(function(b){b.onclick=function(){switchTab(b.dataset.tab)}});
+function showLogin(){$('#appView').classList.add('hidden');$('#loginView').classList.remove('hidden');setTimeout(function(){$('#pw').focus()},50)}
+function showApp(){$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');
+  fetch('/api/content?raw=1',{cache:'no-store'}).then(function(r){return r.json()}).then(function(c){content=c;renderNav();renderEditor();loadComplaints()})}
+$('#loginForm').onsubmit=function(e){e.preventDefault();fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('#pw').value})}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error);$('#pw').value='';showApp()})}).catch(function(err){$('#loginErr').textContent=err.message||'เข้าสู่ระบบไม่สำเร็จ';$('#loginErr').classList.remove('hidden')})};
+$('#logoutBtn').onclick=function(){if(dirty&&!confirm('มีการแก้ไขที่ยังไม่บันทึก ออกจากระบบหรือไม่?'))return;fetch('/api/logout',{method:'POST'}).then(function(){setDirty(false);showLogin()})};
+fetch('/api/me').then(function(r){return r.json()}).then(function(j){j.admin?showApp():showLogin()}).catch(showLogin);
+})();
+</script>
+</body>
+</html>

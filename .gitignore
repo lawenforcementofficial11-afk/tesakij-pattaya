@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.tmp
+# ข้อมูลส่วนบุคคล/ข้อมูลที่ระบบสร้างขึ้น
+data/submissions.json
+data/complaints*
+data/complaint-photos/
+data/backups/
+data/alerts.json
+uploads/alerts/
+uploads/complaints*
