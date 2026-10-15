@@ -46,7 +46,6 @@
     Array.prototype.forEach.call(document.querySelectorAll('.t-live'), function (b) { b.classList.add('hidden'); });
     $('#tBtnReal').classList.add('hidden');
     $('#trafficNotice').classList.remove('hidden');
-    $('#tBtnGTraffic').classList.remove('hidden');
     $('#trafficLegend').classList.add('hidden');
     clock(); clearInterval(refreshTimer);
     if (map) { try { google.maps.event.clearInstanceListeners(map); } catch (e) {} map = null; }
@@ -71,6 +70,7 @@
           ml.setPaintProperty('building-3d', 'fill-extrusion-color', ['interpolate', ['linear'], ['coalesce', ['get', 'render_height'], 0], 0, '#dfe6ee', 30, '#b9c8da', 80, '#8aa3c2', 200, '#5d7aa3']);
           ml.setPaintProperty('building-3d', 'fill-extrusion-opacity', 0.9);
         }
+        if (window.TKPSim) TKPSim.attachMapLibre(ml, cfg.center);
         ml.setSky && ml.setSky({ 'sky-color': '#9fd3ff', 'horizon-color': '#e6f4ff', 'sky-horizon-blend': 0.6, 'horizon-fog-blend': 0.5, 'fog-color': '#ffffff', 'fog-ground-blend': 0.4 });
       } catch (e) {}
     });
@@ -78,8 +78,9 @@
     Array.prototype.forEach.call(document.querySelectorAll('.t-live'), function (b) { b.classList.remove('hidden'); });
     $('#tBtnTilt').textContent = '2D';
     $('#trafficMode').textContent = 'แผนที่ 3 มิติ · แจ้งเหตุสด · CCTV';
-    $('#trafficCredit').innerHTML = 'แผนที่ 3 มิติ: OpenFreeMap · © OpenMapTiles · ข้อมูล © ผู้ร่วมพัฒนา OpenStreetMap (ODbL) · ชั้นข้อมูลจราจร (ปุ่ม 🚦) © Google · ภาพกล้อง © เมืองพัทยา';
+    $('#trafficCredit').innerHTML = 'แผนที่ 3 มิติ: OpenFreeMap · © OpenMapTiles · ข้อมูล © ผู้ร่วมพัฒนา OpenStreetMap (ODbL) · ภาพดาวเทียม © Esri, Maxar, Earthstar Geographics · ชั้นข้อมูลจราจร (โหมด 🚦) © Google · รถ 3 มิติเป็นภาพจำลองบนถนนจาก OSM · ภาพกล้อง © เมืองพัทยา';
     heading = -15; requestAnimationFrame(loop);
+    setBaseUI('map');
     attachAll(mlAdapter(ml));
   }
   function initLeaflet() {
@@ -91,6 +92,7 @@
     lmap.on('focus click', function () { lmap.scrollWheelZoom.enable(); });
     $('#trafficMode').textContent = 'แผนที่ OpenStreetMap · แจ้งเหตุสด';
     $('#trafficCredit').innerHTML = 'แผนที่ © ผู้ร่วมพัฒนา OpenStreetMap (ODbL) · ชั้นข้อมูลจราจร (ปุ่ม 🚦) © Google · ภาพกล้อง © เมืองพัทยา';
+    setBaseUI('map'); var sb = document.querySelector('[data-base=sat]'); if (sb) sb.classList.add('hidden');
     attachAll(leafletAdapter(lmap));
   }
   function attachAll(ad) { if (window.TKPAlerts) TKPAlerts.attach(ad); if (window.TKPCCTV) TKPCCTV.attach(ad); }
@@ -100,7 +102,7 @@
     box.classList.toggle('hidden', !on);
     $('#trafficLegend').classList.toggle('hidden', !on);
     $('#tBtnGTraffic').setAttribute('aria-pressed', String(on)); $('#tBtnGTraffic').classList.toggle('chip-active', on);
-    $('#trafficMode').textContent = on ? 'Google Maps · จราจร (หมุดแจ้งเหตุ/กล้องอยู่ในแผนที่ 3D)' : (ml ? 'แผนที่ 3 มิติ · แจ้งเหตุสด · CCTV' : 'แผนที่ OpenStreetMap · แจ้งเหตุสด');
+    $('#trafficMode').textContent = on ? 'Google Maps · จราจร (หมุดแจ้งเหตุ/กล้อง/รถจำลอง อยู่ในโหมดแผนที่และดาวเทียม)' : (ml ? (base === 'sat' ? 'ภาพดาวเทียม 3 มิติ · แจ้งเหตุสด · CCTV' : 'แผนที่ 3 มิติ · แจ้งเหตุสด · CCTV') : 'แผนที่ OpenStreetMap · แจ้งเหตุสด');
     clearInterval(refreshTimer);
     if (on) refreshTimer = setInterval(function () { var f = $('#trafficFrame'); if (f && visible) { f.src = f.src; clock(); } }, Math.max(60, (cfg.refreshSeconds || 60) * 5) * 1000);
   }
@@ -148,7 +150,48 @@
       fitAll: function () {}
     };
   }
-  function toggleGframe(on) { gframe = on; showGframe(on); }
+  function toggleGframe(on) { gframe = on; showGframe(on); if (on) setBaseUI('traffic'); else if (base === 'traffic') setBaseUI('map'); }
+
+  // ---------- base map: แผนที่ / ดาวเทียม 3D / จราจร ----------
+  var base = 'map';
+  var ESRI_ATTR = 'Imagery © <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>, Maxar, Earthstar Geographics, and the GIS User Community';
+  function setBaseUI(b) { base = b; Array.prototype.forEach.call(document.querySelectorAll('.base-btn'), function (x) { x.setAttribute('aria-pressed', String(x.dataset.base === b)); }); }
+  function mlSatellite(on) {
+    if (!ml) return;
+    var apply = function () {
+      if (on && !ml.getSource('esri-sat')) {
+        ml.addSource('esri-sat', { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 19, attribution: ESRI_ATTR });
+        var layers = ml.getStyle().layers, before = null;
+        for (var i = 0; i < layers.length; i++) { var L0 = layers[i]; if (L0.id === 'building' || L0.id === 'building-3d' || L0.type === 'symbol') { before = L0.id; break; } }
+        ml.addLayer({ id: 'esri-sat', type: 'raster', source: 'esri-sat', paint: { 'raster-saturation': 0.1, 'raster-contrast': 0.08 } }, before || undefined);
+      }
+      if (ml.getLayer('esri-sat')) ml.setLayoutProperty('esri-sat', 'visibility', on ? 'visible' : 'none');
+      if (ml.getLayer('building')) ml.setLayoutProperty('building', 'visibility', on ? 'none' : 'visible');
+      if (ml.getLayer('building-3d')) {
+        ml.setPaintProperty('building-3d', 'fill-extrusion-opacity', on ? 0.55 : 0.9);
+        ml.setPaintProperty('building-3d', 'fill-extrusion-color', on ? '#f1efe9' : ['interpolate', ['linear'], ['coalesce', ['get', 'render_height'], 0], 0, '#dfe6ee', 30, '#b9c8da', 80, '#8aa3c2', 200, '#5d7aa3']);
+      }
+    };
+    if (ml.isStyleLoaded()) apply(); else ml.once('load', apply);
+  }
+  function switchBase(b) {
+    setBaseUI(b);
+    if (live && map) {
+      if (photoreal) togglePhotoreal();
+      map.setMapTypeId(b === 'sat' ? 'hybrid' : 'roadmap');
+      traffic.setMap(b === 'map' ? null : map);
+      $('#trafficLegend').classList.toggle('hidden', b === 'map');
+      $('#trafficMode').textContent = b === 'sat' ? 'ดาวเทียม 3D · Live Traffic' : b === 'traffic' ? 'Live Traffic · 3D' : 'แผนที่ 3D';
+      if (b === 'sat') { tilt = Math.min(cfg.tilt || 60, 45); map.moveCamera({ tilt: tilt }); }
+      return;
+    }
+    if (b === 'traffic') { toggleGframe(true); return; }
+    if (gframe) toggleGframe(false);
+    mlSatellite(b === 'sat');
+    $('#trafficMode').textContent = b === 'sat' ? 'ภาพดาวเทียม 3 มิติ · แจ้งเหตุสด · CCTV' : 'แผนที่ 3 มิติ · แจ้งเหตุสด · CCTV';
+    if (!ml && lmap) { /* Leaflet: ดาวเทียมไม่รองรับในโหมดนี้ */ }
+  }
+
 
   // ---------- live (vector map + traffic) ----------
   function loadScript() {
@@ -177,6 +220,8 @@
     clock(); clearInterval(refreshTimer);
     refreshTimer = setInterval(function () { if (!visible) return; traffic.setMap(null); traffic.setMap(map); clock(); }, (cfg.refreshSeconds || 60) * 1000);
     requestAnimationFrame(loop);
+    setBaseUI('traffic');
+    if (window.TKPSim && cfg.googleMapsMapId) TKPSim.attachGoogle(map, cfg.center);
     googleAdapter().then(attachAll);
   }
   function googleAdapter() {
@@ -283,6 +328,8 @@
     $('#tBtnOrbit').addEventListener('click', function () { setOrbit(!orbit); });
     $('#tBtnReal').addEventListener('click', togglePhotoreal);
     $('#tBtnGTraffic').addEventListener('click', function () { toggleGframe(!gframe); });
+    Array.prototype.forEach.call(document.querySelectorAll('.base-btn'), function (b) { b.addEventListener('click', function () { switchBase(b.dataset.base); }); });
+    $('#tBtnSim').addEventListener('click', function () { if (window.TKPSim) TKPSim.setEnabled(!TKPSim.isEnabled()); });
     $('#tBtnFull').addEventListener('click', function () {
       var el = $('#trafficCard');
       if (document.fullscreenElement) document.exitFullscreen(); else if (el.requestFullscreen) el.requestFullscreen(); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
@@ -290,6 +337,8 @@
   }
 
   window.TKPTraffic = {
+    isVisible: function () { return visible; },
+    setBase: function (b) { switchBase(b); },
     init: function (c, ac) {
       cfg = c || {}; acfg = ac || {};
       var sec = $('#traffic');
@@ -297,11 +346,12 @@
       cfg.center = cfg.center || { lat: 12.9276, lng: 100.8771 };
       $('#trafficOpenGm').href = gmLink(cfg.center.lat, cfg.center.lng, 14);
       renderSpots(); bindControls();
+      if (window.TKPSim) TKPSim.setEnabled(cfg.simulation !== false && TKPSim.defaultOn());
       var started = false;
       var start = function () { if (started) return; started = true; cfg.googleMapsApiKey ? loadScript() : fallback();
         setInterval(clock, 1000); };
       if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function (es) { es.forEach(function (e) { visible = e.isIntersecting; if (visible) start(); }); }, { rootMargin: '300px 0px' }).observe(sec);
+        new IntersectionObserver(function (es) { es.forEach(function (e) { visible = e.isIntersecting; if (visible) { start(); if (window.TKPSim) TKPSim.wake(); } }); }, { rootMargin: '300px 0px' }).observe(sec);
       } else { visible = true; start(); }
     }
   };

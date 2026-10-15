@@ -94,7 +94,7 @@
     "tilt": 60,
     "refreshSeconds": 60,
     "orbitSpeed": 0.04,
-    "fallbackNotice": "โหมดแผนที่ 3 มิติจาก OpenStreetMap (OpenFreeMap) — กดปุ่ม 🚦 เพื่อดูชั้นข้อมูลจราจรจาก Google · โหมด Google 3D + จราจรสดจะเปิดเมื่อผู้ดูแลระบบตั้งค่า Google Maps API key",
+    "fallbackNotice": "โหมดแผนที่ 3 มิติจาก OpenStreetMap (OpenFreeMap) · เลือก 🛰️ ดาวเทียม 3D หรือ 🚦 จราจร (ชั้นข้อมูลจราจรของ Google) ได้ · รถ 3 มิติเป็นภาพจำลอง ไม่ใช่ตำแหน่งรถจริง · โหมด Google 3D + จราจรสดจะเปิดเมื่อตั้งค่า Google Maps API key",
     "spots": [
       {
         "name": "ถนนเลียบชายหาด",
@@ -137,7 +137,8 @@
         "heading": 0
       }
     ],
-    "fallbackStyleUrl": "https://tiles.openfreemap.org/styles/liberty"
+    "fallbackStyleUrl": "https://tiles.openfreemap.org/styles/liberty",
+    "simulation": true
   },
   "tourist": {
     "heading": "Tourist Help",

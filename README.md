@@ -44,7 +44,9 @@ assets/app.js        สคริปต์หน้าเว็บ (render เ�
 assets/traffic.js    แผนที่จราจร 3D (Google vector + TrafficLayer / MapLibre 3D / Leaflet)
 assets/alerts.js     แจ้งเหตุบนถนนแบบเรียลไทม์ (SSE) ฝั่งหน้าเว็บ
 assets/cctv.js       กล้อง CCTV บนแผนที่ 3D + แผงภาพสด
-assets/vendor/       Leaflet 1.9.4 และ MapLibre GL 4.7.1 (BSD) — ไม่ต้องพึ่ง CDN
+assets/sim.js        รถ 3 มิติภาพจำลอง (three.js) บนถนนจาก OSM
+assets/roads-pattaya.geojson  เส้นถนนหลักพัทยา © OpenStreetMap contributors (ODbL)
+assets/vendor/       Leaflet 1.9.4, MapLibre GL 4.7.1 (BSD), three.js r149 (MIT) — ไม่ต้องพึ่ง CDN
 alerts.js            API แจ้งเหตุบนถนน (SSE, โหวต, หมดอายุ, ผู้ดูแล)
 data/alerts.json     การแจ้งเหตุ (สร้างอัตโนมัติ) · uploads/alerts/ รูปแจ้งเหตุ (สาธารณะ)
 assets/              โลโก้ ภาพ hero พระบรมฉายาลักษณ์ favicon
@@ -88,6 +90,9 @@ uploads/             รูปที่ผู้ดูแลอัปโหล�
 
 - **มี Google Maps key** (`traffic.googleMapsApiKey` + `googleMapsMapId` หรือ env `GOOGLE_MAPS_API_KEY` / `GOOGLE_MAPS_MAP_ID`): แผนที่ vector เอียง 3D หมุนรอบอัตโนมัติ + ชั้นข้อมูลจราจรสด หมุดแจ้งเหตุ/กล้องเป็น AdvancedMarker
 - **ไม่มี key:** แผนที่ 3 มิติด้วย MapLibre GL + OpenFreeMap (vector tiles ฟรี, ตึก 3D, เอียง/หมุนได้) แสดงเครดิต OpenFreeMap/OpenMapTiles/OpenStreetMap · ปุ่ม 🚦 สลับดู iframe จราจรของ Google · ถ้าเครื่องไม่รองรับ WebGL จะใช้ Leaflet + OSM แทน
+- **โหมดแผนที่:** ปุ่ม 🗺️ แผนที่ / 🛰️ ดาวเทียม 3D / 🚦 จราจร — ไม่มี key: ดาวเทียมใช้ Esri World Imagery (แสดงเครดิต Esri) บน MapLibre พร้อมเอียง/ตึก 3D, จราจร = iframe ของ Google · มี key: roadmap / hybrid (เอียงได้) / roadmap + TrafficLayer และปุ่ม Photorealistic 3D (Map Tiles API)
+- **รถ 3 มิติ (ภาพจำลอง):** `assets/sim.js` + three.js (vendor) วิ่งบนเส้นถนนจริงจาก OSM (`assets/roads-pattaya.geojson` ดึงครั้งเดียวผ่าน Overpass) ชิดซ้าย ทางเดียวตาม `oneway` ความเร็วตามช่วงเวลา (ชั่วโมงเร่งด่วนช้าลง) และชะลอ/ต่อคิวใกล้จุดแจ้งเหตุ กลางคืน (เวลาไทย) เปิดไฟหน้า · สูงสุด 150 คัน (มือถือ 60) หยุดเมื่อเลื่อนพ้นหรือสลับแท็บ ปิดอัตโนมัติถ้าผู้ใช้ตั้ง reduce motion · แสดงป้าย “ภาพจำลอง” เสมอ ปิด/เปิดด้วยปุ่ม 🚗 · ค่าเริ่มต้นตั้งที่ `traffic.simulation` · โหมด Google ต้องมี Map ID (WebGLOverlayView) และรถไม่แสดงในโหมด Photorealistic 3D
+  - อัปเดตถนน: แก้ query ใน README นี้แล้วดึงใหม่จาก Overpass (โปรดใช้อย่างประหยัด) แปลงเป็น GeoJSON LineString ที่มี `name`, `highway`, `oneway`
 - **แจ้งเหตุบนถนน:** ประเภท/อายุแสดงผล (ชั่วโมง)/เกณฑ์โหวต/ขนาดรูป/ขอบเขตพื้นที่ ตั้งค่าได้ที่ /admin → เนื้อหา → แจ้งเหตุบนถนน · จัดการรายการได้ที่แท็บ "แจ้งเหตุบนถนน" (ประกาศทางการ, ปักหมุด, ลบ, ข้อมูลตัวอย่างติดป้าย "ตัวอย่าง")
 - **Nginx กับ SSE:** เซิร์ฟเวอร์ส่ง `X-Accel-Buffering: no` แล้ว แต่ถ้าใช้ proxy อื่นให้ปิด buffering และตั้ง `proxy_read_timeout 1h;`
 - **กล้อง CCTV:** รายการกล้องแก้ได้ที่ /admin → เนื้อหา → กล้องสด CCTV (ชื่อ พิกัด ทิศกล้อง ชนิดสตรีม `link`/`hls`/`youtube`/`iframe`)

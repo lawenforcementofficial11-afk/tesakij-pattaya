@@ -90,6 +90,8 @@ tailwind.config = {
   .leaflet-container { font-family:'Sarabun',sans-serif; background:#dfe7ef; }
   #trafficMap .leaflet-control-zoom { margin-bottom:140px; border:0; box-shadow:0 4px 14px rgba(0,0,0,.25); }
   #trafficMap .leaflet-control-attribution { font-size:10px; }
+  .base-btn[aria-pressed=true] { background:#F5C518; color:#050f1f; }
+  .base-btn:not([aria-pressed=true]):hover { background:rgba(255,255,255,.12); }
   .cam-pin { position:relative; width:46px; height:64px; cursor:pointer; filter: drop-shadow(0 8px 10px rgba(0,0,0,.45)); transition: transform .2s; }
   .cam-pin:hover, .cam-pin.on { transform: translateY(-4px) scale(1.08); }
   .cam-pin .head { position:absolute; left:3px; top:0; width:40px; height:40px; border-radius:12px; background: linear-gradient(145deg,#1d4377 0%,#0B2545 60%,#050f1f 100%); border:2px solid #F5C518; display:flex; align-items:center; justify-content:center; font-size:19px; box-shadow: inset 0 2px 0 rgba(255,255,255,.25), inset 0 -4px 0 rgba(0,0,0,.35); transform: perspective(80px) rotateX(14deg); }
@@ -316,6 +318,15 @@ tailwind.config = {
           <span class="relative flex w-2.5 h-2.5 shrink-0"><span class="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span><span class="relative inline-flex w-2.5 h-2.5 rounded-full bg-emerald-400"></span></span>
           <span class="font-head font-semibold truncate" id="trafficMode">Google Maps · Traffic</span>
         </div>
+        <!-- base map switch + simulation badge -->
+        <div class="absolute z-[500] top-14 left-3 sm:top-16 sm:left-4 flex flex-col items-start gap-2">
+          <div id="baseSwitch" class="glass-dark rounded-xl p-1 flex gap-1 text-xs sm:text-sm font-head font-medium" role="group" aria-label="เลือกชนิดแผนที่">
+            <button type="button" data-base="map" class="base-btn rounded-lg px-2.5 sm:px-3 py-1.5" aria-pressed="false">🗺️ แผนที่</button>
+            <button type="button" data-base="sat" class="base-btn rounded-lg px-2.5 sm:px-3 py-1.5" aria-pressed="false">🛰️ ดาวเทียม 3D</button>
+            <button type="button" data-base="traffic" class="base-btn rounded-lg px-2.5 sm:px-3 py-1.5" aria-pressed="false">🚦 จราจร</button>
+          </div>
+          <span data-sim-badge class="hidden pointer-events-none inline-flex items-center gap-1.5 rounded-full bg-amber-400/95 text-navy-950 text-[11px] font-head font-semibold px-2.5 py-1 shadow">🚗 รถ 3 มิติ = ภาพจำลอง <span class="font-normal opacity-80">ไม่ใช่ตำแหน่งรถจริง</span></span>
+        </div>
         <!-- right controls -->
         <div class="absolute z-[500] top-3 right-3 sm:top-4 sm:right-4 flex flex-col gap-2" role="toolbar" aria-label="ควบคุมแผนที่">
           <button type="button" id="tBtnTilt" class="t-live hidden w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 font-head font-bold text-sm" title="สลับมุมมอง 2D / 3D" aria-label="สลับมุมมอง 2D หรือ 3D">2D</button>
@@ -323,7 +334,8 @@ tailwind.config = {
           <button type="button" id="tBtnRight" class="t-live hidden w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 flex items-center justify-center" title="หมุนขวา" aria-label="หมุนแผนที่ไปทางขวา"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 11-9-9 9.7 9.7 0 016.7 2.8L21 8M21 3v5h-5"/></svg></button>
           <button type="button" id="tBtnOrbit" class="t-live hidden w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 flex items-center justify-center" title="หยุด/เล่นการหมุนอัตโนมัติ" aria-label="หยุดหรือเล่นการหมุนอัตโนมัติ" aria-pressed="true"><svg id="tIcoPause" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg><svg id="tIcoPlay" class="w-5 h-5 hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
           <button type="button" id="tBtnReal" class="hidden w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 font-head font-bold text-[10px] leading-tight" title="มุมมองภาพถ่าย 3 มิติ (Photorealistic 3D)" aria-label="สลับมุมมองภาพถ่าย 3 มิติ">3D<br>Photo</button>
-          <button type="button" id="tBtnGTraffic" class="t-fb hidden w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 text-lg" title="ชั้นข้อมูลจราจรจาก Google" aria-label="สลับไปดูชั้นข้อมูลจราจรจาก Google" aria-pressed="false">🚦</button>
+          <button type="button" id="tBtnSim" class="w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 text-lg" title="รถ 3 มิติ (ภาพจำลอง) เปิด/ปิด" aria-label="เปิดหรือปิดรถ 3 มิติแบบภาพจำลอง" aria-pressed="false">🚗</button>
+          <button type="button" id="tBtnGTraffic" class="t-fb hidden !hidden w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 text-lg" title="ชั้นข้อมูลจราจรจาก Google" aria-label="สลับไปดูชั้นข้อมูลจราจรจาก Google" aria-pressed="false">🚦</button>
           <button type="button" id="tBtnCam" class="cctv-on w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 text-lg chip-active" title="แสดง/ซ่อนกล้อง CCTV" aria-label="แสดงหรือซ่อนกล้อง CCTV บนแผนที่" aria-pressed="true">📹</button>
           <button type="button" id="tBtnFull" class="w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 flex items-center justify-center" title="เต็มจอ" aria-label="แสดงแผนที่เต็มจอ"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
         </div>
@@ -754,6 +766,7 @@ tailwind.config = {
 <script src="assets/traffic.js"></script>
 <script src="assets/alerts.js"></script>
 <script src="assets/cctv.js"></script>
+<script src="assets/sim.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>

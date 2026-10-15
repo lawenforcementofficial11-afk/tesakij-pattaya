@@ -30,7 +30,7 @@ async def main():
             if not m:
                 # road alerts map: open first alert popup, capture the section
                 await pg.evaluate("document.getElementById('traffic').scrollIntoView()"); await pg.wait_for_timeout(5000)
-                await pg.evaluate("(()=>{const a=Object.values(TKPAlerts._store).find(x=>x.type==='accident'); a&&TKPAlerts.goto(a.id,15)})()")
+                await pg.evaluate("(()=>{const a=Object.values(TKPAlerts._store).find(x=>x.type==='accident'); a&&TKPAlerts.goto(a.id,16)})()")
                 await pg.wait_for_timeout(3500)
                 await pg.set_viewport_size({'width': 1440, 'height': 1400}); await pg.wait_for_timeout(800)
                 await pg.add_style_tag(content='#siteHeader,#chatFab{visibility:hidden !important}')
@@ -38,9 +38,16 @@ async def main():
                 await pg.evaluate("TKPCCTV.open(1)"); await pg.wait_for_timeout(5000)
                 await pg.locator('#traffic').screenshot(path=D + 'preview-cctv.png')
                 await pg.evaluate("TKPCCTV.close()")
+                await pg.evaluate("TKPTraffic.setBase('sat'); document.querySelector('.maplibregl-popup-close-button')?.click(); document.querySelector('[data-spot=\"2\"]').click()"); await pg.wait_for_timeout(7000)
+                await pg.locator('#traffic').screenshot(path=D + 'preview-satellite.png')
+                await pg.evaluate("TKPTraffic.setBase('map')")
                 await pg.add_style_tag(content='#siteHeader,#chatFab{visibility:visible !important}')
                 await pg.set_viewport_size({'width': 1440, 'height': 900})
             if m:
+                await pg.evaluate("document.getElementById('trafficCard').scrollIntoView({block:'center'})"); await pg.wait_for_timeout(6000)
+                await pg.add_style_tag(content='#siteHeader,#chatFab,nav[aria-label="เมนูลัด"]{visibility:hidden !important}')
+                await pg.locator('#trafficCard').screenshot(path=D + 'preview-map-mobile.png')
+                await pg.add_style_tag(content='#siteHeader,#chatFab,nav[aria-label="เมนูลัด"]{visibility:visible !important}')
                 await pg.evaluate("document.querySelector('[data-open-report]').click()"); await pg.wait_for_timeout(600)
                 await pg.evaluate("document.querySelector('[data-rtype=construction]').click()"); await pg.wait_for_timeout(2500)
                 await pg.screenshot(path=D + 'preview-report.png')
