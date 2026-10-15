@@ -75,6 +75,28 @@ tailwind.config = {
   .typing span { width:7px; height:7px; border-radius:99px; background:#94a3b8; display:inline-block; animation: blink 1.2s infinite both; }
   .typing span:nth-child(2){animation-delay:.2s} .typing span:nth-child(3){animation-delay:.4s}
   @keyframes blink { 0%,80%,100%{opacity:.25; transform:translateY(0)} 40%{opacity:1; transform:translateY(-3px)} }
+  /* ---- mascot น้องAI (original character, CSS + SVG) ---- */
+  .mascot{overflow:visible}
+  .mascot .m-bob{animation:mBob 3.2s ease-in-out infinite;transform-origin:60px 130px;transform-box:view-box}
+  .mascot .m-eye{transform-box:fill-box;transform-origin:center;animation:mBlink 4.6s infinite}
+  .mascot .m-arm{transform-box:view-box;transform-origin:96px 98px}
+  .mascot.wave .m-arm{animation:mWave .5s ease-in-out 4 alternate}
+  .mascot .m-talk{opacity:0}
+  .mascot.talking .m-smile{opacity:0}
+  .mascot.talking .m-talk{opacity:1;transform-box:fill-box;transform-origin:center;animation:mTalk .18s ease-in-out infinite alternate}
+  .mascot .m-shadow{transform-box:fill-box;transform-origin:center;animation:mShadow 3.2s ease-in-out infinite}
+  .mascot.static .m-bob,.mascot.static .m-shadow{animation:none}
+  @keyframes mBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes mShadow{0%,100%{transform:scaleX(1);opacity:.25}50%{transform:scaleX(.85);opacity:.15}}
+  @keyframes mBlink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+  @keyframes mWave{from{transform:rotate(10deg)}to{transform:rotate(-28deg)}}
+  @keyframes mTalk{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
+  .fab-mascot{filter:drop-shadow(0 8px 14px rgba(5,15,31,.35))}
+  #chatFab:hover .mascot .m-arm{animation:mWave .5s ease-in-out 2 alternate}
+  .chat-bubble-hint{animation:hintIn .4s ease both}
+  @keyframes hintIn{from{opacity:0;transform:translateY(6px) scale(.95)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.mascot *{animation:none!important}}
+  .no-mobilebar footer{padding-bottom:0!important} .no-mobilebar #chatFab{bottom:16px} .no-mobilebar #chatPanel{bottom:12px}
   .chat-panel { transform-origin: bottom right; transition: transform .25s ease, opacity .25s ease; }
   .chat-panel.closed { transform: scale(.92) translateY(12px); opacity:0; pointer-events:none; }
   :focus-visible { outline: 3px solid #F5C518; outline-offset: 2px; border-radius: 6px; }
@@ -177,7 +199,7 @@ tailwind.config = {
 
 <main id="main">
 <!-- HERO -->
-<section id="home" class="relative isolate overflow-hidden text-white bg-navy-950 -mt-[72px] lg:-mt-20">
+<section id="home" data-sec="hero" class="relative isolate overflow-hidden text-white bg-navy-950 -mt-[72px] lg:-mt-20">
   <div class="absolute inset-0 -z-10">
     <picture>
       <source data-srcset="hero.image" srcset="assets/hero-pattaya-2400.jpg" media="(min-width: 1024px)">
@@ -233,7 +255,7 @@ tailwind.config = {
 </section>
 
 <!-- ROYAL TRIBUTE -->
-<section id="royal" class="hidden relative royal-bg overflow-hidden scroll-mt-20" aria-labelledby="royalHeading">
+<section id="royal" data-sec="royal" class="hidden relative royal-bg overflow-hidden scroll-mt-20" aria-labelledby="royalHeading">
   <div class="absolute inset-0 thai-pattern opacity-70"></div>
   <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-gold-600 via-gold-300 to-gold-600"></div>
   <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
@@ -271,7 +293,7 @@ tailwind.config = {
 </section>
 
 <!-- SERVICES -->
-<section id="services" class="py-16 sm:py-24 scroll-mt-20">
+<section id="services" data-sec="services" class="py-16 sm:py-24 scroll-mt-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
     <div class="max-w-2xl reveal">
       <p class="font-head text-gold-600 font-semibold tracking-wide">บริการประชาชน · e-Services</p>
@@ -282,7 +304,7 @@ tailwind.config = {
 </section>
 
 <!-- LIVE TRAFFIC + ROAD ALERTS -->
-<section id="traffic" class="relative bg-navy-950 text-white overflow-hidden scroll-mt-20">
+<section id="traffic" data-sec="traffic" class="relative bg-navy-950 text-white overflow-hidden scroll-mt-20">
   <div class="absolute -top-40 right-0 w-[640px] h-[640px] rounded-full bg-sea-500/15 blur-3xl"></div>
   <div class="absolute -bottom-40 -left-40 w-[520px] h-[520px] rounded-full bg-gold-500/10 blur-3xl"></div>
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
@@ -308,7 +330,7 @@ tailwind.config = {
       </div>
     </div>
 
-    <div class="mt-8 grid lg:grid-cols-[minmax(0,1fr)_370px] gap-4 reveal" style="--d:120ms">
+    <div id="trafficGrid" class="mt-8 grid lg:grid-cols-[minmax(0,1fr)_370px] gap-4 reveal" style="--d:120ms">
       <div id="trafficCard" class="relative h-[540px] sm:h-[600px] lg:h-[660px] rounded-[28px] overflow-hidden ring-1 ring-white/15 shadow-lift bg-navy-900">
         <div id="trafficMap" class="absolute inset-0 z-0" aria-label="แผนที่สภาพการจราจรและการแจ้งเหตุเมืองพัทยา"></div>
         <div id="trafficMap3d" class="absolute inset-0 z-0 hidden"></div>
@@ -334,7 +356,7 @@ tailwind.config = {
           <button type="button" id="tBtnRight" class="t-live hidden w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 flex items-center justify-center" title="หมุนขวา" aria-label="หมุนแผนที่ไปทางขวา"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12a9 9 0 11-9-9 9.7 9.7 0 016.7 2.8L21 8M21 3v5h-5"/></svg></button>
           <button type="button" id="tBtnOrbit" class="t-live hidden w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 flex items-center justify-center" title="หยุด/เล่นการหมุนอัตโนมัติ" aria-label="หยุดหรือเล่นการหมุนอัตโนมัติ" aria-pressed="true"><svg id="tIcoPause" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg><svg id="tIcoPlay" class="w-5 h-5 hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
           <button type="button" id="tBtnReal" class="hidden w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 font-head font-bold text-[10px] leading-tight" title="มุมมองภาพถ่าย 3 มิติ (Photorealistic 3D)" aria-label="สลับมุมมองภาพถ่าย 3 มิติ">3D<br>Photo</button>
-          <button type="button" id="tBtnSim" class="w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 text-lg" title="รถ 3 มิติ (ภาพจำลอง) เปิด/ปิด" aria-label="เปิดหรือปิดรถ 3 มิติแบบภาพจำลอง" aria-pressed="false">🚗</button>
+          <button type="button" id="tBtnSim" data-feat="simulation" class="w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 text-lg" title="รถ 3 มิติ (ภาพจำลอง) เปิด/ปิด" aria-label="เปิดหรือปิดรถ 3 มิติแบบภาพจำลอง" aria-pressed="false">🚗</button>
           <button type="button" id="tBtnGTraffic" class="t-fb hidden !hidden w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 text-lg" title="ชั้นข้อมูลจราจรจาก Google" aria-label="สลับไปดูชั้นข้อมูลจราจรจาก Google" aria-pressed="false">🚦</button>
           <button type="button" id="tBtnCam" class="cctv-on w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 text-lg chip-active" title="แสดง/ซ่อนกล้อง CCTV" aria-label="แสดงหรือซ่อนกล้อง CCTV บนแผนที่" aria-pressed="true">📹</button>
           <button type="button" id="tBtnFull" class="w-11 h-11 rounded-xl glass-dark hover:bg-navy-800 flex items-center justify-center" title="เต็มจอ" aria-label="แสดงแผนที่เต็มจอ"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
@@ -410,7 +432,7 @@ tailwind.config = {
 </section>
 
 <!-- TOURIST HELP -->
-<section id="tourist" class="relative bg-navy-950 text-white overflow-hidden scroll-mt-20">
+<section id="tourist" data-sec="tourist" class="relative bg-navy-950 text-white overflow-hidden scroll-mt-20">
   <div class="absolute -top-32 -left-32 w-[520px] h-[520px] rounded-full bg-sea-500/20 blur-3xl"></div>
   <div class="absolute -bottom-40 right-0 w-[520px] h-[520px] rounded-full bg-gold-500/10 blur-3xl"></div>
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
@@ -470,9 +492,9 @@ tailwind.config = {
 </section>
 
 <!-- ABOUT + QUICK REPORT/TRACK -->
-<section id="track" class="py-16 sm:py-24 scroll-mt-20">
+<section id="track" data-sec="track" class="py-16 sm:py-24 scroll-mt-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-5 gap-10 lg:gap-14 items-start">
-    <div id="about" class="lg:col-span-2 scroll-mt-28 reveal">
+    <div id="about" data-feat="about" class="lg:col-span-2 scroll-mt-28 reveal">
       <p class="font-head text-gold-600 font-semibold tracking-wide">เกี่ยวกับเรา</p>
       <h2 class="mt-2 font-head font-bold text-3xl sm:text-4xl xl:text-5xl text-navy-900 leading-tight text-balance">เมืองท่องเที่ยวระดับโลก ที่เป็นระเบียบและปลอดภัย</h2>
       <p class="mt-5 text-lg leading-relaxed text-slate-600"><span data-bind="site.name">เทศกิจพัทยา</span> ปฏิบัติหน้าที่ตามกฎหมายและข้อบัญญัติเมืองพัทยา ดูแลทางเท้า พื้นที่สาธารณะ และชายหาด ให้ประชาชนและนักท่องเที่ยวใช้ชีวิตได้อย่างสะดวกและปลอดภัย</p>
@@ -482,9 +504,9 @@ tailwind.config = {
         <li class="flex gap-3"><span class="mt-0.5 w-7 h-7 shrink-0 rounded-full bg-gold-500/20 text-gold-700 flex items-center justify-center"><span data-icon="check" class="w-4 h-4"></span></span>ตรวจตราพื้นที่ชายหาดและแหล่งท่องเที่ยว</li>
       </ul>
     </div>
-    <div class="lg:col-span-3 grid sm:grid-cols-5 gap-4 reveal" style="--d:120ms">
+    <div id="trackCards" class="lg:col-span-3 grid sm:grid-cols-5 gap-4 reveal" style="--d:120ms">
       <!-- compact report card -->
-      <div id="complaint" class="sm:col-span-2 relative rounded-[24px] bg-gradient-to-br from-navy-900 to-navy-800 text-white p-6 overflow-hidden scroll-mt-28">
+      <div id="complaint" data-feat="complaint" class="sm:col-span-2 relative rounded-[24px] bg-gradient-to-br from-navy-900 to-navy-800 text-white p-6 overflow-hidden scroll-mt-28">
         <img data-src="site.logo" src="assets/logo.png" alt="" aria-hidden="true" class="absolute -right-8 -bottom-8 w-36 opacity-[0.08] pointer-events-none">
         <span class="w-11 h-11 rounded-2xl bg-gold-500 text-navy-950 flex items-center justify-center"><span data-icon="edit" class="w-6 h-6"></span></span>
         <h3 class="mt-4 font-head font-bold text-xl">แจ้งเรื่องร้องเรียน</h3>
@@ -492,7 +514,7 @@ tailwind.config = {
         <button type="button" data-open-complaint class="mt-5 w-full rounded-full bg-gold-500 hover:bg-gold-400 text-navy-950 font-head font-semibold py-3 shadow-glow transition">แจ้งเรื่อง</button>
       </div>
       <!-- compact track card -->
-      <div class="sm:col-span-3 rounded-[24px] bg-white shadow-card ring-1 ring-slate-100 p-6">
+      <div id="trackCard" data-feat="trackStatus" class="sm:col-span-3 rounded-[24px] bg-white shadow-card ring-1 ring-slate-100 p-6">
         <div class="flex items-center gap-3">
           <span class="w-11 h-11 rounded-2xl bg-navy-900 text-gold-400 flex items-center justify-center"><span data-icon="search" class="w-6 h-6"></span></span>
           <div><h3 class="font-head font-bold text-xl text-navy-900">ติดตามสถานะ</h3><p class="text-xs text-slate-500">Track your report</p></div>
@@ -510,7 +532,7 @@ tailwind.config = {
 </section>
 
 <!-- STATS -->
-<section class="relative bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900 text-white overflow-hidden">
+<section id="statsSec" data-sec="stats" class="relative bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900 text-white overflow-hidden">
   <div class="absolute inset-0 opacity-[.07]" style="background-image:repeating-linear-gradient(45deg,#F5C518 0 2px,transparent 2px 22px)"></div>
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
     <div class="flex items-center justify-between flex-wrap gap-3 mb-8 reveal">
@@ -522,7 +544,7 @@ tailwind.config = {
 </section>
 
 <!-- NEWS -->
-<section id="news" class="py-16 sm:py-24 scroll-mt-20">
+<section id="news" data-sec="news" class="py-16 sm:py-24 scroll-mt-20">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
     <div class="flex items-end justify-between gap-4 flex-wrap reveal">
       <div>
@@ -535,24 +557,37 @@ tailwind.config = {
   </div>
 </section>
 
-<!-- LAWS + FAQ -->
-<section id="laws" class="pb-16 sm:pb-24 scroll-mt-20">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-8">
-    <div class="rounded-[28px] bg-white shadow-card ring-1 ring-slate-100 p-6 sm:p-8 reveal">
-      <div class="flex items-center gap-3">
-        <span class="w-11 h-11 rounded-2xl bg-navy-900 text-gold-400 flex items-center justify-center"><span data-icon="scale" class="w-6 h-6"></span></span>
-        <h2 class="font-head font-bold text-2xl sm:text-3xl text-navy-900">ข้อบัญญัติและค่าปรับ</h2>
+<!-- LAWS (sourced from official government websites) -->
+<section id="laws" data-sec="laws" class="py-16 sm:py-24 scroll-mt-20 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 reveal">
+      <div class="flex items-start gap-4">
+        <span class="w-12 h-12 shrink-0 rounded-2xl bg-navy-900 text-gold-400 flex items-center justify-center"><span data-icon="scale" class="w-7 h-7"></span></span>
+        <div>
+          <p class="font-head text-gold-600 font-semibold">Laws &amp; Fines · อ้างอิงแหล่งข้อมูลทางราชการ</p>
+          <h2 class="mt-1 font-head font-bold text-3xl sm:text-5xl text-navy-900" data-bind="laws.title">กฎหมาย ข้อบัญญัติ และอัตราค่าปรับ</h2>
+        </div>
       </div>
-      <p class="mt-3 text-sm rounded-xl bg-amber-50 text-amber-800 px-4 py-2.5" data-bind="laws.note"></p>
-      <ul id="lawList" class="mt-4 divide-y divide-slate-100"></ul>
+      <p class="text-sm text-slate-500 shrink-0">ตรวจสอบล่าสุด <b id="lawsChecked" class="text-navy-900"></b> · <span id="lawsCount"></span></p>
     </div>
-    <div id="faq" class="rounded-[28px] bg-white shadow-card ring-1 ring-slate-100 p-6 sm:p-8 scroll-mt-20 reveal" style="--d:120ms">
-      <div class="flex items-center gap-3">
-        <span class="w-11 h-11 rounded-2xl bg-sea-500 text-white flex items-center justify-center"><span data-icon="help" class="w-6 h-6"></span></span>
-        <h2 class="font-head font-bold text-2xl sm:text-3xl text-navy-900">คำถามที่พบบ่อย</h2>
-      </div>
-      <div id="faqList" class="mt-5 space-y-3"></div>
+    <div class="mt-6 rounded-2xl bg-amber-50 ring-1 ring-amber-200 text-amber-900 px-5 py-4 text-sm leading-relaxed flex gap-3 reveal"><span class="text-lg leading-none">⚠️</span><p><b class="font-head">ข้อสงวนสิทธิ์:</b> <span data-bind="laws.disclaimer"></span></p></div>
+    <div id="lawCats" class="mt-6 flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+    <div id="lawGroups" class="mt-4 grid lg:grid-cols-2 gap-6 items-start"></div>
+    <div class="mt-8 rounded-2xl bg-white ring-1 ring-slate-200 p-5 reveal">
+      <p class="font-head font-semibold text-navy-900">แหล่งข้อมูลทางราชการที่ใช้อ้างอิง</p>
+      <ul id="lawSources" class="mt-2 grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm"></ul>
     </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" data-sec="faq" class="py-16 sm:py-24 scroll-mt-20">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center gap-3 reveal">
+      <span class="w-11 h-11 rounded-2xl bg-sea-500 text-white flex items-center justify-center"><span data-icon="help" class="w-6 h-6"></span></span>
+      <h2 class="font-head font-bold text-2xl sm:text-4xl text-navy-900">คำถามที่พบบ่อย</h2>
+    </div>
+    <div id="faqList" class="mt-6 space-y-3 reveal"></div>
   </div>
 </section>
 
@@ -610,7 +645,7 @@ tailwind.config = {
 </footer>
 
 <!-- Mobile bottom bar -->
-<nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 glass-dark border-t border-white/10 text-white pb-safe" aria-label="เมนูลัด">
+<nav id="mobileBar" data-feat="mobileBar" class="lg:hidden fixed bottom-0 inset-x-0 z-40 glass-dark border-t border-white/10 text-white pb-safe" aria-label="เมนูลัด">
   <div class="grid grid-cols-4 h-[68px] text-[11px] font-head">
     <a href="#home" class="flex flex-col items-center justify-center gap-1 text-gold-300"><span data-icon="home" class="w-6 h-6"></span>หน้าแรก</a>
     <a href="#complaint" class="flex flex-col items-center justify-center gap-1 text-white/80"><span data-icon="edit" class="w-6 h-6"></span>แจ้งเรื่อง</a>
@@ -621,17 +656,15 @@ tailwind.config = {
 
 <!-- Chatbot -->
 <div id="chatRoot" class="hidden">
-  <button id="chatFab" type="button" class="fixed z-50 right-4 bottom-[88px] lg:bottom-6 lg:right-6 group flex items-center gap-2 rounded-full bg-navy-900 text-white pl-1.5 pr-4 py-1.5 shadow-lift ring-2 ring-gold-500/80 hover:ring-gold-400 transition" aria-controls="chatPanel" aria-expanded="false">
-    <span class="relative w-11 h-11 rounded-full bg-gradient-to-br from-gold-300 to-gold-500 flex items-center justify-center overflow-hidden">
-      <img id="chatFabAvatar" src="assets/logo.png" alt="" class="w-8 h-9 object-contain">
-      <span class="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-navy-900"></span>
-    </span>
-    <span class="font-head font-semibold text-sm hidden sm:inline">ถาม<span class="bot-name">น้องAI</span></span>
-    <span class="font-head font-semibold text-sm sm:hidden">แชท</span>
+  <button id="chatFab" type="button" class="fixed z-50 right-3 bottom-[84px] lg:bottom-5 lg:right-6 group flex items-end gap-1" aria-controls="chatPanel" aria-expanded="false" aria-label="แชทกับน้องAIเทศกิจพัทยา">
+    <span id="chatHint" class="chat-bubble-hint hidden sm:inline-flex mb-9 mr-[-6px] items-center rounded-2xl rounded-br-md bg-white text-navy-900 font-head font-semibold text-sm px-3.5 py-2 shadow-lift ring-1 ring-black/5"><span id="chatHintText">ถาม<span class="bot-name">น้องAI</span>ได้เลย!</span></span>
+    <span id="chatFabFig" class="relative block w-[78px] h-[92px] fab-mascot"></span>
+    <span class="absolute right-2 bottom-1 w-3.5 h-3.5 rounded-full bg-emerald-400 ring-2 ring-white"></span>
   </button>
   <section id="chatPanel" class="chat-panel closed fixed z-[55] inset-x-2 bottom-[84px] top-[96px] sm:top-auto sm:inset-x-auto sm:right-6 sm:bottom-24 lg:bottom-24 sm:w-[400px] sm:h-[620px] max-h-[calc(100svh-100px)] rounded-[26px] bg-white shadow-lift ring-1 ring-black/5 flex flex-col overflow-hidden" role="dialog" aria-label="แชทกับน้องAI" aria-modal="false">
     <header class="relative bg-gradient-to-r from-navy-950 to-navy-800 text-white px-4 py-3.5 flex items-center gap-3">
-      <span class="relative w-11 h-11 rounded-full bg-gradient-to-br from-gold-300 to-gold-500 flex items-center justify-center shrink-0">
+      <span id="chatHeadFig" class="relative w-14 h-16 -my-2 shrink-0"></span>
+      <span class="hidden">
         <img id="chatAvatar" src="assets/logo.png" alt="" class="w-8 h-9 object-contain">
         <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-navy-900"></span>
       </span>
@@ -767,6 +800,7 @@ tailwind.config = {
 <script src="assets/alerts.js"></script>
 <script src="assets/cctv.js"></script>
 <script src="assets/sim.js"></script>
+<script src="assets/mascot.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>

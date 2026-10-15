@@ -23,6 +23,15 @@
   .btn-red{background:#fef2f2;color:#b91c1c}.btn-red:hover{background:#fee2e2}
   .tab.active{background:#0B2545;color:#fff}
   .sec-link.active{background:#FFF6D6;color:#8F6B00;font-weight:600}
+  .sw{position:relative;width:46px;height:26px;flex-shrink:0;display:inline-block}
+  .sw input{opacity:0;width:0;height:0;position:absolute}
+  .sw span{position:absolute;inset:0;border-radius:99px;background:#cbd5e1;transition:.2s;cursor:pointer}
+  .sw span:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:.2s}
+  .sw input:checked+span{background:#16a34a}.sw input:checked+span:before{transform:translateX(20px)}
+  .sw input:focus-visible+span{outline:3px solid #F5C518;outline-offset:2px}
+  .lay-row{cursor:grab;transition:box-shadow .15s,transform .15s}.lay-row.dragging{opacity:.55;box-shadow:0 12px 30px rgba(11,37,69,.25);cursor:grabbing}
+  .lay-row.off .lay-name{color:#94a3b8;text-decoration:line-through}
+  .lay-row.pinned{cursor:default}
 </style>
 </head>
 <body class="bg-slate-100 text-slate-700 min-h-screen">
@@ -52,6 +61,7 @@
       </div>
       <nav class="flex items-center gap-1 bg-white/10 rounded-xl p-1 font-head text-sm">
         <button class="tab active px-3 py-1.5 rounded-lg" data-tab="content">เนื้อหาเว็บไซต์</button>
+        <button class="tab px-3 py-1.5 rounded-lg" data-tab="layout">เลย์เอาต์ / เปิด-ปิด</button>
         <button class="tab px-3 py-1.5 rounded-lg" data-tab="complaints">เรื่องร้องเรียน <span id="cCount" class="ml-1 text-[11px] bg-gold-500 text-navy-950 rounded-full px-1.5"></span></button>
         <button class="tab px-3 py-1.5 rounded-lg" data-tab="alerts">แจ้งเหตุบนถนน <span id="aCount" class="ml-1 text-[11px] bg-gold-500 text-navy-950 rounded-full px-1.5"></span></button>
         <button class="tab px-3 py-1.5 rounded-lg" data-tab="chat">แชทบอท</button>
@@ -86,6 +96,26 @@
     </section>
   </main>
 
+
+  <!-- Layout: sections on/off + drag reorder -->
+  <main id="tab-layout" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div><h1 class="font-head font-bold text-2xl text-navy-900">เลย์เอาต์หน้าแรก &amp; เปิด/ปิดฟีเจอร์</h1><p class="text-sm text-slate-500">ลาก ☰ เพื่อจัดลำดับส่วนต่าง ๆ ของหน้าแรก (หรือใช้ปุ่ม ↑ ↓) · สวิตช์เขียว = แสดงบนเว็บ · กด “บันทึก” แล้วหน้าเว็บจะอ่านค่าใหม่ทันที</p></div>
+      <div class="flex items-center gap-2"><span id="layDirty" class="hidden text-xs text-amber-700 bg-amber-100 rounded-full px-2.5 py-1">ยังไม่ได้บันทึก</span><a href="/" target="_blank" rel="noopener" class="btn btn-ghost">ดูหน้าเว็บ ↗</a><button id="laySave" class="btn btn-gold shadow">💾 บันทึก</button></div>
+    </div>
+    <div class="grid lg:grid-cols-[1.25fr_1fr] gap-5 items-start">
+      <section class="rounded-2xl bg-white ring-1 ring-slate-200 p-4">
+        <div class="flex items-center justify-between mb-3"><h2 class="font-head font-semibold text-lg text-navy-900">ส่วนของหน้าแรก (ลำดับจากบนลงล่าง)</h2><span id="layCount" class="text-xs text-slate-500"></span></div>
+        <ol id="layList" class="space-y-2" aria-label="ลำดับส่วนของหน้าแรก"></ol>
+        <p class="mt-3 text-xs text-slate-400">* “ภาพหลัก (Hero)” ตรึงไว้บนสุดเสมอ เพราะอยู่ใต้แถบเมนูโปร่งใส — ปิดได้แต่ย้ายไม่ได้</p>
+      </section>
+      <section class="rounded-2xl bg-white ring-1 ring-slate-200 p-4">
+        <h2 class="font-head font-semibold text-lg text-navy-900 mb-3">ฟีเจอร์ย่อย</h2>
+        <div id="featList" class="divide-y divide-slate-100"></div>
+        <p class="mt-3 text-xs text-slate-400">ปิด “แชทบอท” จะปิด API /api/chat ด้วย · ปิด “แจ้งเหตุบนถนน” จะซ่อนปุ่ม/รายการแจ้งเหตุและหมุดบนแผนที่</p>
+      </section>
+    </div>
+  </main>
   <!-- Complaints -->
   <main id="tab-complaints" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 py-6">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -177,7 +207,7 @@ var SECTIONS=[
  ['tourist','นักท่องเที่ยว','Tourist Help เคล็ดลับ และพื้นที่สำคัญบนแผนที่'],
  ['stats','สถิติ','ตัวเลขผลการดำเนินงาน'],
  ['news','ข่าว/ประกาศ','ข่าวสารล่าสุด (แสดง 6 รายการแรก)'],
- ['laws','กฎหมาย/ค่าปรับ','ข้อบัญญัติและอัตราค่าปรับ'],
+ ['laws','กฎหมาย/ค่าปรับ','ใส่เฉพาะข้อมูลจากเว็บไซต์ราชการ พร้อมลิงก์แหล่งที่มา · ถ้ายืนยันจำนวนเงินไม่ได้ ให้ใช้ “ดูรายละเอียดในแหล่งอ้างอิง” · ตรวจสอบ/แก้ทั้งหมดได้ที่นี่ (บอทใช้ข้อมูลนี้ตอบ)'],
  ['faq','คำถามที่พบบ่อย','FAQ (บอทใช้เป็นฐานความรู้ด้วย)'],
  ['complaintCategories','ประเภทเรื่องร้องเรียน','ตัวเลือกในแบบฟอร์ม'],
  ['footer','ส่วนท้าย','ข้อความและลิงก์ด่วน'],
@@ -189,7 +219,8 @@ var L={name:'ชื่อ',namePart1:'ชื่อส่วนที่ 1 (ส�
  icon:'ไอคอน',title:'หัวข้อ',desc:'คำอธิบาย',link:'ลิงก์',headingTh:'หัวข้อภาษาไทย',intro:'คำนำ',languages:'ภาษาที่รองรับ',tips:'เคล็ดลับ',titleEn:'หัวข้อภาษาอังกฤษ',zones:'พื้นที่บนแผนที่',nameEn:'ชื่อภาษาอังกฤษ',x:'ตำแหน่ง X (%)',y:'ตำแหน่ง Y (%)',
  isExample:'เป็นข้อมูลตัวอย่าง (แสดงป้าย)',items:'รายการ',value:'ตัวเลข',suffix:'หน่วย',label:'ป้ายกำกับ',date:'วันที่',category:'หมวดหมู่',excerpt:'เนื้อหาย่อ',note:'หมายเหตุ',fine:'ค่าปรับ',ref:'อ้างอิงกฎหมาย',q:'คำถาม',a:'คำตอบ',aEn:'คำตอบภาษาอังกฤษ',about:'ข้อความเกี่ยวกับหน่วยงาน',links:'ลิงก์',href:'ลิงก์ (URL หรือ #section)',
  avatar:'รูปอวตาร',greeting:'คำทักทาย',quickReplies:'ปุ่มตอบด่วน',fallback:'คำตอบเมื่อไม่พบข้อมูล (ไทย)',fallbackEn:'คำตอบเมื่อไม่พบข้อมูล (อังกฤษ)',disclaimer:'ข้อความกำกับ',systemPrompt:'System prompt สำหรับ LLM',kb:'ฐานความรู้ (Q&A)',keywords:'คำสำคัญ (ใช้จับคู่คำถาม)',googleMapsApiKey:'Google Maps API key',googleMapsMapId:'Map ID (Vector, เปิด Tilt/Rotation)',enablePhotorealistic:'เปิดปุ่ม Photorealistic 3D (ต้องเปิด Map Tiles API)',center:'จุดศูนย์กลาง',lat:'ละติจูด',lng:'ลองจิจูด',zoom:'ระดับซูม',tilt:'มุมเอียง (0–67)',heading:'ทิศทาง (องศา)',refreshSeconds:'รีเฟรชข้อมูลทุก (วินาที)',orbitSpeed:'ความเร็วหมุนอัตโนมัติ',fallbackNotice:'ข้อความเมื่อยังไม่มี API key',spots:'จุดลัดบนแผนที่',reportButton:'ข้อความปุ่มแจ้งเหตุ',types:'ประเภทเหตุ',key:'รหัส (ภาษาอังกฤษ ห้ามซ้ำ)',labelEn:'ชื่อภาษาอังกฤษ',emoji:'อีโมจิ',color:'สี (#hex)',ttlHours:'แสดงนาน (ชั่วโมง) ก่อนหมดอายุ',voteExtendRatio:'กด 👍 ต่ออายุ (สัดส่วนของอายุประเภท)',downvotesToRemove:'จำนวน 👎 ที่ทำให้เหตุหายไป',maxPhotoMB:'ขนาดรูปสูงสุด (MB)',maxNoteLength:'ความยาวข้อความสูงสุด',bounds:'ขอบเขตพื้นที่ที่รับแจ้ง',south:'ใต้ (lat ต่ำสุด)',north:'เหนือ (lat สูงสุด)',west:'ตะวันตก (lng ต่ำสุด)',east:'ตะวันออก (lng สูงสุด)',nearbyNotifyKm:'รัศมีแจ้งเตือนเหตุใกล้ฉัน (กม.)',tileUrl:'URL แผ่นแผนที่ (tile)',tileAttribution:'เครดิตแผนที่ (ต้องมี)',fallbackZoom:'ระดับซูมโหมดสำรอง',fallbackStyleUrl:'สไตล์แผนที่ 3D โหมดไม่มี key (MapLibre)',simulation:'แสดงรถ 3 มิติ (ภาพจำลอง) เป็นค่าเริ่มต้น',cameras:'กล้อง',credit:'เครดิตภาพ (ต้องแสดง)',officialUrl:'ลิงก์เว็บไซต์กล้องทางการ',allowOfficialEmbed:'ฝังเว็บทางการเมื่อโฮสต์บน *.pattaya.go.th',linkNotice:'ข้อความเมื่อเปิดได้เฉพาะเว็บทางการ',exampleNotice:'หมายเหตุตำแหน่งตัวอย่าง',approx:'ตำแหน่งโดยประมาณ',type:'ชนิดสตรีม: link / hls / youtube / iframe',src:'URL สตรีม (.m3u8 / YouTube / https iframe)',url:'ลิงก์หน้าเว็บทางการของกล้อง',id:'รหัส'};
-var LONG=/^(fallbackNotice|desc|description|excerpt|a|aEn|greeting|systemPrompt|dedication|intro|fallback|fallbackEn|about|tagline|note|disclaimer)$/;
+L.category='หมวดหมู่';L.summary='สรุปสาระสำคัญ';L.fineAmount='ค่าปรับสูงสุด (ตัวเลขบาท · เว้นว่างถ้าไม่ระบุ)';L.legalRef='ฐานกฎหมาย (ชื่อกฎหมาย/มาตรา)';L.year='ปี พ.ศ. ที่ประกาศ/มีผล';L.source='ชื่อแหล่งที่มา';L.url='ลิงก์แหล่งที่มาทางการ (URL)';L.url2='ลิงก์สำรอง/ตัวบท (URL)';L.lastChecked='วันที่ตรวจสอบล่าสุด (YYYY-MM-DD)';L.sources='แหล่งข้อมูลทางราชการ';L.titleZh='หัวข้อภาษาจีน';L.titleRu='หัวข้อภาษารัสเซีย';L.greetings='คำทักทายแยกภาษา';L.quickRepliesI18n='ปุ่มตอบด่วนแยกภาษา';L.fallbackI18n='คำตอบเมื่อไม่พบข้อมูล (แยกภาษา)';L.mascot='ใช้มาสคอตแอนิเมชัน (ปิด = ใช้รูปอวตาร)';L.th='ไทย';L.en='English';L.zh='中文';L.ru='Русский';L.aZh='คำตอบภาษาจีน';L.aRu='คำตอบภาษารัสเซีย';L.source='ชื่อแหล่งที่มา / URL';L.fine='ค่าปรับ (ข้อความที่แสดง)';
+var LONG=/^(summary|legalRef|fallbackNotice|desc|description|excerpt|a|aEn|greeting|systemPrompt|dedication|intro|fallback|fallbackEn|about|tagline|note|disclaimer)$/;
 var IMG=/(image|logo|avatar|favicon|qr|imageMobile)$/i;
 var ICONS=['chat','clipboard','store','scale','megaphone','pin','phone','clock','mail','search','check','globe','edit','shield','trash','tag','doc','image','home','help'];
 var HINTS={type:'link = ปุ่มเปิดเว็บทางการ · hls = ลิงก์ .m3u8 (ต้องอนุญาต CORS) · youtube = ลิงก์ YouTube Live · iframe = ลิงก์ฝัง https',heading:'ทิศที่กล้องหัน (0=เหนือ, 90=ตะวันออก) ใช้ตอนบินไปยังกล้องบนแผนที่ 3D',systemPrompt:'ตัวแปรที่ใช้ได้: {botName} {siteName} {englishName} {subtitle} {knowledge}',fallback:'ตัวแปร: {hotline} {hours} {address} {email} {lineId}',a:'ตัวแปร: {hotline} {hours} {address} {email} {lineId} {laws} · ใส่ #complaint #track #laws เพื่อทำเป็นลิงก์',keywords:'ถ้าข้อความผู้ใช้มีคำเหล่านี้ จะเลือกคำตอบนี้',googleMapsApiKey:'เปิด Maps JavaScript API และจำกัด key ด้วย HTTP referrer (โดเมนเว็บ) — ดู README · เว้นว่างเพื่อใช้ค่า env GOOGLE_MAPS_API_KEY หรือโหมดแผนที่มาตรฐาน',googleMapsMapId:'สร้างใน Google Cloud → Map Management (JavaScript, Vector, เปิด Tilt และ Rotation)'};
@@ -318,9 +349,57 @@ $('#testChat').onsubmit=function(e){e.preventDefault();var m=$('#testMsg').value
 $('#loadPrompt').onclick=function(){api('/api/chat/system-prompt').then(function(t){$('#promptOut').textContent=t;$('#promptOut').classList.remove('hidden')})};
 $$('[data-goto]').forEach(function(b){b.onclick=function(){current=b.dataset.goto;switchTab('content');renderNav();renderEditor()}});
 
+
+// ---------- layout tab (sections on/off + drag-and-drop order) ----------
+var SEC_DEF=[['hero','ภาพหลัก (Hero)'],['royal','ส่วนถวายพระพร'],['services','บริการ'],['traffic','แผนที่จราจร 3D / CCTV / แจ้งเหตุ'],['tourist','ช่วยเหลือนักท่องเที่ยว'],['track','เกี่ยวกับเรา · แจ้งเรื่อง · ติดตามสถานะ'],['stats','สถิติ'],['news','ข่าวสาร'],['laws','กฎหมาย/ค่าปรับ'],['faq','คำถามที่พบบ่อย']];
+var FEAT_DEF=[['cctv','กล้อง CCTV','กล้องสดบนแผนที่ 3D และแถบกล้อง'],['alerts','แจ้งเหตุบนถนน (Waze-style)','ปุ่มแจ้งเหตุ รายการเหตุ และหมุดบนแผนที่'],['simulation','รถ 3 มิติ (ภาพจำลอง)','ปุ่ม 🚗 และรถจำลองบนแผนที่'],['complaint','แจ้งเรื่องร้องเรียน','การ์ด/แบบฟอร์มแจ้งเรื่อง และลิงก์เมนู'],['trackStatus','ติดตามสถานะ','การ์ดค้นหาเลขรับเรื่อง'],['about','เกี่ยวกับเรา','ข้อความแนะนำหน่วยงาน'],['chatbot','แชทบอท น้องAI','ปุ่มลอยและหน้าต่างแชท'],['mobileBar','แถบเมนูล่าง (มือถือ)','เมนูลัด 4 ปุ่มด้านล่างจอมือถือ']];
+var layDirtyFlag=false;
+function layDirty(on){layDirtyFlag=on;$('#layDirty').classList.toggle('hidden',!on);setDirty(on)}
+function ensureLayout(){
+  var old={};(content.sections||[]).forEach(function(x){old[x.id]=x});
+  var list=SEC_DEF.map(function(d,i){var o=old[d[0]]||{};return {id:d[0],label:o.label||d[1],enabled:o.enabled!==false,order:o.order||i+1}});
+  list.sort(function(a,b){return a.id==='hero'?-1:b.id==='hero'?1:a.order-b.order});
+  list.forEach(function(x,i){x.order=i+1});content.sections=list;
+  content.features=content.features||{};FEAT_DEF.forEach(function(d){if(!(d[0] in content.features))content.features[d[0]]=true});
+  content.chatbot=content.chatbot||{};if(!('mascot' in content.chatbot))content.chatbot.mascot=true;
+}
+function swHtml(attr,on,label){return '<label class="sw" title="'+esc(label)+'"><input type="checkbox" '+attr+' '+(on?'checked':'')+' aria-label="'+esc(label)+'"><span></span></label>'}
+function renderLayout(){
+  ensureLayout();
+  var secs=content.sections;
+  $('#layCount').textContent='แสดง '+secs.filter(function(x){return x.enabled}).length+' / '+secs.length+' ส่วน';
+  $('#layList').innerHTML=secs.map(function(x,i){var pin=x.id==='hero';
+    return '<li class="lay-row '+(pin?'pinned ':'')+(x.enabled?'':'off ')+'flex items-center gap-3 rounded-xl ring-1 ring-slate-200 bg-white px-3 py-2.5" '+(pin?'':'draggable="true"')+' data-id="'+x.id+'">'+
+      '<span class="text-xl text-slate-400 select-none w-6 text-center" aria-hidden="true">'+(pin?'📌':'☰')+'</span>'+
+      '<span class="w-7 h-7 rounded-lg bg-navy-900 text-gold-300 font-head text-sm flex items-center justify-center shrink-0">'+(i+1)+'</span>'+
+      '<div class="flex-1 min-w-0"><p class="lay-name font-head font-medium text-navy-900 truncate">'+esc(x.label)+'</p><p class="text-[11px] text-slate-400">#'+esc(x.id)+(x.enabled?'':' · ซ่อนอยู่')+'</p></div>'+
+      (pin?'':'<button type="button" class="btn btn-ghost !px-2 !py-1" data-lmv="-1" aria-label="เลื่อนขึ้น">↑</button><button type="button" class="btn btn-ghost !px-2 !py-1" data-lmv="1" aria-label="เลื่อนลง">↓</button>')+
+      swHtml('data-lsw',x.enabled,'แสดง '+x.label)+'</li>'}).join('');
+  var fl=FEAT_DEF.map(function(d){return '<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">'+esc(d[1])+'</p><p class="text-xs text-slate-500">'+esc(d[2])+'</p></div>'+swHtml('data-fsw="'+d[0]+'"',content.features[d[0]]!==false,d[1])+'</div>'}).join('');
+  fl+='<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">มาสคอตน้องAI (แอนิเมชัน)</p><p class="text-xs text-slate-500">ปิดเพื่อใช้รูปอวตารที่อัปโหลดเอง (เนื้อหาเว็บไซต์ → แชทบอท → รูปอวตาร)</p></div>'+swHtml('data-msw',content.chatbot.mascot!==false,'มาสคอต')+'</div>';
+  $('#featList').innerHTML=fl;
+  $$('#layList [data-lsw]').forEach(function(cb){cb.onchange=function(){var id=cb.closest('li').dataset.id;secs.find(function(x){return x.id===id}).enabled=cb.checked;layDirty(true);renderLayout()}});
+  $$('#layList [data-lmv]').forEach(function(b){b.onclick=function(){var id=b.closest('li').dataset.id,i=secs.findIndex(function(x){return x.id===id}),j=i+(+b.dataset.lmv);if(j<1||j>=secs.length)return;var t=secs[i];secs[i]=secs[j];secs[j]=t;secs.forEach(function(x,k){x.order=k+1});layDirty(true);renderLayout();var el=$('#layList [data-id="'+id+'"] [data-lmv="'+b.dataset.lmv+'"]');if(el)el.focus()}});
+  $$('#featList [data-fsw]').forEach(function(cb){cb.onchange=function(){content.features[cb.dataset.fsw]=cb.checked;layDirty(true)}});
+  var m=$('#featList [data-msw]');if(m)m.onchange=function(){content.chatbot.mascot=m.checked;layDirty(true)};
+  // drag & drop
+  var dragEl=null,list=$('#layList');
+  $$('#layList li[draggable]').forEach(function(li){
+    li.addEventListener('dragstart',function(e){dragEl=li;li.classList.add('dragging');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',li.dataset.id)}catch(_){}});
+    li.addEventListener('dragend',function(){li.classList.remove('dragging');dragEl=null;var ids=$$('#layList li').map(function(x){return x.dataset.id});
+      content.sections.sort(function(a,b){return ids.indexOf(a.id)-ids.indexOf(b.id)});content.sections.forEach(function(x,k){x.order=k+1});layDirty(true);renderLayout()});
+  });
+  list.ondragover=function(e){if(!dragEl)return;e.preventDefault();var after=null;
+    $$('#layList li:not(.dragging)').forEach(function(x){var r=x.getBoundingClientRect();if(after===null&&e.clientY<r.top+r.height/2)after=x});
+    if(after&&after.classList.contains('pinned'))after=after.nextElementSibling;
+    if(after)list.insertBefore(dragEl,after);else list.appendChild(dragEl)};
+}
+$('#laySave').onclick=function(){api('/api/content',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(content)}).then(function(){layDirty(false);toast('✔ บันทึกเลย์เอาต์แล้ว หน้าเว็บอัปเดตทันที')}).catch(function(e){toast('บันทึกไม่สำเร็จ: '+e.message,true)})};
+
 // ---------- tabs / auth ----------
-function switchTab(t){$$('.tab').forEach(function(b){b.classList.toggle('active',b.dataset.tab===t)});['content','complaints','alerts','chat'].forEach(function(x){$('#tab-'+x).classList.toggle('hidden',x!==t)});
+function switchTab(t){$$('.tab').forEach(function(b){b.classList.toggle('active',b.dataset.tab===t)});['content','layout','complaints','alerts','chat'].forEach(function(x){$('#tab-'+x).classList.toggle('hidden',x!==t)});
   if(t==='complaints')loadComplaints();
+  if(t==='layout')renderLayout();
   if(t==='alerts')initAlertsTab();
   if(t==='chat'){$('#botNameH').textContent=(content.chatbot||{}).name||'';api('/api/chat/mode').then(function(m){$('#botMode').textContent=m.mode==='llm'?'LLM ('+m.model+' @ '+m.baseUrl+')':'ออฟไลน์ (ฐานความรู้ใน content.json)'})}}
 $$('.tab').forEach(function(b){b.onclick=function(){switchTab(b.dataset.tab)}});

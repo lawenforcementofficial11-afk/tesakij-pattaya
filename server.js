@@ -175,8 +175,8 @@ app.post('/api/chat', rateLimit(20, 60 * 1000), async (req, res) => {
   const message = clean(req.body?.message, 1000);
   if (!message) return res.status(400).json({ error: 'empty message' });
   const content = await readJson(CONTENT_FILE, {});
-  if (content.chatbot && content.chatbot.enabled === false) return res.status(503).json({ error: 'chatbot disabled' });
-  res.json(await chatbot.answer(message, req.body?.history, content));
+  if ((content.chatbot && content.chatbot.enabled === false) || (content.features && content.features.chatbot === false)) return res.status(503).json({ error: 'chatbot disabled' });
+  res.json(await chatbot.answer(message, req.body?.history, content, req.body?.lang));
 });
 app.get('/api/chat/system-prompt', requireAdmin, async (req, res) => res.type('text/plain').send(chatbot.buildSystemPrompt(await readJson(CONTENT_FILE, {}))));
 app.get('/api/chat/mode', requireAdmin, (req, res) => res.json({ mode: process.env.AI_API_KEY ? 'llm' : 'offline', baseUrl: process.env.AI_API_KEY ? (process.env.AI_BASE_URL || 'https://api.openai.com/v1') : null, model: process.env.AI_API_KEY ? (process.env.AI_MODEL || 'gpt-4o-mini') : null }));

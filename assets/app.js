@@ -52,6 +52,80 @@
   function fmtDate(iso) { try { return new Date(iso + 'T00:00:00').toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return iso; } }
   var exBadge = function (on, cls) { return on ? '<span class="' + (cls || '') + ' text-[11px] font-semibold rounded-full bg-amber-100 text-amber-800 px-2.5 py-1">เนื้อหาตัวอย่าง</span>' : ''; };
 
+
+  // ---------- linkify (URL ทางการ + #section) ----------
+  function shortUrl(u) { try { var x = new URL(u.replace(/&amp;/g, '&')); return x.hostname.replace(/^www\./, '') + (x.pathname.length > 1 ? '/…' : ''); } catch (e) { return u; } }
+  function linkify(t) {
+    return esc(t)
+      .replace(/https?:\/\/[^\s<>"',]+[^\s<>"',.)]/g, function (u) { return '<a href="' + u + '" target="_blank" rel="noopener" class="chat-ext underline decoration-sea-500 decoration-2 underline-offset-2 text-navy-800 font-semibold break-all">🔗 ' + esc(shortUrl(u)) + '</a>'; })
+      .replace(/(^|[\s(])(#(?:complaint|track|laws|contact|news|faq|tourist|traffic|cctv))\b/g, '$1<a href="$2" class="chat-link underline decoration-gold-500 decoration-2 underline-offset-2 font-semibold">$2</a>')
+      .replace(/\n/g, '<br>');
+  }
+
+  // ---------- laws (sourced) ----------
+  function renderLaws(L) {
+    var items = L.items || [], cats = [];
+    items.forEach(function (l) { var k = l.category || 'อื่น ๆ'; if (cats.indexOf(k) < 0) cats.push(k); });
+    $('#lawsChecked').textContent = L.lastChecked ? new Date(L.lastChecked + 'T00:00:00').toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+    $('#lawsCount').textContent = items.length + ' รายการ · ' + cats.length + ' หมวด';
+    $('#lawCats').innerHTML = ['ทั้งหมด'].concat(cats).map(function (k, i) { return '<button type="button" data-lawcat="' + esc(i ? k : '') + '" class="law-cat shrink-0 rounded-full px-4 py-2 font-head text-sm ring-1 transition ' + (i ? 'bg-white text-navy-900 ring-slate-200 hover:ring-gold-500' : 'bg-navy-900 text-white ring-navy-900') + '">' + esc(k) + '</button>'; }).join('');
+    $('#lawGroups').innerHTML = cats.map(function (k) {
+      var list = items.filter(function (l) { return (l.category || 'อื่น ๆ') === k; });
+      return '<div class="law-group rounded-[24px] bg-white shadow-card ring-1 ring-slate-100 overflow-hidden" data-cat="' + esc(k) + '"><div class="px-5 sm:px-6 py-4 bg-navy-900 text-white flex items-center justify-between gap-3"><h3 class="font-head font-semibold text-lg">' + esc(k) + '</h3><span class="text-xs text-gold-300">' + list.length + ' รายการ</span></div><ul class="divide-y divide-slate-100">' +
+        list.map(function (l) {
+          var has = l.fineAmount != null && l.fineAmount !== '';
+          var links = [l.url, l.url2].filter(Boolean).map(function (u, i) { return '<a href="' + esc(safeUrl(u)) + '" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-navy-800 hover:text-gold-700 underline decoration-gold-500/60 underline-offset-2">' + (i ? 'ตัวบท/สำเนา' : 'แหล่งที่มาทางการ') + ' · ' + esc(shortUrl(u)) + ' ↗</a>'; }).join('<span class="text-slate-300">|</span>');
+          return '<li class="px-5 sm:px-6 py-4 grid sm:grid-cols-[1fr_auto] gap-x-6 gap-y-2"><div class="min-w-0"><p class="font-head font-semibold text-navy-900 leading-snug">' + esc(l.title) + '</p>' +
+            (l.summary ? '<p class="mt-1 text-sm text-slate-600 leading-relaxed">' + esc(l.summary) + '</p>' : '') +
+            '<p class="mt-1.5 text-xs text-slate-500">📜 ' + esc(l.legalRef || l.ref || '') + (l.year ? ' · ปีที่มีผล/ประกาศ พ.ศ. ' + esc(l.year) : '') + '</p>' +
+            (links ? '<p class="mt-1.5 text-xs flex flex-wrap gap-x-2 gap-y-1">' + links + '</p>' : '') + '</div>' +
+            '<div class="sm:text-right"><span class="inline-block rounded-full ' + (has ? 'bg-navy-900 text-gold-300' : 'bg-slate-100 text-slate-600') + ' text-xs sm:text-sm font-head font-semibold px-3 py-1.5 whitespace-nowrap">' + (has ? 'ปรับ' : '') + esc(l.fine) + '</span>' + (has ? '<p class="mt-1 text-[11px] text-slate-400">อัตราสูงสุดตามตัวบท</p>' : '') + '</div></li>';
+        }).join('') + '</ul></div>';
+    }).join('');
+    $('#lawSources').innerHTML = (L.sources || []).map(function (x) { return '<li class="flex gap-2"><span class="text-gold-600">•</span><a class="text-navy-800 hover:text-gold-700 underline decoration-gold-500/50 underline-offset-2" target="_blank" rel="noopener" href="' + esc(safeUrl(x.url)) + '">' + esc(x.name) + ' ↗</a></li>'; }).join('');
+    $$('.law-cat').forEach(function (b) { b.addEventListener('click', function () {
+      var k = b.dataset.lawcat;
+      $$('.law-cat').forEach(function (x) { var on = x === b; x.classList.toggle('bg-navy-900', on); x.classList.toggle('text-white', on); x.classList.toggle('ring-navy-900', on); x.classList.toggle('bg-white', !on); x.classList.toggle('text-navy-900', !on); });
+      $$('.law-group').forEach(function (g) { g.classList.toggle('hidden', !!k && g.dataset.cat !== k); });
+    }); });
+  }
+
+  // ---------- section layout (admin: เปิด/ปิด + ลากเรียงลำดับ) ----------
+  var SEC_LINK = { complaint: 'complaint', track: 'trackStatus', about: 'about', traffic: 'traffic', news: 'news', laws: 'laws', faq: 'faq', tourist: 'tourist', royal: 'royal', services: 'services', cctv: 'cctv' };
+  function applyLayout(c) {
+    var f = c.features || {}, secs = (c.sections || []).slice().sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+    var on = {}; secs.forEach(function (x) { on[x.id] = x.enabled !== false; });
+    var main = $('#main') || $('main');
+    // reorder (hero stays first because it sits under the transparent header)
+    secs.forEach(function (x) { var el = $('[data-sec="' + x.id + '"]'); if (el && x.id !== 'hero') main.appendChild(el); });
+    $$('[data-sec]').forEach(function (el) { var id = el.dataset.sec; if (id in on && !on[id]) { el.classList.add('hidden'); el.setAttribute('data-off', '1'); } });
+    $$('[data-feat]').forEach(function (el) { if (f[el.dataset.feat] === false) { el.classList.add('hidden'); el.setAttribute('data-off', '1'); } });
+    if (!on.hero) document.body.classList.add('no-hero');
+    // features inside the traffic section
+    if (f.alerts === false) { c.alerts = Object.assign({}, c.alerts, { enabled: false }); var g = $('#trafficGrid'); if (g) g.className = g.className.replace(/lg:grid-cols-\[[^\]]+\]/, ''); }
+    if (f.cctv === false) c.cctv = Object.assign({}, c.cctv, { enabled: false });
+    if (f.simulation === false) c.traffic = Object.assign({}, c.traffic, { simulation: false });
+    if (f.chatbot === false) c.chatbot = Object.assign({}, c.chatbot, { enabled: false });
+    // track section: if both cards are off, let the about text span the row
+    if (f.complaint === false && f.trackStatus === false) { var tc = $('#trackCards'); if (tc) tc.classList.add('hidden'); }
+    if (f.about === false) { var tc2 = $('#trackCards'); if (tc2) tc2.classList.replace('lg:col-span-3', 'lg:col-span-5'); }
+    if (on.track === false) { f = Object.assign({}, f, { complaint: false, trackStatus: false, about: false }); }
+    // hide nav links to things that are off
+    var off = { traffic: !on.traffic, news: !on.news, laws: !on.laws, faq: !on.faq, tourist: !on.tourist, royal: !on.royal, services: !on.services, complaint: f.complaint === false, track: f.trackStatus === false, about: f.about === false, cctv: f.cctv === false || !on.traffic };
+    $$('a[href^="#"]').forEach(function (a) { var id = a.getAttribute('href').slice(1); if (off[id] && !a.closest('#chatLog')) a.classList.add('hidden'); });
+    if (f.mobileBar === false) document.body.classList.add('no-mobilebar');
+  }
+
+  // ---------- language (TH / EN / 中文 / РУС) ----------
+  var LANG_KEYS = { TH: 'th', EN: 'en', '中文': 'zh', 'РУС': 'ru' }, LANG_UI = { th: 'TH', en: 'EN', zh: '中文', ru: 'РУС' };
+  function initialLang() {
+    try { var v = localStorage.getItem('tkpLang'); if (v && LANG_UI[v]) return v; } catch (e) {}
+    var n = (navigator.language || 'th').toLowerCase();
+    return /^zh/.test(n) ? 'zh' : /^ru/.test(n) ? 'ru' : /^th/.test(n) ? 'th' : /^en/.test(n) ? 'en' : 'th';
+  }
+  var curLang = initialLang();
+  window.TKPLang = function () { return curLang; };
+
   function render(c) {
     var s = c.site || {};
     document.title = (s.name || 'เทศกิจพัทยา') + ' | ' + (s.subtitle || '');
@@ -115,16 +189,15 @@
         '<span class="mt-4 font-head font-semibold text-navy-800 inline-flex items-center gap-1">อ่านต่อ ' + icon('arrow', 'w-4 h-4') + '</span></div></article>';
     }).join('');
 
-    $('#lawList').innerHTML = ((c.laws || {}).items || []).map(function (l) {
-      return '<li class="py-4 flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4"><div><p class="font-head font-medium text-navy-900">' + esc(l.title) + '</p><p class="text-xs text-slate-500 mt-0.5">' + esc(l.ref) + '</p></div><span class="self-start shrink-0 rounded-full bg-navy-900 text-gold-300 text-xs sm:text-sm font-head font-semibold px-3 py-1.5">' + esc(l.fine) + '</span></li>';
-    }).join('');
+    renderLaws(c.laws || {});
     $('#faqList').innerHTML = (c.faq || []).map(function (f) {
-      return '<details class="rounded-2xl ring-1 ring-slate-200 open:ring-gold-500/60 open:bg-gold-100/30 transition"><summary class="cursor-pointer px-5 py-4 flex items-center justify-between gap-3 font-head font-medium text-navy-900">' + esc(f.q) + '<span class="faq-icon text-2xl leading-none text-gold-600 transition">+</span></summary><p class="px-5 pb-5 -mt-1 text-slate-600 leading-relaxed">' + esc(f.a) + '</p></details>';
+      return '<details class="rounded-2xl bg-white ring-1 ring-slate-200 open:ring-gold-500/60 open:bg-gold-100/30 transition"><summary class="cursor-pointer px-5 py-4 flex items-center justify-between gap-3 font-head font-medium text-navy-900">' + esc(f.q) + '<span class="faq-icon text-2xl leading-none text-gold-600 transition">+</span></summary><p class="px-5 pb-5 -mt-1 text-slate-600 leading-relaxed break-words">' + linkify(f.a) + '</p></details>';
     }).join('');
 
     $('#cCat').innerHTML = '<option value="">— เลือกประเภทเรื่อง —</option>' + (c.complaintCategories || []).map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('');
     $('#footerLinks').innerHTML = ((c.footer || {}).links || []).map(function (l) { return '<li><a class="hover:text-gold-400 transition" href="' + esc(safeUrl(l.href)) + '">' + esc(l.label) + '</a></li>'; }).join('');
 
+    applyLayout(c);
     if (window.TKPAlerts) window.TKPAlerts.init(c.alerts || {});
     if (window.TKPCCTV) window.TKPCCTV.init(c.cctv || {});
     if (window.TKPTraffic) window.TKPTraffic.init(c.traffic || {}, c.alerts || {});
@@ -164,8 +237,16 @@
   var langMenu = $('#langMenu'), langBtn = $('#langBtn');
   langBtn.addEventListener('click', function (e) { e.stopPropagation(); var hidden = langMenu.classList.toggle('hidden'); langBtn.setAttribute('aria-expanded', String(!hidden)); });
   document.addEventListener('click', function () { langMenu.classList.add('hidden'); langBtn.setAttribute('aria-expanded', 'false'); });
-  var langMsg = { EN: ['English', 'English version coming soon.'], '中文': ['中文', '中文版即将推出。'], 'РУС': ['Русский', 'Русская версия скоро появится.'] };
-  $$('.lang-opt').forEach(function (b) { b.addEventListener('click', function () { var l = b.dataset.lang; $('#langCur').textContent = l; if (langMsg[l]) toast(langMsg[l][0], langMsg[l][1]); }); });
+  var langMsg = { en: ['English', 'The assistant “น้องAI” now replies in English. Full English pages coming soon.'], zh: ['中文', '智能助手现在用中文回答。中文网页即将推出。'], ru: ['Русский', 'Помощник теперь отвечает по-русски. Русская версия сайта скоро появится.'], th: ['ภาษาไทย', 'น้องAIตอบเป็นภาษาไทย'] };
+  function setLang(l, silent) {
+    if (!LANG_UI[l]) return; curLang = l; $('#langCur').textContent = LANG_UI[l];
+    try { localStorage.setItem('tkpLang', l); } catch (e) {}
+    $$('.lang-opt').forEach(function (b) { b.setAttribute('aria-selected', String(LANG_KEYS[b.dataset.lang] === l)); });
+    if (!silent && langMsg[l]) toast(langMsg[l][0], esc(langMsg[l][1]));
+    document.dispatchEvent(new CustomEvent('tkp:lang', { detail: l }));
+  }
+  $$('.lang-opt').forEach(function (b) { b.addEventListener('click', function () { setLang(LANG_KEYS[b.dataset.lang]); }); });
+  setLang(curLang, true);
 
   // ---------- tracker ----------
   var STEPS = [['received', 'รับเรื่อง'], ['in_progress', 'กำลังดำเนินการ'], ['done', 'เสร็จสิ้น']];
@@ -255,49 +336,91 @@
   $('#cCopy').addEventListener('click', function () { var t = $('#cDoneId').textContent; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { toast('คัดลอกแล้ว', esc(t)); }, function () {}); });
   $('#cGoTrack').addEventListener('click', function () { openComplaint(false); track($('#cDoneId').textContent); setTimeout(function () { $('#track').scrollIntoView({ behavior: 'smooth' }); }, 320); });
 
-  // ---------- chatbot ----------
-  var chatReady = false, history = [];
-  function initChat(b) {
-    if (b.enabled === false) return;
-    $('#chatRoot').classList.remove('hidden');
-    $$('.bot-name').forEach(function (el) { el.textContent = b.name || 'น้องAI'; });
-    if (b.avatar) { $('#chatAvatar').src = safeUrl(b.avatar); $('#chatFabAvatar').src = safeUrl(b.avatar); }
-    $('#chatSub').textContent = b.subtitle || '';
-    $('#chatDisclaimer').textContent = b.disclaimer || '';
-    $('#chatChips').innerHTML = (b.quickReplies || []).map(function (q) { return '<button type="button" class="chat-chip shrink-0 rounded-full border border-navy-800/20 bg-white text-navy-900 text-sm font-head px-3.5 py-1.5 hover:bg-gold-100 hover:border-gold-500 transition">' + esc(q) + '</button>'; }).join('');
-    $$('.chat-chip').forEach(function (c) { c.addEventListener('click', function () { send(c.textContent); }); });
-    if (!chatReady) { addMsg('bot', b.greeting || 'สวัสดีครับ'); chatReady = true; }
+  // ---------- chatbot (มาสคอต + หลายภาษา) ----------
+  var chatReady = false, history = [], bot = {}, userSpoke = false, greetEl = null, logoUrl = 'assets/logo.png';
+  var CUI = {
+    th: { ph: 'พิมพ์คำถาม…', hint: 'ถามน้องAIได้เลย!', typing: 'กำลังพิมพ์', off: 'ขออภัยครับ ขณะนี้ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่อีกครั้ง', sub: 'ออนไลน์ · ตอบจากแหล่งข้อมูลทางราชการ', dis: '', hi: 'สวัสดีครับ ผมน้องAIเทศกิจพัทยา' },
+    en: { ph: 'Type your question…', hint: 'Ask me anything!', typing: 'typing', off: 'Sorry, the assistant is offline right now. Please try again.', sub: 'Online · answers from official sources', dis: 'Answers only from this website and official sources · Emergency 191 / 1155 / 1669', hi: 'Hi, I’m your Pattaya City helper' },
+    zh: { ph: '请输入您的问题…', hint: '有问题问我吧！', typing: '正在输入', off: '抱歉，助手暂时无法连接，请稍后再试。', sub: '在线 · 依据官方来源回答', dis: '仅根据本网站及官方来源回答 · 紧急情况拨打 191 / 1155 / 1669', hi: '您好，我是芭提雅市执法小助手' },
+    ru: { ph: 'Введите вопрос…', hint: 'Спросите меня!', typing: 'печатает', off: 'Извините, помощник сейчас недоступен. Попробуйте позже.', sub: 'Онлайн · ответы по официальным источникам', dis: 'Ответы только по данным сайта и официальным источникам · Экстренно 191 / 1155 / 1669', hi: 'Привет! Я помощник инспекции Паттайи' }
+  };
+  function useMascot() { return bot.mascot !== false; }
+  function avatarHtml(cls) {
+    return useMascot() ? window.TKPMascot.svg(logoUrl, cls) : '<img src="' + esc(safeUrl(bot.avatar || logoUrl)) + '" alt="" class="w-full h-full object-contain rounded-full bg-gradient-to-br from-gold-300 to-gold-500 p-1">';
   }
-  function linkify(t) { return esc(t).replace(/(#(?:complaint|track|laws|contact|news|faq|tourist|traffic))\b/g, '<a href="$1" class="chat-link underline decoration-gold-500 decoration-2 underline-offset-2 font-semibold">$1</a>').replace(/\n/g, '<br>'); }
+  function figs() { return $$('#chatFabFig .mascot, #chatHeadFig .mascot, #chatHeroFig .mascot'); }
+  function talk(on) { figs().forEach(function (m) { m.classList.toggle('talking', !!on); }); }
+  function wave() { figs().forEach(function (m) { m.classList.remove('wave'); void m.getBoundingClientRect(); m.classList.add('wave'); setTimeout(function () { m.classList.remove('wave'); }, 2100); }); }
+  function L(k) { return (CUI[curLang] || CUI.th)[k]; }
+  function greeting() { var g = bot.greetings || {}; return g[curLang] || (curLang === 'th' ? bot.greeting : g.en) || bot.greeting || 'สวัสดีครับ'; }
+  function chips() { var q = bot.quickRepliesI18n || {}; return q[curLang] || (curLang === 'th' ? bot.quickReplies : q.en) || bot.quickReplies || []; }
+  function paintChat() {
+    $('#chatInput').placeholder = L('ph'); $('#chatHintText').textContent = L('hint');
+    $('#chatSub').textContent = L('sub');
+    $('#chatDisclaimer').textContent = L('dis') || bot.disclaimer || '';
+    var hh = $('#chatHeroHi'); if (hh) hh.textContent = L('hi');
+    $('#chatChips').innerHTML = chips().map(function (q) { return '<button type="button" class="chat-chip shrink-0 rounded-full border border-navy-800/20 bg-white text-navy-900 text-sm font-head px-3.5 py-1.5 hover:bg-gold-100 hover:border-gold-500 transition">' + esc(q) + '</button>'; }).join('');
+    $$('.chat-chip').forEach(function (c) { c.addEventListener('click', function () { send(c.textContent); }); });
+    if (greetEl && !userSpoke) { greetEl.remove(); greetEl = addMsg('bot', greeting()); }
+  }
+  function initChat(b) {
+    bot = b || {};
+    if (bot.enabled === false) return;
+    logoUrl = safeUrl(((window.__content || {}).site || {}).logo || 'assets/logo.png');
+    $('#chatRoot').classList.remove('hidden');
+    $$('.bot-name').forEach(function (el) { el.textContent = bot.name || 'น้องAI'; });
+    $('#chatFabFig').innerHTML = avatarHtml('');
+    $('#chatHeadFig').innerHTML = avatarHtml('');
+    $('#chatDisclaimer').textContent = bot.disclaimer || '';
+    if (!chatReady) {
+      if (useMascot()) {
+        var hero = document.createElement('div');
+        hero.className = 'flex flex-col items-center text-center pt-1 pb-2';
+        hero.innerHTML = '<span id="chatHeroFig" class="block w-28 h-32">' + window.TKPMascot.svg(logoUrl, '') + '</span><p class="mt-1 font-head font-semibold text-navy-900 bot-name">' + esc(bot.name || 'น้องAI') + '</p><p id="chatHeroHi" class="text-xs text-slate-500"></p>';
+        $('#chatLog').appendChild(hero);
+      }
+      greetEl = addMsg('bot', greeting()); chatReady = true;
+    }
+    paintChat();
+    setTimeout(function () { var h = $('#chatHint'); if (h) h.classList.add('sm:hidden'); }, 9000);
+  }
+  document.addEventListener('tkp:lang', function () { if (chatReady) paintChat(); });
   function addMsg(who, text) {
     var wrap = document.createElement('div');
     wrap.className = who === 'user' ? 'flex justify-end' : 'flex gap-2 items-end';
     wrap.innerHTML = who === 'user'
       ? '<div class="max-w-[82%] rounded-2xl rounded-br-md bg-navy-900 text-white px-4 py-2.5 text-[15px] leading-relaxed">' + esc(text).replace(/\n/g, '<br>') + '</div>'
-      : '<span class="w-8 h-8 rounded-full bg-gradient-to-br from-gold-300 to-gold-500 flex items-center justify-center shrink-0"><img src="' + esc($('#chatAvatar').getAttribute('src')) + '" alt="" class="w-6 h-6 object-contain"></span><div class="max-w-[82%] rounded-2xl rounded-bl-md bg-white ring-1 ring-slate-200 text-slate-800 px-4 py-2.5 text-[15px] leading-relaxed shadow-sm">' + linkify(text) + '</div>';
+      : '<span class="w-9 h-10 shrink-0 -mb-1">' + avatarHtml('static') + '</span><div class="max-w-[84%] min-w-0 rounded-2xl rounded-bl-md bg-white ring-1 ring-slate-200 text-slate-800 px-4 py-2.5 text-[15px] leading-relaxed shadow-sm break-words">' + linkify(text) + '</div>';
     $('#chatLog').appendChild(wrap); $('#chatLog').scrollTop = 1e9;
     $$('.chat-link', wrap).forEach(function (a) { a.addEventListener('click', function () { if (window.innerWidth < 640) openChat(false); }); });
     return wrap;
   }
   function send(text) {
     text = String(text || '').trim(); if (!text) return;
+    userSpoke = true;
     addMsg('user', text); $('#chatInput').value = '';
     var typing = document.createElement('div'); typing.className = 'flex gap-2 items-end';
-    typing.innerHTML = '<span class="w-8 h-8 rounded-full bg-gradient-to-br from-gold-300 to-gold-500 shrink-0"></span><div class="rounded-2xl rounded-bl-md bg-white ring-1 ring-slate-200 px-4 py-3.5 typing flex gap-1" aria-label="กำลังพิมพ์"><span></span><span></span><span></span></div>';
+    typing.innerHTML = '<span class="w-9 h-10 shrink-0 -mb-1">' + avatarHtml('static talking') + '</span><div class="rounded-2xl rounded-bl-md bg-white ring-1 ring-slate-200 px-4 py-3.5 typing flex gap-1" aria-label="' + esc(L('typing')) + '"><span></span><span></span><span></span></div>';
     $('#chatLog').appendChild(typing); $('#chatLog').scrollTop = 1e9;
+    talk(true);
     var started = Date.now();
-    fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, history: history.slice(-10) }) })
+    fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, history: history.slice(-10), lang: curLang }) })
       .then(function (r) { return r.json(); })
       .then(function (j) { return j.reply || j.error || '…'; })
-      .catch(function () { return 'ขออภัยครับ ขณะนี้ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่อีกครั้ง\nSorry, the assistant is offline right now.'; })
+      .catch(function () { return L('off'); })
       .then(function (reply) {
-        setTimeout(function () { typing.remove(); addMsg('bot', reply); history.push({ role: 'user', content: text }, { role: 'assistant', content: reply }); }, Math.max(0, 650 - (Date.now() - started)));
+        setTimeout(function () {
+          typing.remove(); addMsg('bot', reply); history.push({ role: 'user', content: text }, { role: 'assistant', content: reply });
+          setTimeout(function () { talk(false); }, Math.min(2600, 500 + reply.length * 12));
+        }, Math.max(0, 900 - (Date.now() - started)));
       });
   }
   function openChat(open) {
     var small = window.innerWidth < 640;
     $('#chatPanel').classList.toggle('closed', !open); $('#chatFab').setAttribute('aria-expanded', String(open));
     $('#chatFab').classList.toggle('opacity-0', open && small); $('#chatFab').classList.toggle('pointer-events-none', open && small);
+    var h = $('#chatHint'); if (h && open) h.classList.add('sm:hidden');
+    if (open) setTimeout(wave, 120);
     if (open && !small) setTimeout(function () { $('#chatInput').focus({ preventScroll: true }); }, 200);
   }
   window.__openChat = openChat; window.__chatSend = send;
@@ -311,6 +434,6 @@
   paintIcons(document);
   fetch('/api/content').then(function (r) { if (!r.ok) throw 0; return r.json(); })
     .catch(function () { return fetch('data/content.json').then(function (r) { return r.json(); }); })
-    .then(render)
+    .then(function (c) { window.__content = c; render(c); })
     .catch(function () { observeReveal(document); console.warn('content.json not available — run `npm start` and open http://localhost:3000'); });
 })();
