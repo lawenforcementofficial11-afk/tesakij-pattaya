@@ -346,12 +346,12 @@
   };
   function useMascot() { return bot.mascot !== false; }
   function avatarHtml(cls) {
-    return useMascot() ? window.TKPMascot.svg(logoUrl, cls) : '<img src="' + esc(safeUrl(bot.avatar || logoUrl)) + '" alt="" class="w-full h-full object-contain rounded-full bg-gradient-to-br from-gold-300 to-gold-500 p-1">';
+    return useMascot() ? window.TKPMascot.svg(logoUrl, cls, bot.mascotStyle) : '<img src="' + esc(safeUrl(bot.avatar || logoUrl)) + '" alt="" class="w-full h-full object-contain rounded-full bg-gradient-to-br from-gold-300 to-gold-500 p-1">';
   }
   // อวาตาร์ในบับเบิลแชท: ภาพนิ่ง assets/mascot.png (เบา) · ถ้าปิดมาสคอตใช้รูปที่อัปโหลดเอง/โลโก้
   function bubbleAvatar() {
     if (!useMascot()) return '<span class="w-9 h-9 shrink-0">' + avatarHtml('static') + '</span>';
-    return '<span class="w-9 h-9 shrink-0 rounded-full ring-2 ring-cyan-300/70 shadow-sm" role="img" aria-label="" style="background:url(' + esc((window.TKPMascot && window.TKPMascot.png) || 'assets/mascot.png') + ') 50% -3px/140% auto no-repeat,linear-gradient(#f0f9ff,#cffafe)"></span>';
+    return '<span class="w-9 h-9 shrink-0 rounded-full ring-2 ring-cyan-300/70 shadow-sm" role="img" aria-label="" style="background:url(' + esc(bot.mascotStyle === 'officer' ? 'assets/mascot-officer.png' : 'assets/mascot.png') + ') 50% -3px/140% auto no-repeat,linear-gradient(#f0f9ff,#cffafe)"></span>';
   }
   function figs() { return $$('#chatFabFig .mascot, #chatHeadFig .mascot, #chatHeroFig .mascot'); }
   function talk(on) { figs().forEach(function (m) { m.classList.toggle('talking', !!on); }); }
@@ -381,7 +381,7 @@
       if (useMascot()) {
         var hero = document.createElement('div');
         hero.className = 'flex flex-col items-center text-center pt-1 pb-2';
-        hero.innerHTML = '<span id="chatHeroFig" class="block w-32 h-36" style="background:radial-gradient(circle at 50% 58%,rgba(103,232,249,.35) 0,rgba(186,230,253,.25) 38%,transparent 66%)">' + window.TKPMascot.svg(logoUrl, '') + '</span><p class="mt-1 font-head font-semibold text-navy-900 bot-name">' + esc(bot.name || 'น้องAI') + '</p><p id="chatHeroHi" class="text-xs text-slate-500"></p>';
+        hero.innerHTML = '<span id="chatHeroFig" class="block w-32 h-36" style="background:radial-gradient(circle at 50% 58%,rgba(103,232,249,.35) 0,rgba(186,230,253,.25) 38%,transparent 66%)">' + window.TKPMascot.svg(logoUrl, '', bot.mascotStyle) + '</span><p class="mt-1 font-head font-semibold text-navy-900 bot-name">' + esc(bot.name || 'น้องAI') + '</p><p id="chatHeroHi" class="text-xs text-slate-500"></p>';
         $('#chatLog').appendChild(hero);
       }
       greetEl = addMsg('bot', greeting()); chatReady = true;
