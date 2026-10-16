@@ -75,7 +75,7 @@ tailwind.config = {
   .typing span { width:7px; height:7px; border-radius:99px; background:#94a3b8; display:inline-block; animation: blink 1.2s infinite both; }
   .typing span:nth-child(2){animation-delay:.2s} .typing span:nth-child(3){animation-delay:.4s}
   @keyframes blink { 0%,80%,100%{opacity:.25; transform:translateY(0)} 40%{opacity:1; transform:translateY(-3px)} }
-  /* ---- mascot น้องAI: CSS อยู่ใน assets/mascot.js ---- */
+  /* ---- mascot น้องอัศวิน: CSS อยู่ใน assets/mascot.js ---- */
   #chatMic.mic-on{background:#ef4444;color:#fff}
   #chatMic.mic-on::before,#chatMic.mic-on::after{content:'';position:absolute;inset:0;border-radius:9999px;background:rgba(239,68,68,.45);animation:micPulse 1.4s ease-out infinite}
   #chatMic.mic-on::after{animation-delay:.7s}
@@ -645,12 +645,12 @@ tailwind.config = {
 
 <!-- Chatbot -->
 <div id="chatRoot" class="hidden">
-  <button id="chatFab" type="button" class="fixed z-50 right-3 bottom-[84px] lg:bottom-5 lg:right-6 group flex items-end gap-1" aria-controls="chatPanel" aria-expanded="false" aria-label="แชทกับน้องAIเทศกิจพัทยา">
-    <span id="chatHint" class="chat-bubble-hint hidden sm:inline-flex mb-9 mr-[-6px] items-center rounded-2xl rounded-br-md bg-white text-navy-900 font-head font-semibold text-sm px-3.5 py-2 shadow-lift ring-1 ring-black/5"><span id="chatHintText">ถาม<span class="bot-name">น้องAI</span>ได้เลย!</span></span>
+  <button id="chatFab" type="button" class="fixed z-50 right-3 bottom-[84px] lg:bottom-5 lg:right-6 group flex items-end gap-1" aria-controls="chatPanel" aria-expanded="false" aria-label="แชทกับน้องอัศวิน">
+    <span id="chatHint" class="chat-bubble-hint hidden sm:inline-flex mb-9 mr-[-6px] items-center rounded-2xl rounded-br-md bg-white text-navy-900 font-head font-semibold text-sm px-3.5 py-2 shadow-lift ring-1 ring-black/5"><span id="chatHintText">ถาม<span class="bot-name">น้องอัศวิน</span>ได้เลย!</span></span>
     <span id="chatFabFig" class="relative block w-[78px] h-[92px] fab-mascot"></span>
     <span class="absolute right-2 bottom-1 w-3.5 h-3.5 rounded-full bg-emerald-400 ring-2 ring-white"></span>
   </button>
-  <section id="chatPanel" class="chat-panel closed fixed z-[55] inset-x-2 bottom-[84px] top-[96px] sm:top-auto sm:inset-x-auto sm:right-6 sm:bottom-24 lg:bottom-24 sm:w-[400px] sm:h-[620px] max-h-[calc(100svh-100px)] rounded-[26px] bg-white shadow-lift ring-1 ring-black/5 flex flex-col overflow-hidden" role="dialog" aria-label="แชทกับน้องAI" aria-modal="false">
+  <section id="chatPanel" class="chat-panel closed fixed z-[55] inset-x-2 bottom-[84px] top-[96px] sm:top-auto sm:inset-x-auto sm:right-6 sm:bottom-24 lg:bottom-24 sm:w-[400px] sm:h-[620px] max-h-[calc(100svh-100px)] rounded-[26px] bg-white shadow-lift ring-1 ring-black/5 flex flex-col overflow-hidden" role="dialog" aria-label="แชทกับน้องอัศวิน" aria-modal="false">
     <header class="relative bg-gradient-to-r from-navy-950 to-navy-800 text-white px-4 py-3.5 flex items-center gap-3">
       <span id="chatHeadFig" class="relative w-14 h-16 -my-2 shrink-0"></span>
       <span class="hidden">
@@ -658,7 +658,7 @@ tailwind.config = {
         <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-navy-900"></span>
       </span>
       <div class="min-w-0 flex-1">
-        <p class="font-head font-semibold leading-tight truncate bot-name">น้องAIเทศกิจพัทยา</p>
+        <p class="font-head font-semibold leading-tight truncate bot-name">น้องอัศวิน</p>
         <p class="text-xs text-white/60 truncate" id="chatSub">ออนไลน์ · TH / EN</p>
       </div>
       <button id="chatSpk" type="button" class="hidden w-9 h-9 rounded-full hover:bg-white/10 items-center justify-center" aria-pressed="true" aria-label="เปิด/ปิดเสียงพูด" title="เสียงพูด">

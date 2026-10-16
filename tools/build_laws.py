@@ -161,7 +161,7 @@ old = {s['id']: s for s in c.get('sections', [])}
 c['sections'] = [dict(id=k, label=l, enabled=old.get(k, {}).get('enabled', True), order=old.get(k, {}).get('order', i + 1)) for i, (k, l) in enumerate(SEC)]
 of = c.get('features', {})
 FEAT = [('cctv','กล้อง CCTV'),('alerts','แจ้งเหตุบนถนน (Waze-style)'),('simulation','รถ 3 มิติ (ภาพจำลอง)'),('complaint','แจ้งเรื่องร้องเรียน'),('trackStatus','ติดตามสถานะ'),
-        ('about','เกี่ยวกับเรา'),('chatbot','แชทบอท น้องAI'),('mobileBar','แถบเมนูล่าง (มือถือ)')]
+        ('about','เกี่ยวกับเรา'),('chatbot','แชทบอท น้องอัศวิน'),('mobileBar','แถบเมนูล่าง (มือถือ)')]
 c['features'] = {k: of.get(k, True) for k, _ in FEAT}
 c['featureLabels'] = {k: l for k, l in FEAT}
 
@@ -170,10 +170,10 @@ b = c['chatbot']
 b['mascot'] = b.get('mascot', True)
 b['subtitle'] = 'ผู้ช่วยตอบคำถามอัตโนมัติ · TH / EN / 中文 / РУС'
 b['greetings'] = {
- 'th': 'สวัสดีครับ 👋 น้องAIเทศกิจพัทยายินดีให้บริการ ถามเรื่องการแจ้งร้องเรียน ติดตามสถานะ ข้อบัญญัติและค่าปรับ (มีลิงก์แหล่งข้อมูลทางราชการ) หรือข้อมูลนักท่องเที่ยวได้เลยครับ',
+ 'th': 'สวัสดีครับ 👋 น้องอัศวินยินดีให้บริการ ถามเรื่องการแจ้งร้องเรียน ติดตามสถานะ ข้อบัญญัติและค่าปรับ (มีลิงก์แหล่งข้อมูลทางราชการ) หรือข้อมูลนักท่องเที่ยวได้เลยครับ',
  'en': 'Hello! 👋 I\'m the Pattaya City Law Enforcement assistant. Ask me about reporting issues, tracking a report, local rules & fines (with official source links) or tourist help.',
- 'zh': '您好！👋 我是芭提雅市执法助手。可以咨询投诉、进度查询、法规与罚款（附官方来源链接）以及游客帮助。',
- 'ru': 'Здравствуйте! 👋 Я помощник муниципальной инспекции Паттайи. Спрашивайте о жалобах, статусе обращения, правилах и штрафах (со ссылками на официальные источники) и помощи туристам.'}
+ 'zh': '您好！👋 我是阿萨温（Nong Assawin），芭提雅市执法助手。可以咨询投诉、进度查询、法规与罚款（附官方来源链接）以及游客帮助。',
+ 'ru': 'Здравствуйте! 👋 Я Нонг Ассавин, помощник муниципальной инспекции Паттайи. Спрашивайте о жалобах, статусе обращения, правилах и штрафах (со ссылками на официальные источники) и помощи туристам.'}
 b['greeting'] = b['greetings']['th']
 b['quickRepliesI18n'] = {
  'th': ['แจ้งเรื่องร้องเรียน','ติดตามสถานะ','ทิ้งขยะปรับเท่าไร','ขายของบนทางเท้า','สภาพจราจร','เบอร์ฉุกเฉิน','เวลาทำการ'],
@@ -182,7 +182,7 @@ b['quickRepliesI18n'] = {
  'ru': ['Подать жалобу','Статус обращения','Штраф за мусор','Уличная торговля','Пробки','Экстренные номера','Часы работы']}
 b['quickReplies'] = b['quickRepliesI18n']['th']
 b['fallbackI18n'] = {
- 'th': 'ขออภัยครับ น้องไม่มีข้อมูลที่ยืนยันได้จากแหล่งทางราชการในเรื่องนี้ จึงไม่ขอเดาคำตอบ 🙏 โปรดตรวจสอบที่ห้องสมุดกฎหมายเมืองพัทยา https://info.pattaya.go.th/DocLib8/Forms/AllItems.aspx หรือเว็บไซต์เมืองพัทยา https://www.pattaya.go.th หรือโทรสายด่วน {hotline} ({hours})',
+ 'th': 'ขออภัยครับ น้องอัศวินไม่มีข้อมูลที่ยืนยันได้จากแหล่งทางราชการในเรื่องนี้ จึงไม่ขอเดาคำตอบ 🙏 โปรดตรวจสอบที่ห้องสมุดกฎหมายเมืองพัทยา https://info.pattaya.go.th/DocLib8/Forms/AllItems.aspx หรือเว็บไซต์เมืองพัทยา https://www.pattaya.go.th หรือโทรสายด่วน {hotline} ({hours})',
  'en': 'Sorry, I don\'t have verified official information on that, so I won\'t guess 🙏 Please check Pattaya City\'s law library https://info.pattaya.go.th/DocLib8/Forms/AllItems.aspx or https://www.pattaya.go.th, or call {hotline} ({hours}). Emergencies: 191 / 1155 / 1669.',
  'zh': '抱歉，我没有经官方核实的相关信息，因此不作猜测 🙏 请查阅芭提雅市法规库 https://info.pattaya.go.th/DocLib8/Forms/AllItems.aspx 或 https://www.pattaya.go.th，或致电 {hotline}。紧急情况请拨 191 / 1155（旅游警察）/ 1669。',
  'ru': 'Извините, у меня нет проверенной официальной информации по этому вопросу, поэтому я не буду гадать 🙏 См. правовую библиотеку Паттайи https://info.pattaya.go.th/DocLib8/Forms/AllItems.aspx или https://www.pattaya.go.th, либо звоните {hotline}. Экстренно: 191 / 1155 (туристическая полиция) / 1669.'}
@@ -243,6 +243,6 @@ json.dump(c, open(P, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 
 print('laws items:', len(items), 'with amounts:', sum(1 for i in items if i['fineAmount']))
 
-# บุคลิกน้องAI (ลงท้าย 'ฮะ') + ค่าเสียงพูด
+# บุคลิกน้องอัศวิน (ลงท้าย 'ฮะ') + ค่าเสียงพูด
 import subprocess, sys
 subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'apply_persona.py')], check=True)

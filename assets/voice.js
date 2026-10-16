@@ -1,4 +1,4 @@
-/* น้องAIเทศกิจพัทยา — เสียงพูด/ฟัง (ฟรี ไม่ต้องใช้กุญแจ)
+/* น้องอัศวิน — เสียงพูด/ฟัง (ฟรี ไม่ต้องใช้กุญแจ)
  * TTS : Web Speech API speechSynthesis (เลือกเสียงตามภาษา th-TH / en-US / zh-CN / ru-RU, ชอบเสียงผู้ชาย)
  *       ถ้าเซิร์ฟเวอร์ตั้ง TTS_PROVIDER ไว้ จะใช้ POST /api/tts (เสียงคุณภาพสูงกว่า) และถอยกลับมาใช้เสียงเบราว์เซอร์เมื่อผิดพลาด
  * STT : SpeechRecognition / webkitSpeechRecognition (Chrome, Edge, Android, Safari) — ไม่รองรับ = ซ่อนปุ่มไมค์

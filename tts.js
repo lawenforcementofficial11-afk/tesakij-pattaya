@@ -1,6 +1,6 @@
 /* Server TTS (ไม่บังคับ) — เสียงคุณภาพสูงกว่าเสียงในเบราว์เซอร์
  * TTS_PROVIDER=openai : เรียก OpenAI-compatible POST {TTS_BASE_URL|AI_BASE_URL}/audio/speech (กุญแจ TTS_API_KEY หรือ AI_API_KEY)
- *                       TTS_MODEL (ค่าเริ่มต้น gpt-4o-mini-tts) · TTS_VOICE_FEMALE (nova) · TTS_VOICE_MALE (echo — เสียงผู้ชายนุ่ม ๆ ค่าเริ่มต้นของน้องAI)
+ *                       TTS_MODEL (ค่าเริ่มต้น gpt-4o-mini-tts) · TTS_VOICE_FEMALE (nova) · TTS_VOICE_MALE (echo — เสียงผู้ชายนุ่ม ๆ ค่าเริ่มต้นของน้องอัศวิน)
  * TTS_PROVIDER=google : Google Cloud Text-to-Speech REST ด้วย GOOGLE_TTS_API_KEY (ไม่ใช่กุญแจ Maps; จำกัด API ให้เฉพาะ Text-to-Speech)
  *                       เลือกเสียงเจาะจงได้ด้วย GOOGLE_TTS_VOICE_TH / _EN / _ZH / _RU (เช่น เสียงผู้ชายภาษาไทยรุ่น Chirp3-HD) ไม่ตั้ง = ให้ Google เลือกตาม ssmlGender
  * ไม่ตั้ง = ปิด → หน้าเว็บใช้ speechSynthesis ของเบราว์เซอร์ (ฟรี ไม่ต้องมีกุญแจ) · กุญแจอยู่ฝั่งเซิร์ฟเวอร์เท่านั้น */

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- น้องAIเทศกิจพัทยา — มาสคอตต้นฉบับ (officer) · ตราโล่อ้างอิง logo.png ในโฟลเดอร์เดียวกัน -->
-<svg xmlns="http://www.w3.org/2000/svg" class="mascot mascot-officer " viewBox="0 0 160 190" width="320" height="380" role="img" aria-label="น้องAIเทศกิจพัทยา (ชุดเจ้าหน้าที่)"><style>.mascot{overflow:visible;display:block}
+<!-- น้องอัศวิน — มาสคอตต้นฉบับ (officer) · ตราโล่อ้างอิง logo.png ในโฟลเดอร์เดียวกัน -->
+<svg xmlns="http://www.w3.org/2000/svg" class="mascot mascot-officer " viewBox="0 0 160 190" width="320" height="380" role="img" aria-label="น้องอัศวิน (ชุดเจ้าหน้าที่)"><style>.mascot{overflow:visible;display:block}
 .mascot *{transform-box:view-box}
 .mascot .m-bob{animation:tmBob 3.6s ease-in-out infinite}
 .mascot .m-shadow{transform-origin:80px 184px;animation:tmShadow 3.6s ease-in-out infinite}

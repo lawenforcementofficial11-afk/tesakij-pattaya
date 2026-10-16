@@ -1,5 +1,5 @@
 /**
- * น้องAIเทศกิจพัทยา — chatbot engine (TH / EN / 中文 / РУС)
+ * น้องอัศวิน — chatbot engine (TH / EN / 中文 / РУС)
  * โหมด 1 (ค่าเริ่มต้น): ออฟไลน์ ตอบจากฐานความรู้ใน content.json เท่านั้น
  *   = chatbot.kb + faq + laws.items (ข้อมูลกฎหมายที่สรุปจากเว็บไซต์ราชการ พร้อม URL แหล่งที่มา)
  *   ถ้าไม่พบคำตอบที่มั่นใจ → ไม่เดา ตอบว่าไม่มีข้อมูล + ลิงก์ทางการ (chatbot.fallbackI18n)
@@ -115,7 +115,7 @@ function offlineAnswer(message, c, uiLang) {
   return { reply: applyParticle(fill(fb, c), lang, c), lang, matched: null, sources: [], score: +bestScore.toFixed(2) };
 }
 
-// คำลงท้ายภาษาไทยของน้องAI (ค่าเริ่มต้น "ฮะ" แก้ได้ในหลังบ้าน chatbot.particle) — เปลี่ยนเฉพาะคำลงท้ายประโยค ไม่แตะเนื้อหากฎหมาย
+// คำลงท้ายภาษาไทยของน้องอัศวิน (ค่าเริ่มต้น "ฮะ" แก้ได้ในหลังบ้าน chatbot.particle) — เปลี่ยนเฉพาะคำลงท้ายประโยค ไม่แตะเนื้อหากฎหมาย
 const PARTICLE_RE = /(ครับ|ค่ะ|ฮะ)(?=$|[\s.!?,)…👉🙏—:]|\n)/gu;
 function applyParticle(text, lang, c) {
   if (lang !== 'th') return text;

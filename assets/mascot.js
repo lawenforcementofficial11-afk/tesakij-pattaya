@@ -1,4 +1,4 @@
-/* น้องAIเทศกิจพัทยา — มาสคอตหุ่นยนต์ต้นฉบับ (ออกแบบใหม่ทั้งหมด ไม่ได้ลอก/ตามรอยภาพใด) วาดด้วย SVG หลายเลเยอร์ + แอนิเมชัน CSS
+/* น้องอัศวิน — มาสคอตหุ่นยนต์ต้นฉบับ (ออกแบบใหม่ทั้งหมด ไม่ได้ลอก/ตามรอยภาพใด) วาดด้วย SVG หลายเลเยอร์ + แอนิเมชัน CSS
  * TKPMascot.svg(logoUrl, extraClass) → string
  *   คลาสเสริม: wave (โบกมือ) · talking (ขยับปาก/ตาเรืองแสงขณะตอบ) · static (หยุดลอย/เอียงหัว)
  *   แอนิเมชันพื้นฐาน: ลอยขึ้นลง · กะพริบตา · เอียงหัว · ไฟอก/ตาเรืองแสงเป็นจังหวะ · hover = โบกมือ + เอียงหัว + ตายิ้ม
@@ -74,7 +74,7 @@
     logo = esc(logo || 'assets/logo.png');
     var id = 'm' + (++n) + Math.random().toString(36).slice(2, 6);
     var W = 'url(#wh' + id + ')';
-    return '<svg class="mascot ' + esc(cls || '') + '" viewBox="0 0 160 190" width="100%" height="100%" role="img" aria-label="น้องAIเทศกิจพัทยา">' +
+    return '<svg class="mascot ' + esc(cls || '') + '" viewBox="0 0 160 190" width="100%" height="100%" role="img" aria-label="น้องอัศวิน">' +
       '<defs>' +
         '<radialGradient id="wh' + id + '" cx="36%" cy="28%" r="78%"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#eef3f8"/><stop offset=".85" stop-color="#cfd9e5"/><stop offset="1" stop-color="#aebdcf"/></radialGradient>' +
         '<radialGradient id="ey' + id + '" cx="45%" cy="40%" r="65%"><stop offset="0" stop-color="#1d3b7a"/><stop offset=".6" stop-color="#0b1730"/><stop offset="1" stop-color="#030712"/></radialGradient>' +
@@ -149,7 +149,7 @@
     logo = esc(logo || 'assets/logo.png');
     var id = 'o' + (++n) + Math.random().toString(36).slice(2, 6);
     var W = 'url(#wh' + id + ')', NV = 'url(#nv' + id + ')', GD = 'url(#gd' + id + ')', G = 'url(#gl' + id + ')';
-    return '<svg class="mascot mascot-officer ' + esc(cls || '') + '" viewBox="0 0 160 190" width="100%" height="100%" role="img" aria-label="น้องAIเทศกิจพัทยา (ชุดเจ้าหน้าที่)">' +
+    return '<svg class="mascot mascot-officer ' + esc(cls || '') + '" viewBox="0 0 160 190" width="100%" height="100%" role="img" aria-label="น้องอัศวิน (ชุดเจ้าหน้าที่)">' +
       '<defs>' +
         '<radialGradient id="wh' + id + '" cx="36%" cy="28%" r="78%"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#eef3f8"/><stop offset=".85" stop-color="#cfd9e5"/><stop offset="1" stop-color="#aebdcf"/></radialGradient>' +
         '<linearGradient id="nv' + id + '" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#2c4f86"/><stop offset=".5" stop-color="#16325e"/><stop offset="1" stop-color="#0a1c3a"/></linearGradient>' +

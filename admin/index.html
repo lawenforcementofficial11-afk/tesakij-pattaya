@@ -116,7 +116,7 @@
         <p class="mt-3 text-xs text-slate-400">ปิด “แชทบอท” จะปิด API /api/chat ด้วย · ปิด “แจ้งเหตุบนถนน” จะซ่อนปุ่ม/รายการแจ้งเหตุและหมุดบนแผนที่</p>
       </section>
       <section class="rounded-2xl bg-white ring-1 ring-slate-200 p-4 mt-4" id="voiceBox">
-        <h2 class="font-head font-semibold text-lg text-navy-900 mb-1">🔊 เสียงพูดของน้องAI</h2>
+        <h2 class="font-head font-semibold text-lg text-navy-900 mb-1">🔊 เสียงพูดของน้องอัศวิน</h2>
         <p class="text-xs text-slate-500 mb-2">ใช้เสียงในเบราว์เซอร์ (ฟรี) · เสียงภาษาไทยขึ้นกับอุปกรณ์ผู้ใช้ · <span id="ttsStatus">กำลังตรวจสอบเสียงฝั่งเซิร์ฟเวอร์…</span></p>
         <div id="voiceList" class="divide-y divide-slate-100"></div>
       </section>
@@ -358,7 +358,7 @@ $$('[data-goto]').forEach(function(b){b.onclick=function(){current=b.dataset.got
 
 // ---------- layout tab (sections on/off + drag-and-drop order) ----------
 var SEC_DEF=[['hero','ภาพหลัก (Hero)'],['royal','ส่วนถวายพระพร'],['services','บริการ'],['traffic','แผนที่จราจร 3D / CCTV / แจ้งเหตุ'],['tourist','ช่วยเหลือนักท่องเที่ยว'],['track','เกี่ยวกับเรา · แจ้งเรื่อง · ติดตามสถานะ'],['stats','สถิติ'],['news','ข่าวสาร'],['laws','กฎหมาย/ค่าปรับ'],['faq','คำถามที่พบบ่อย']];
-var FEAT_DEF=[['cctv','กล้อง CCTV','กล้องสดบนแผนที่ 3D และแถบกล้อง'],['alerts','แจ้งเหตุบนถนน (Waze-style)','ปุ่มแจ้งเหตุ รายการเหตุ และหมุดบนแผนที่'],['simulation','รถ 3 มิติ (ภาพจำลอง)','ปุ่ม 🚗 และรถจำลองบนแผนที่'],['complaint','แจ้งเรื่องร้องเรียน','การ์ด/แบบฟอร์มแจ้งเรื่อง และลิงก์เมนู'],['trackStatus','ติดตามสถานะ','การ์ดค้นหาเลขรับเรื่อง'],['about','เกี่ยวกับเรา','ข้อความแนะนำหน่วยงาน'],['chatbot','แชทบอท น้องAI','ปุ่มลอยและหน้าต่างแชท'],['mobileBar','แถบเมนูล่าง (มือถือ)','เมนูลัด 4 ปุ่มด้านล่างจอมือถือ']];
+var FEAT_DEF=[['cctv','กล้อง CCTV','กล้องสดบนแผนที่ 3D และแถบกล้อง'],['alerts','แจ้งเหตุบนถนน (Waze-style)','ปุ่มแจ้งเหตุ รายการเหตุ และหมุดบนแผนที่'],['simulation','รถ 3 มิติ (ภาพจำลอง)','ปุ่ม 🚗 และรถจำลองบนแผนที่'],['complaint','แจ้งเรื่องร้องเรียน','การ์ด/แบบฟอร์มแจ้งเรื่อง และลิงก์เมนู'],['trackStatus','ติดตามสถานะ','การ์ดค้นหาเลขรับเรื่อง'],['about','เกี่ยวกับเรา','ข้อความแนะนำหน่วยงาน'],['chatbot','แชทบอท น้องอัศวิน','ปุ่มลอยและหน้าต่างแชท'],['mobileBar','แถบเมนูล่าง (มือถือ)','เมนูลัด 4 ปุ่มด้านล่างจอมือถือ']];
 var layDirtyFlag=false;
 function layDirty(on){layDirtyFlag=on;$('#layDirty').classList.toggle('hidden',!on);setDirty(on)}
 function ensureLayout(){
@@ -405,7 +405,7 @@ function renderLayout(){
       (pin?'':'<button type="button" class="btn btn-ghost !px-2 !py-1" data-lmv="-1" aria-label="เลื่อนขึ้น">↑</button><button type="button" class="btn btn-ghost !px-2 !py-1" data-lmv="1" aria-label="เลื่อนลง">↓</button>')+
       swHtml('data-lsw',x.enabled,'แสดง '+x.label)+'</li>'}).join('');
   var fl=FEAT_DEF.map(function(d){return '<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">'+esc(d[1])+'</p><p class="text-xs text-slate-500">'+esc(d[2])+'</p></div>'+swHtml('data-fsw="'+d[0]+'"',content.features[d[0]]!==false,d[1])+'</div>'}).join('');
-  fl+='<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">มาสคอตน้องAI (แอนิเมชัน)</p><p class="text-xs text-slate-500">ปิดเพื่อใช้รูปอวตารที่อัปโหลดเอง (เนื้อหาเว็บไซต์ → แชทบอท → รูปอวตาร)</p></div>'+swHtml('data-msw',content.chatbot.mascot!==false,'มาสคอต')+'</div>';
+  fl+='<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">มาสคอตน้องอัศวิน (แอนิเมชัน)</p><p class="text-xs text-slate-500">ปิดเพื่อใช้รูปอวตารที่อัปโหลดเอง (เนื้อหาเว็บไซต์ → แชทบอท → รูปอวตาร)</p></div>'+swHtml('data-msw',content.chatbot.mascot!==false,'มาสคอต')+'</div>';
   var ms=content.chatbot.mascotStyle==='officer'?'officer':'robot';
   fl+='<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">แบบมาสคอต</p><p class="text-xs text-slate-500">หุ่นยนต์ (ค่าเริ่มต้น) หรือ หุ่นยนต์ชุดเจ้าหน้าที่เทศกิจ (ตัวอย่าง)</p></div><select data-mstyle class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm"><option value="robot"'+(ms==='robot'?' selected':'')+'>หุ่นยนต์</option><option value="officer"'+(ms==='officer'?' selected':'')+'>เจ้าหน้าที่</option></select></div>';
   $('#featList').innerHTML=fl;

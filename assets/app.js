@@ -237,7 +237,7 @@
   var langMenu = $('#langMenu'), langBtn = $('#langBtn');
   langBtn.addEventListener('click', function (e) { e.stopPropagation(); var hidden = langMenu.classList.toggle('hidden'); langBtn.setAttribute('aria-expanded', String(!hidden)); });
   document.addEventListener('click', function () { langMenu.classList.add('hidden'); langBtn.setAttribute('aria-expanded', 'false'); });
-  var langMsg = { en: ['English', 'The assistant “น้องAI” now replies in English. Full English pages coming soon.'], zh: ['中文', '智能助手现在用中文回答。中文网页即将推出。'], ru: ['Русский', 'Помощник теперь отвечает по-русски. Русская версия сайта скоро появится.'], th: ['ภาษาไทย', 'น้องAIตอบเป็นภาษาไทย'] };
+  var langMsg = { en: ['English', 'The assistant “Nong Assawin” now replies in English. Full English pages coming soon.'], zh: ['中文', '智能助手阿萨温现在用中文回答。中文网页即将推出。'], ru: ['Русский', 'Помощник Нонг Ассавин теперь отвечает по-русски. Русская версия сайта скоро появится.'], th: ['ภาษาไทย', 'น้องอัศวินตอบเป็นภาษาไทย'] };
   function setLang(l, silent) {
     if (!LANG_UI[l]) return; curLang = l; $('#langCur').textContent = LANG_UI[l];
     try { localStorage.setItem('tkpLang', l); } catch (e) {}
@@ -339,10 +339,10 @@
   // ---------- chatbot (มาสคอต + หลายภาษา) ----------
   var chatReady = false, history = [], bot = {}, userSpoke = false, greetEl = null, logoUrl = 'assets/logo.png';
   var CUI = {
-    th: { ph: 'พิมพ์คำถาม…', hint: 'ถามน้องAIได้เลย!', typing: 'กำลังพิมพ์', off: 'ขออภัยฮะ ขณะนี้ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่อีกครั้งนะฮะ', sub: 'ออนไลน์ · ตอบจากแหล่งข้อมูลทางราชการ', dis: '', hi: 'สวัสดีฮะ ผมน้องAIเทศกิจพัทยา', tease: 'สวัสดีฮะ 👋', listen: 'กำลังฟัง… พูดได้เลยฮะ', spkOn: 'ปิดเสียงพูด', spkOff: 'เปิดเสียงพูด', replay: 'ฟังอีกครั้ง', mic: 'พูดเพื่อถาม', noVoice: 'อุปกรณ์นี้ยังไม่มีเสียงอ่านภาษาไทย (ลองใช้ Chrome/Edge หรือเพิ่มเสียงภาษาไทยในการตั้งค่าเครื่อง)', micErr: 'ใช้ไมโครโฟนไม่ได้ กรุณาอนุญาตการใช้ไมโครโฟนในเบราว์เซอร์' },
-    en: { ph: 'Type your question…', hint: 'Ask me anything!', typing: 'typing', off: 'Sorry, the assistant is offline right now. Please try again.', sub: 'Online · answers from official sources', dis: 'Answers only from this website and official sources · Emergency 191 / 1155 / 1669', hi: 'Hi, I’m your Pattaya City helper', tease: 'Hello! 👋', listen: 'Listening… go ahead', spkOn: 'Mute voice', spkOff: 'Unmute voice', replay: 'Play again', mic: 'Speak to ask', noVoice: 'No English voice is available on this device.', micErr: 'Microphone unavailable. Please allow microphone access.' },
-    zh: { ph: '请输入您的问题…', hint: '有问题问我吧！', typing: '正在输入', off: '抱歉，助手暂时无法连接，请稍后再试。', sub: '在线 · 依据官方来源回答', dis: '仅根据本网站及官方来源回答 · 紧急情况拨打 191 / 1155 / 1669', hi: '您好，我是芭提雅市执法小助手', tease: '您好！👋', listen: '正在聆听…请说', spkOn: '关闭语音', spkOff: '开启语音', replay: '再听一次', mic: '语音提问', noVoice: '此设备没有中文语音。', micErr: '无法使用麦克风，请在浏览器中允许麦克风权限。' },
-    ru: { ph: 'Введите вопрос…', hint: 'Спросите меня!', typing: 'печатает', off: 'Извините, помощник сейчас недоступен. Попробуйте позже.', sub: 'Онлайн · ответы по официальным источникам', dis: 'Ответы только по данным сайта и официальным источникам · Экстренно 191 / 1155 / 1669', hi: 'Привет! Я помощник инспекции Паттайи', tease: 'Привет! 👋', listen: 'Слушаю… говорите', spkOn: 'Выключить голос', spkOff: 'Включить голос', replay: 'Прослушать снова', mic: 'Спросить голосом', noVoice: 'На этом устройстве нет русского голоса.', micErr: 'Микрофон недоступен. Разрешите доступ к микрофону.' }
+    th: { ph: 'พิมพ์คำถาม…', hint: 'ถามน้องอัศวินได้เลย!', typing: 'กำลังพิมพ์', off: 'ขออภัยฮะ ขณะนี้ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่อีกครั้งนะฮะ', sub: 'ออนไลน์ · ตอบจากแหล่งข้อมูลทางราชการ', dis: '', hi: 'สวัสดีฮะ ผมน้องอัศวิน', tease: 'สวัสดีฮะ 👋', listen: 'กำลังฟัง… พูดได้เลยฮะ', spkOn: 'ปิดเสียงพูด', spkOff: 'เปิดเสียงพูด', replay: 'ฟังอีกครั้ง', mic: 'พูดเพื่อถาม', noVoice: 'อุปกรณ์นี้ยังไม่มีเสียงอ่านภาษาไทย (ลองใช้ Chrome/Edge หรือเพิ่มเสียงภาษาไทยในการตั้งค่าเครื่อง)', micErr: 'ใช้ไมโครโฟนไม่ได้ กรุณาอนุญาตการใช้ไมโครโฟนในเบราว์เซอร์' },
+    en: { ph: 'Type your question…', hint: 'Ask me anything!', typing: 'typing', off: 'Sorry, the assistant is offline right now. Please try again.', sub: 'Online · answers from official sources', dis: 'Answers only from this website and official sources · Emergency 191 / 1155 / 1669', hi: 'Hi, I’m Nong Assawin, your Pattaya City helper', tease: 'Hello! 👋', listen: 'Listening… go ahead', spkOn: 'Mute voice', spkOff: 'Unmute voice', replay: 'Play again', mic: 'Speak to ask', noVoice: 'No English voice is available on this device.', micErr: 'Microphone unavailable. Please allow microphone access.' },
+    zh: { ph: '请输入您的问题…', hint: '有问题问我吧！', typing: '正在输入', off: '抱歉，助手暂时无法连接，请稍后再试。', sub: '在线 · 依据官方来源回答', dis: '仅根据本网站及官方来源回答 · 紧急情况拨打 191 / 1155 / 1669', hi: '您好，我是阿萨温，芭提雅市执法小助手', tease: '您好！👋', listen: '正在聆听…请说', spkOn: '关闭语音', spkOff: '开启语音', replay: '再听一次', mic: '语音提问', noVoice: '此设备没有中文语音。', micErr: '无法使用麦克风，请在浏览器中允许麦克风权限。' },
+    ru: { ph: 'Введите вопрос…', hint: 'Спросите меня!', typing: 'печатает', off: 'Извините, помощник сейчас недоступен. Попробуйте позже.', sub: 'Онлайн · ответы по официальным источникам', dis: 'Ответы только по данным сайта и официальным источникам · Экстренно 191 / 1155 / 1669', hi: 'Привет! Я Нонг Ассавин, помощник инспекции Паттайи', tease: 'Привет! 👋', listen: 'Слушаю… говорите', spkOn: 'Выключить голос', spkOff: 'Включить голос', replay: 'Прослушать снова', mic: 'Спросить голосом', noVoice: 'На этом устройстве нет русского голоса.', micErr: 'Микрофон недоступен. Разрешите доступ к микрофону.' }
   };
   function useMascot() { return bot.mascot !== false; }
   function avatarHtml(cls) {
@@ -403,7 +403,7 @@
     });
     if (!stopMic) micState(false);
   }
-  function voiceGreeting() { var g = vcfg().greetings || {}; return pfx(g[curLang] || (curLang === 'th' ? 'สวัสดีฮะ ยินดีต้อนรับสู่เทศกิจพัทยาฮะ น้องAIยินดีช่วยเหลือฮะ' : g.en) || ''); }
+  function voiceGreeting() { var g = vcfg().greetings || {}; return pfx(g[curLang] || (curLang === 'th' ? 'สวัสดีฮะ น้องอัศวินยินดีต้อนรับสู่เทศกิจพัทยาฮะ' : g.en) || ''); }
   function greeting() { var g = bot.greetings || {}; return pfx(g[curLang] || (curLang === 'th' ? bot.greeting : g.en) || bot.greeting || 'สวัสดีฮะ'); }
   function chips() { var q = bot.quickRepliesI18n || {}; return q[curLang] || (curLang === 'th' ? bot.quickReplies : q.en) || bot.quickReplies || []; }
   function paintChat() {
@@ -421,7 +421,7 @@
     if (bot.enabled === false) return;
     logoUrl = safeUrl(((window.__content || {}).site || {}).logo || 'assets/logo.png');
     $('#chatRoot').classList.remove('hidden');
-    $$('.bot-name').forEach(function (el) { el.textContent = bot.name || 'น้องAI'; });
+    $$('.bot-name').forEach(function (el) { el.textContent = bot.name || 'น้องอัศวิน'; });
     $('#chatFabFig').innerHTML = avatarHtml('');
     $('#chatHeadFig').innerHTML = avatarHtml('');
     $('#chatDisclaimer').textContent = bot.disclaimer || '';
@@ -429,7 +429,7 @@
       if (useMascot()) {
         var hero = document.createElement('div');
         hero.className = 'flex flex-col items-center text-center pt-1 pb-2';
-        hero.innerHTML = '<span id="chatHeroFig" class="block w-32 h-36" style="background:radial-gradient(circle at 50% 58%,rgba(103,232,249,.35) 0,rgba(186,230,253,.25) 38%,transparent 66%)">' + window.TKPMascot.svg(logoUrl, '', bot.mascotStyle) + '</span><p class="mt-1 font-head font-semibold text-navy-900 bot-name">' + esc(bot.name || 'น้องAI') + '</p><p id="chatHeroHi" class="text-xs text-slate-500"></p>';
+        hero.innerHTML = '<span id="chatHeroFig" class="block w-32 h-36" style="background:radial-gradient(circle at 50% 58%,rgba(103,232,249,.35) 0,rgba(186,230,253,.25) 38%,transparent 66%)">' + window.TKPMascot.svg(logoUrl, '', bot.mascotStyle) + '</span><p class="mt-1 font-head font-semibold text-navy-900 bot-name">' + esc(bot.name || 'น้องอัศวิน') + '</p><p id="chatHeroHi" class="text-xs text-slate-500"></p>';
         $('#chatLog').appendChild(hero);
       }
       greetEl = addMsg('bot', greeting()); chatReady = true;
