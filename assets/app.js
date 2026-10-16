@@ -58,7 +58,7 @@
   function linkify(t) {
     return esc(t)
       .replace(/https?:\/\/[^\s<>"',]+[^\s<>"',.)]/g, function (u) { return '<a href="' + u + '" target="_blank" rel="noopener" class="chat-ext underline decoration-sea-500 decoration-2 underline-offset-2 text-navy-800 font-semibold break-all">🔗 ' + esc(shortUrl(u)) + '</a>'; })
-      .replace(/(^|[\s(])(#(?:complaint|track|laws|contact|news|faq|tourist|traffic|cctv))\b/g, '$1<a href="$2" class="chat-link underline decoration-gold-500 decoration-2 underline-offset-2 font-semibold">$2</a>')
+      .replace(/(^|[\s(])(#(?:complaint|track|laws|contact|news|faq|services))\b/g, '$1<a href="$2" class="chat-link underline decoration-gold-500 decoration-2 underline-offset-2 font-semibold">$2</a>')
       .replace(/\n/g, '<br>');
   }
 
@@ -72,26 +72,28 @@
     $('#lawGroups').innerHTML = cats.map(function (k) {
       var list = items.filter(function (l) { return (l.category || 'อื่น ๆ') === k; });
       return '<div class="law-group rounded-[24px] bg-white shadow-card ring-1 ring-slate-100 overflow-hidden" data-cat="' + esc(k) + '"><div class="px-5 sm:px-6 py-4 bg-navy-900 text-white flex items-center justify-between gap-3"><h3 class="font-head font-semibold text-lg">' + esc(k) + '</h3><span class="text-xs text-gold-300">' + list.length + ' รายการ</span></div><ul class="divide-y divide-slate-100">' +
-        list.map(function (l) {
+        list.map(function (l, li) {
           var has = l.fineAmount != null && l.fineAmount !== '';
           var links = [l.url, l.url2].filter(Boolean).map(function (u, i) { return '<a href="' + esc(safeUrl(u)) + '" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-navy-800 hover:text-gold-700 underline decoration-gold-500/60 underline-offset-2">' + (i ? 'ตัวบท/สำเนา' : 'แหล่งที่มาทางการ') + ' · ' + esc(shortUrl(u)) + ' ↗</a>'; }).join('<span class="text-slate-300">|</span>');
-          return '<li class="px-5 sm:px-6 py-4 grid sm:grid-cols-[1fr_auto] gap-x-6 gap-y-2"><div class="min-w-0"><p class="font-head font-semibold text-navy-900 leading-snug">' + esc(l.title) + '</p>' +
+          return '<li class="' + (li >= 2 ? 'law-more hidden ' : '') + 'px-5 sm:px-6 py-4 grid sm:grid-cols-[1fr_auto] gap-x-6 gap-y-2"><div class="min-w-0"><p class="font-head font-semibold text-navy-900 leading-snug">' + esc(l.title) + '</p>' +
             (l.summary ? '<p class="mt-1 text-sm text-slate-600 leading-relaxed">' + esc(l.summary) + '</p>' : '') +
             '<p class="mt-1.5 text-xs text-slate-500">📜 ' + esc(l.legalRef || l.ref || '') + (l.year ? ' · ปีที่มีผล/ประกาศ พ.ศ. ' + esc(l.year) : '') + '</p>' +
             (links ? '<p class="mt-1.5 text-xs flex flex-wrap gap-x-2 gap-y-1">' + links + '</p>' : '') + '</div>' +
             '<div class="sm:text-right"><span class="inline-block rounded-full ' + (has ? 'bg-navy-900 text-gold-300' : 'bg-slate-100 text-slate-600') + ' text-xs sm:text-sm font-head font-semibold px-3 py-1.5 whitespace-nowrap">' + (has ? 'ปรับ' : '') + esc(l.fine) + '</span>' + (has ? '<p class="mt-1 text-[11px] text-slate-400">อัตราสูงสุดตามตัวบท</p>' : '') + '</div></li>';
-        }).join('') + '</ul></div>';
+        }).join('') + '</ul>' + (list.length > 2 ? '<button type="button" class="law-toggle w-full border-t border-slate-100 px-5 py-3 text-sm font-head font-semibold text-navy-800 hover:bg-gold-100/40 hover:text-gold-700 transition" data-n="' + (list.length - 2) + '">ดูอีก ' + (list.length - 2) + ' รายการ ▾</button>' : '') + '</div>';
     }).join('');
+    function expand(g, on) { $$('.law-more', g).forEach(function (li) { li.classList.toggle('hidden', !on); }); var t = $('.law-toggle', g); if (t) t.textContent = on ? 'ย่อรายการ ▴' : 'ดูอีก ' + t.dataset.n + ' รายการ ▾'; g.dataset.open = on ? '1' : ''; }
+    $$('.law-toggle').forEach(function (t) { t.addEventListener('click', function () { var g = t.closest('.law-group'); expand(g, !g.dataset.open); }); });
     $('#lawSources').innerHTML = (L.sources || []).map(function (x) { return '<li class="flex gap-2"><span class="text-gold-600">•</span><a class="text-navy-800 hover:text-gold-700 underline decoration-gold-500/50 underline-offset-2" target="_blank" rel="noopener" href="' + esc(safeUrl(x.url)) + '">' + esc(x.name) + ' ↗</a></li>'; }).join('');
     $$('.law-cat').forEach(function (b) { b.addEventListener('click', function () {
       var k = b.dataset.lawcat;
       $$('.law-cat').forEach(function (x) { var on = x === b; x.classList.toggle('bg-navy-900', on); x.classList.toggle('text-white', on); x.classList.toggle('ring-navy-900', on); x.classList.toggle('bg-white', !on); x.classList.toggle('text-navy-900', !on); });
-      $$('.law-group').forEach(function (g) { g.classList.toggle('hidden', !!k && g.dataset.cat !== k); });
+      $$('.law-group').forEach(function (g) { g.classList.toggle('hidden', !!k && g.dataset.cat !== k); expand(g, !!k && g.dataset.cat === k); });
     }); });
   }
 
   // ---------- section layout (admin: เปิด/ปิด + ลากเรียงลำดับ) ----------
-  var SEC_LINK = { complaint: 'complaint', track: 'trackStatus', about: 'about', traffic: 'traffic', news: 'news', laws: 'laws', faq: 'faq', tourist: 'tourist', royal: 'royal', services: 'services', cctv: 'cctv' };
+  var SEC_LINK = { complaint: 'complaint', track: 'trackStatus', about: 'about', news: 'news', laws: 'laws', faq: 'faq', royal: 'royal', services: 'services' };
   function applyLayout(c) {
     var f = c.features || {}, secs = (c.sections || []).slice().sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
     var on = {}; secs.forEach(function (x) { on[x.id] = x.enabled !== false; });
@@ -101,17 +103,13 @@
     $$('[data-sec]').forEach(function (el) { var id = el.dataset.sec; if (id in on && !on[id]) { el.classList.add('hidden'); el.setAttribute('data-off', '1'); } });
     $$('[data-feat]').forEach(function (el) { if (f[el.dataset.feat] === false) { el.classList.add('hidden'); el.setAttribute('data-off', '1'); } });
     if (!on.hero) document.body.classList.add('no-hero');
-    // features inside the traffic section
-    if (f.alerts === false) { c.alerts = Object.assign({}, c.alerts, { enabled: false }); var g = $('#trafficGrid'); if (g) g.className = g.className.replace(/lg:grid-cols-\[[^\]]+\]/, ''); }
-    if (f.cctv === false) c.cctv = Object.assign({}, c.cctv, { enabled: false });
-    if (f.simulation === false) c.traffic = Object.assign({}, c.traffic, { simulation: false });
     if (f.chatbot === false) c.chatbot = Object.assign({}, c.chatbot, { enabled: false });
     // track section: if both cards are off, let the about text span the row
     if (f.complaint === false && f.trackStatus === false) { var tc = $('#trackCards'); if (tc) tc.classList.add('hidden'); }
     if (f.about === false) { var tc2 = $('#trackCards'); if (tc2) tc2.classList.replace('lg:col-span-3', 'lg:col-span-5'); }
     if (on.track === false) { f = Object.assign({}, f, { complaint: false, trackStatus: false, about: false }); }
     // hide nav links to things that are off
-    var off = { traffic: !on.traffic, news: !on.news, laws: !on.laws, faq: !on.faq, tourist: !on.tourist, royal: !on.royal, services: !on.services, complaint: f.complaint === false, track: f.trackStatus === false, about: f.about === false, cctv: f.cctv === false || !on.traffic };
+    var off = { news: !on.news, laws: !on.laws, faq: !on.faq, royal: !on.royal, services: !on.services, complaint: f.complaint === false, track: f.trackStatus === false, about: f.about === false, chat: f.chatbot === false };
     $$('a[href^="#"]').forEach(function (a) { var id = a.getAttribute('href').slice(1); if (off[id] && !a.closest('#chatLog')) a.classList.add('hidden'); });
     if (f.mobileBar === false) document.body.classList.add('no-mobilebar');
   }
@@ -143,30 +141,25 @@
     $('#royal').classList.toggle('hidden', r.enabled === false);
     $('#royalRibbon').classList.toggle('hidden', r.enabled === false);
 
-    $('#servicesGrid').innerHTML = (c.services || []).map(function (x, i) {
-      return '<a href="' + esc(safeUrl(x.link)) + '" class="reveal group relative rounded-3xl bg-white p-5 sm:p-7 shadow-card ring-1 ring-slate-100 hover:shadow-lift hover:-translate-y-1 transition duration-300 overflow-hidden" style="--d:' + (i * 60) + 'ms">' +
+    var botOn = (c.features || {}).chatbot !== false && (c.chatbot || {}).enabled !== false;
+    var mascotPng = (c.chatbot || {}).mascotStyle === 'robot' ? 'assets/mascot.png' : 'assets/mascot-officer.png';
+    $('#servicesGrid').innerHTML = (c.services || []).filter(function (x) { return botOn || x.link !== '#chat'; }).map(function (x, i) {
+      if (x.link === '#chat') {
+        return '<a href="#chat" class="reveal group relative rounded-3xl bg-gradient-to-br from-navy-800 via-navy-900 to-navy-950 text-white p-5 sm:p-7 shadow-lift ring-1 ring-navy-800 hover:-translate-y-1 transition duration-300 overflow-hidden min-h-[180px]" style="--d:' + (i * 60) + 'ms">' +
+          '<span class="absolute -right-10 -bottom-12 w-48 h-48 rounded-full bg-cyan-400/20 blur-2xl"></span>' +
+          '<img src="' + mascotPng + '" alt="" class="absolute right-2 bottom-0 w-[104px] sm:w-[124px] drop-shadow-[0_12px_18px_rgba(0,0,0,.45)] group-hover:-translate-y-1 group-hover:rotate-[-3deg] transition duration-300">' +
+          '<span class="relative inline-flex items-center gap-1.5 rounded-full bg-gold-500 text-navy-950 text-[11px] font-head font-bold px-2.5 py-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>AI · ออนไลน์</span>' +
+          '<h3 class="relative mt-4 font-head font-semibold text-base sm:text-xl leading-snug pr-24 sm:pr-28">' + esc(x.title) + '</h3>' +
+          '<p class="relative mt-1.5 text-sm sm:text-base text-white/70 leading-relaxed pr-24 sm:pr-28">' + esc(x.desc) + '</p>' +
+          '<span class="relative mt-4 inline-flex items-center gap-1 text-sm font-head font-semibold text-gold-300">เริ่มคุยเลย ' + icon('arrow', 'w-4 h-4') + '</span></a>';
+      }
+      return '<a href="' + esc(safeUrl(x.link)) + '" class="reveal group relative rounded-3xl bg-white p-5 sm:p-7 shadow-card ring-1 ring-slate-100 hover:shadow-lift hover:-translate-y-1 transition duration-300 overflow-hidden min-h-[180px]" style="--d:' + (i * 60) + 'ms">' +
         '<span class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-gold-500/0 group-hover:bg-gold-500/10 transition"></span>' +
         '<span class="relative inline-flex w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ' + (i === 0 ? 'bg-gold-500 text-navy-950' : 'bg-navy-900 text-gold-400') + ' items-center justify-center group-hover:scale-110 transition">' + icon(x.icon, 'w-6 h-6 sm:w-7 sm:h-7') + '</span>' +
         '<h3 class="relative mt-4 sm:mt-5 font-head font-semibold text-navy-900 text-base sm:text-xl leading-snug">' + esc(x.title) + '</h3>' +
         '<p class="relative mt-1.5 text-sm sm:text-base text-slate-500 leading-relaxed">' + esc(x.desc) + '</p>' +
-        '<span class="relative mt-4 hidden sm:inline-flex items-center gap-1 text-sm font-head font-semibold text-navy-800 group-hover:text-gold-700 transition">เข้าสู่บริการ ' + icon('arrow', 'w-4 h-4') + '</span></a>';
+        '<span class="relative mt-4 inline-flex items-center gap-1 text-sm font-head font-semibold text-navy-800 group-hover:text-gold-700 transition">เข้าสู่บริการ ' + icon('arrow', 'w-4 h-4') + '</span></a>';
     }).join('');
-
-    var t = c.tourist || {};
-    $('#touristLangs').innerHTML = (t.languages || []).map(function (l) { return '<span class="rounded-full bg-navy-950/90 text-gold-300 text-xs font-head font-semibold px-3 py-1.5">' + esc(l) + '</span>'; }).join('');
-    $('#touristTips').innerHTML = (t.tips || []).map(function (x, i) {
-      return '<div class="reveal rounded-2xl bg-white/5 ring-1 ring-white/10 p-5 hover:bg-white/10 transition" style="--d:' + (i * 70) + 'ms"><div class="flex items-center gap-3"><span class="w-10 h-10 rounded-xl bg-sea-500/20 text-sea-300 flex items-center justify-center shrink-0">' + icon(x.icon, 'w-5 h-5') + '</span><div><p class="font-head font-semibold leading-tight">' + esc(x.title) + '</p><p class="text-xs text-sea-300">' + esc(x.titleEn) + '</p></div></div><p class="mt-3 text-sm text-white/65 leading-relaxed">' + esc(x.desc) + '</p></div>';
-    }).join('');
-    var zones = t.zones || [];
-    $('#zonePins').innerHTML = zones.map(function (z, i) {
-      return '<button type="button" data-zone="' + i + '" class="zone-pin absolute -translate-x-1/2 -translate-y-full flex flex-col items-center" style="left:' + (+z.x || 50) + '%;top:' + (+z.y || 50) + '%" aria-label="' + esc(z.nameEn + ' ' + z.name) + '">' +
-        '<span class="mb-1 whitespace-nowrap rounded-full bg-white text-navy-900 text-[11px] sm:text-xs font-head font-semibold px-2.5 py-1 shadow-lg">' + esc(z.nameEn) + '</span>' +
-        '<span class="pin-dot relative w-5 h-5 rounded-full bg-gold-500 ring-4 ring-gold-500/30 transition ' + (i === 0 ? 'pin-pulse' : '') + '"></span></button>';
-    }).join('');
-    $('#zoneList').innerHTML = zones.map(function (z, i) {
-      return '<button type="button" data-zone="' + i + '" class="zone-item text-left rounded-2xl px-4 py-3 ring-1 ring-white/10 hover:bg-white/10 transition flex gap-3 items-start ' + (i === 0 ? 'bg-white/10' : '') + '"><span class="mt-1.5 w-2.5 h-2.5 rounded-full bg-gold-500 shrink-0"></span><span><span class="font-head font-semibold">' + esc(z.nameEn) + ' · ' + esc(z.name) + '</span><span class="block text-sm text-white/60">' + esc(z.desc) + '</span></span></button>';
-    }).join('');
-    $$('[data-zone]').forEach(function (b) { b.addEventListener('click', function () { selectZone(+b.getAttribute('data-zone')); }); });
 
     var st = c.stats || {};
     $('#statsBadge').classList.toggle('hidden', !st.isExample);
@@ -198,18 +191,10 @@
     $('#footerLinks').innerHTML = ((c.footer || {}).links || []).map(function (l) { return '<li><a class="hover:text-gold-400 transition" href="' + esc(safeUrl(l.href)) + '">' + esc(l.label) + '</a></li>'; }).join('');
 
     applyLayout(c);
-    if (window.TKPAlerts) window.TKPAlerts.init(c.alerts || {});
-    if (window.TKPCCTV) window.TKPCCTV.init(c.cctv || {});
-    if (window.TKPTraffic) window.TKPTraffic.init(c.traffic || {}, c.alerts || {});
     initChat(c.chatbot || {});
     paintIcons(document);
     observeReveal(document);
     observeCounters();
-  }
-
-  function selectZone(i) {
-    $$('.zone-item').forEach(function (b, j) { b.classList.toggle('bg-white/10', j === i); });
-    $$('.pin-dot').forEach(function (p, j) { p.classList.toggle('pin-pulse', j === i); p.classList.toggle('scale-125', j === i); });
   }
 
   var countersDone = false;
@@ -353,7 +338,7 @@
     if (!useMascot()) return '<span class="w-9 h-9 shrink-0">' + avatarHtml('static') + '</span>';
     return '<span class="w-9 h-9 shrink-0 rounded-full ring-2 ring-cyan-300/70 shadow-sm" role="img" aria-label="" style="background:url(' + esc(bot.mascotStyle === 'robot' ? 'assets/mascot.png' : 'assets/mascot-officer.png') + ') 50% -3px/140% auto no-repeat,linear-gradient(#f0f9ff,#cffafe)"></span>';
   }
-  function figs() { return $$('#chatFabFig .mascot, #chatHeadFig .mascot, #chatHeroFig .mascot'); }
+  function figs() { return $$('#chatFabFig .mascot, #chatHeadFig .mascot, #chatHeroFig .mascot, #heroBotFig .mascot'); }
   function talk(on) { figs().forEach(function (m) { m.classList.toggle('talking', !!on); }); }
   function wave() { figs().forEach(function (m) { m.classList.remove('wave'); void m.getBoundingClientRect(); m.classList.add('wave'); setTimeout(function () { m.classList.remove('wave'); }, 2100); }); }
   function pfx(t) { var p = bot.particle; return (p == null || p === 'ฮะ') ? t : String(t).replace(/ฮะ(?=$|[\s.!?,…👋🙏])/gu, p); }
@@ -414,16 +399,23 @@
     var hh = $('#chatHeroHi'); if (hh) hh.textContent = L('hi');
     $('#chatChips').innerHTML = chips().map(function (q) { return '<button type="button" class="chat-chip shrink-0 rounded-full border border-navy-800/20 bg-white text-navy-900 text-sm font-head px-3.5 py-1.5 hover:bg-gold-100 hover:border-gold-500 transition">' + esc(q) + '</button>'; }).join('');
     $$('.chat-chip').forEach(function (c) { c.addEventListener('click', function () { send(c.textContent); }); });
+    var ha = $('#heroAsk');
+    if (ha) {
+      ha.innerHTML = chips().slice(0, 3).map(function (q) { return '<button type="button" class="hero-ask rounded-full bg-white/10 hover:bg-white/20 ring-1 ring-white/20 text-white text-sm font-head px-3.5 py-1.5 transition">' + esc(q) + '</button>'; }).join('');
+      $$('.hero-ask', ha).forEach(function (b) { b.addEventListener('click', function () { openChat(true); setTimeout(function () { send(b.textContent); }, 250); }); });
+    }
+    var hs = $('#heroBotSay'); if (hs) { if (!hs.dataset.th) hs.dataset.th = hs.textContent; hs.textContent = curLang === 'th' ? hs.dataset.th : (L('hi') || hs.dataset.th); }
     if (greetEl && !userSpoke) { greetEl.remove(); greetEl = addMsg('bot', greeting()); }
   }
   function initChat(b) {
     bot = b || {};
-    if (bot.enabled === false) return;
+    if (bot.enabled === false) { var hb = $('#heroBotCard'); if (hb) hb.classList.add('hidden'); return; }
     logoUrl = safeUrl(((window.__content || {}).site || {}).logo || 'assets/logo.png');
     $('#chatRoot').classList.remove('hidden');
     $$('.bot-name').forEach(function (el) { el.textContent = bot.name || 'น้องอัศวิน'; });
     $('#chatFabFig').innerHTML = avatarHtml('');
     $('#chatHeadFig').innerHTML = avatarHtml('');
+    var hf = $('#heroBotFig'); if (hf && window.TKPMascot) hf.innerHTML = window.TKPMascot.svg(logoUrl, '', bot.mascotStyle);
     $('#chatDisclaimer').textContent = bot.disclaimer || '';
     if (!chatReady) {
       if (useMascot()) {
@@ -491,6 +483,7 @@
   $('#chatForm').addEventListener('submit', function (e) { e.preventDefault(); send($('#chatInput').value); });
   $('#chatInput').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(this.value); } });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') openChat(false); });
+  document.addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('a[href="#chat"], [data-open-chat]'); if (!t) return; e.preventDefault(); openChat(true); });
 
   // ---------- boot ----------
   paintIcons(document);

@@ -141,9 +141,9 @@ function buildSystemPrompt(c, lang) {
     `บริการบนเว็บไซต์: ${(c.services || []).map(x => x.title).join(', ')}`,
     `กฎหมาย/ข้อบัญญัติ/ค่าปรับ (สรุปจากแหล่งทางราชการ ตรวจสอบล่าสุด ${lw.lastChecked || '-'}; ${lw.disclaimer || ''}):\n${laws}`,
     `แหล่งข้อมูลทางการ (เมื่ออ้างอิง ให้คัดลอก URL เต็มของ [S#] ที่ใช้ลงในคำตอบ):\n${srcList}\nรายชื่อแหล่ง: ${(lw.sources || []).map(x => `${x.name} [${sid(x.url)}]`).join(' ; ')}`,
-    `เคล็ดลับนักท่องเที่ยว: ${((c.tourist && c.tourist.tips) || []).map(t => `${t.title} — ${t.desc}`).join('; ')}`,
+    (c.tourist && (c.tourist.tips || []).length) ? `เคล็ดลับนักท่องเที่ยว: ${c.tourist.tips.map(t => `${t.title} — ${t.desc}`).join('; ')}` : '',
     `คำถามที่พบบ่อย:\n${kb}`
-  ].join('\n\n');
+  ].filter(Boolean).join('\n\n');
   return String(bot.systemPrompt || '')
     .replace(/\{botName\}/g, bot.name || '').replace(/\{siteName\}/g, s.name || '').replace(/\{englishName\}/g, s.englishName || '')
     .replace(/\{subtitle\}/g, s.subtitle || '').replace(/\{lang\}/g, LANG_NAME[lang || 'th']).replace(/\{particle\}/g, bot.particle == null ? 'ฮะ' : bot.particle).replace(/\{knowledge\}/g, knowledge);
