@@ -9,3 +9,5 @@ data/backups/
 data/alerts.json
 uploads/alerts/
 uploads/complaints*
+__pycache__/
+*.pyc
