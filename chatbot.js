@@ -69,9 +69,15 @@ function knowledgeEntries(c) {
 }
 
 // คำภาษาอังกฤษต้องตรงทั้งคำ (กัน “tree” ไปตรงกับ “street”) ส่วนไทย/จีน/รัสเซียใช้การมีอยู่ในข้อความ (รองรับคำต่อท้าย/ผันรูป)
+const STOP = new Set(['the', 'and', 'for', 'with', 'what', 'how', 'can', 'fine', 'much']);
 function hit(m, kk) {
   if (!kk) return false;
-  if (/^[a-z0-9 ]+$/.test(kk)) return (' ' + m + ' ').includes(' ' + kk + ' ') || (kk.length >= 5 && m.includes(kk));
+  if (/^[a-z0-9 ]+$/.test(kk)) {
+    if ((' ' + m + ' ').includes(' ' + kk + ' ') || (kk.length >= 5 && m.includes(kk))) return true;
+    // วลีหลายคำ: ถือว่าตรงเมื่อพบทุกคำสำคัญ (เช่น "park my motorbike on the sidewalk" ↔ "park on sidewalk")
+    const ws = kk.split(' ').filter(w => w.length > 2 && !STOP.has(w));
+    return ws.length > 1 && ws.every(w => new RegExp('\\b' + w + '(s|ing|ed)?\\b').test(m));
+  }
   return m.includes(kk);
 }
 function score(message, e) {

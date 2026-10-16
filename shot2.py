@@ -5,6 +5,17 @@ D = '/workspace/tesakij-pattaya/'
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:3000/'
 PW = os.environ.get('ADMIN_PASSWORD', 'demo1234')
 PREP = "() => document.querySelectorAll('.reveal').forEach(e => e.classList.add('is-in'))"
+MASCOT_CARD = """()=>{const M=(c)=>TKPMascot.svg('assets/logo.png',c);
+const st=(h,t)=>'<div style="text-align:center"><div style="width:150px;height:178px;margin:auto">'+h+'</div><p style="margin:6px 0 0;font:600 15px Prompt;color:#0b2545">'+t+'</p></div>';
+document.body.innerHTML='<div style="height:100vh;display:flex;align-items:center;gap:40px;padding:0 60px;box-sizing:border-box;background:radial-gradient(circle at 28% 50%,#e0fbff 0,#d5ecf8 35%,#b9d7ec 100%);font-family:Sarabun">'+
+'<div style="width:470px;height:560px;flex:none">'+M('static')+'</div>'+
+'<div><p style="font:700 34px Prompt;color:#0b2545;margin:0">น้องAIเทศกิจพัทยา</p><p style="font:400 17px Sarabun;color:#334155;margin:6px 0 26px">หุ่นยนต์ผู้ช่วยต้นฉบับ · SVG หลายเลเยอร์ + CSS แอนิเมชัน · ตราโล่เทศกิจพัทยาที่หน้าอก</p>'+
+'<div style="display:flex;gap:26px;align-items:flex-end">'+st(M('static talking'),'กำลังพูด')+st(M('static happy'),'ยิ้ม (hover)')+
+'<div style="text-align:center"><div style="display:flex;gap:10px;align-items:center;justify-content:center;height:178px"><span style="width:44px;height:44px;border-radius:50%;overflow:hidden;background:linear-gradient(#f0f9ff,#cffafe);box-shadow:0 0 0 2px #67e8f9"><img src="assets/mascot.png" style="width:100%;transform:scale(1.55);transform-origin:top;margin-top:2px"></span><span style="width:88px;height:104px"><img src="assets/mascot.png" style="width:100%"></span></div><p style="margin:6px 0 0;font:600 15px Prompt;color:#0b2545">ภาพนิ่ง mascot.png</p></div></div></div></div>';
+document.querySelectorAll('.mascot.happy .m-eyeball').forEach(e=>e.style.opacity=0);document.querySelectorAll('.mascot.happy .m-happy').forEach(e=>e.style.opacity=1);
+document.querySelectorAll('.mascot.happy .m-head').forEach(e=>{e.style.animation='none';e.style.transform='rotate(-7deg)'});
+document.querySelectorAll('.mascot.talking .m-talk').forEach(e=>{e.style.animation='none'});
+}"""
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'])
@@ -26,14 +37,22 @@ async def main():
         pg = await b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
         pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL, wait_until='networkidle'); await pg.evaluate('document.fonts.ready')
-        await pg.evaluate("localStorage.setItem('tkpLang','zh')"); await pg.reload(wait_until='networkidle'); await pg.evaluate('document.fonts.ready')
+        await pg.evaluate("localStorage.setItem('tkpLang','th')"); await pg.reload(wait_until='networkidle'); await pg.evaluate('document.fonts.ready')
         await pg.wait_for_timeout(600)
-        await pg.screenshot(path='/tmp/fab.png')
-        await pg.evaluate("window.__openChat(true)"); await pg.wait_for_timeout(1100)
+        await pg.evaluate("window.__openChat(true)"); await pg.wait_for_timeout(700)
+        await pg.evaluate("window.__chatSend('เวลาทำการ')"); await pg.wait_for_timeout(1500)
+        await pg.evaluate("document.querySelector('#chatLog').scrollTop=0"); await pg.wait_for_timeout(300)
         await pg.screenshot(path=D + 'preview-chatbot.png')
+        await pg.evaluate("localStorage.setItem('tkpLang','zh')"); await pg.reload(wait_until='networkidle'); await pg.evaluate('document.fonts.ready')
+        await pg.evaluate("window.__openChat(true)"); await pg.wait_for_timeout(900)
         await pg.evaluate("window.__chatSend('乱扔垃圾罚多少钱？')"); await pg.wait_for_timeout(1500)
         await pg.screenshot(path=D + 'preview-chatbot-answer.png')
         await pg.close()
+        # mascot closeup (states)
+        pg = await b.new_page(viewport={'width': 1200, 'height': 700}, device_scale_factor=1)
+        await pg.goto(URL, wait_until='networkidle'); await pg.evaluate('document.fonts.ready')
+        await pg.evaluate(MASCOT_CARD); await pg.wait_for_timeout(900)
+        await pg.screenshot(path=D + 'preview-mascot.png'); await pg.close()
         # desktop chatbot with mascot + English
         pg = await b.new_page(viewport={'width': 1280, 'height': 860})
         await pg.goto(URL, wait_until='networkidle'); await pg.evaluate('document.fonts.ready')
