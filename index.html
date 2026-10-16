@@ -65,6 +65,17 @@ tailwind.config = {
   .royal-frame { padding:10px; border-radius: 999px 999px 18px 18px; background: linear-gradient(145deg,#FFF3C4,#E9B923 28%,#9C7300 52%,#F5C518 74%,#FFF0B3); box-shadow: 0 30px 60px -25px rgba(143,107,0,.7), inset 0 0 0 1px rgba(255,255,255,.5); }
   .royal-frame > .inner { border-radius: 999px 999px 10px 10px; padding:6px; background:#FFFBEB; }
   .royal-frame > .inner > .pic { border-radius: 999px 999px 6px 6px; overflow:hidden; position:relative; aspect-ratio: 3/4; background: linear-gradient(180deg,#FDF1C7,#F5DB7F); box-shadow: inset 0 0 0 2px #C99A06; }
+  .hero-grid { grid-template-columns: minmax(0,1fr); grid-template-areas: "id" "bot" "cta"; }
+  .hero-id { grid-area:id } .hero-bot { grid-area:bot } .hero-cta { grid-area:cta }
+  @media (min-width:1024px){ .hero-grid { grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr); grid-template-areas: "id bot" "cta bot"; align-items:end; } .hero-cta{align-self:start;margin-top:1.25rem} }
+  #chatFab { transition: opacity .35s, transform .35s; } body.hero-bot-on #chatFab { opacity:0; transform:translateY(16px) scale(.85); pointer-events:none; }
+  .hero-grid.no-bot { grid-template-areas: "id" "cta"; grid-template-columns:minmax(0,1fr); }
+  .src-link { margin-left:.35rem; font-size:11px; color:rgba(255,255,255,.45); text-decoration:underline; text-underline-offset:2px; white-space:nowrap; }
+  .src-link:hover { color:#F5C518; } .src-link.src-dark { color:#94a3b8; } .src-link.src-dark:hover { color:#a16207; }
+  .royal-mini { width:54px; }
+  .royal-mini .royal-frame { padding:3px; } .royal-mini .royal-frame > .inner { padding:2px; }
+  @media (min-width:640px){ .royal-mini { width:84px; } .royal-mini .royal-frame { padding:5px; } .royal-mini .royal-frame > .inner { padding:3px; } }
+  @media (min-width:1024px){ .royal-mini { width:94px; } }
   .divider-orn { display:flex; align-items:center; gap:.75rem; color:#C99A06; }
   .divider-orn::before, .divider-orn::after { content:''; height:1px; flex:1; background: linear-gradient(90deg, transparent, #C99A06, transparent); }
   .map-sea { background: linear-gradient(160deg,#0b3a6b 0%, #0e5a96 60%, #1374b8 100%); }
@@ -96,12 +107,33 @@ tailwind.config = {
 <body class="bg-slate-50 text-slate-700 antialiased">
 <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] bg-gold-500 text-navy-950 px-4 py-2 rounded-lg font-head">ข้ามไปยังเนื้อหาหลัก</a>
 
-<!-- Royal ribbon -->
-<a id="royalRibbon" href="#royal" class="hidden block bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600 text-navy-950">
-  <div class="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-center gap-3 text-xs sm:text-sm font-head font-semibold tracking-wide">
-    <span aria-hidden="true">✦</span><span data-bind="royal.ribbonText">ทรงพระเจริญ</span><span aria-hidden="true">✦</span>
+<!-- ROYAL TRIBUTE (แถบบนสุด) -->
+<section id="royal" data-sec="royal" class="royal-banner relative royal-bg overflow-hidden" aria-labelledby="royalHeading">
+  <div class="absolute inset-0 thai-pattern opacity-60" aria-hidden="true"></div>
+  <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-gold-700 via-gold-300 to-gold-700" aria-hidden="true"></div>
+  <div class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-gold-700 via-gold-300 to-gold-700" aria-hidden="true"></div>
+  <div class="relative max-w-5xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-center gap-3 sm:gap-8">
+    <figure class="royal-mini shrink-0" title="พระบาทสมเด็จพระวชิรเกล้าเจ้าอยู่หัว">
+      <div class="royal-frame"><div class="inner"><div class="pic">
+        <img data-src="royal.kingImage" src="assets/king.jpg" alt="พระบรมฉายาลักษณ์ พระบาทสมเด็จพระวชิรเกล้าเจ้าอยู่หัว" class="absolute inset-0 w-full h-full object-cover object-top" fetchpriority="high">
+      </div></div></div>
+    </figure>
+    <div class="min-w-0 text-center">
+      <div class="divider-orn max-w-[260px] mx-auto hidden sm:flex" aria-hidden="true"><span class="text-[10px] tracking-[.3em]">✦ ✦ ✦</span></div>
+      <h2 id="royalHeading" class="font-head font-extrabold leading-[1.25] text-[1.65rem] sm:text-[2.6rem] lg:text-[2.9rem] whitespace-nowrap">
+        <span class="bg-gradient-to-b from-gold-500 via-gold-600 to-gold-700 bg-clip-text text-transparent drop-shadow-[0_1px_0_rgba(255,255,255,.7)]" data-bind="royal.heading">ทรงพระเจริญ</span>
+      </h2>
+      <p class="mt-0.5 font-head text-navy-900 text-[10.5px] sm:text-[15px] leading-snug text-balance max-w-[64ch] mx-auto" data-bind="royal.dedication">ด้วยเกล้าด้วยกระหม่อม ข้าพระพุทธเจ้า คณะผู้บริหารและเจ้าหน้าที่เทศกิจเมืองพัทยา</p>
+      <p class="mt-0.5 hidden sm:block text-[11px] text-gold-800/80"><span data-bind="royal.kingName">พระบาทสมเด็จพระวชิรเกล้าเจ้าอยู่หัว</span> · <span data-bind="royal.queenName">สมเด็จพระนางเจ้าสุทิดา พัชรสุธาพิมลลักษณ พระบรมราชินี</span></p>
+    </div>
+    <figure class="royal-mini shrink-0" title="สมเด็จพระนางเจ้าสุทิดา พัชรสุธาพิมลลักษณ พระบรมราชินี">
+      <div class="royal-frame"><div class="inner"><div class="pic">
+        <img data-src="royal.queenImage" src="assets/queen.jpg" alt="พระบรมฉายาลักษณ์ สมเด็จพระนางเจ้าสุทิดา พัชรสุธาพิมลลักษณ พระบรมราชินี" class="absolute inset-0 w-full h-full object-cover object-top" fetchpriority="high">
+      </div></div></div>
+    </figure>
   </div>
-</a>
+  <p class="sr-only" data-bind="royal.imageCredit"></p>
+</section>
 
 <!-- Header -->
 <header id="siteHeader" class="sticky top-0 z-50 glass-dark border-b border-white/10 text-white transition-all">
@@ -173,65 +205,62 @@ tailwind.config = {
     <div class="absolute bottom-0 left-1/3 w-[520px] h-[320px] rounded-full bg-sea-500/10 blur-3xl"></div>
   </div>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-[112px] lg:pt-[140px] pb-8 lg:pb-10 lg:min-h-[88svh] flex flex-col">
-    <div class="flex-1 grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,.8fr)] gap-8 lg:gap-12 items-center">
-      <!-- left: identity + CTA -->
-      <div>
+    <div id="heroGrid" class="hero-grid flex-1 grid gap-x-10 gap-y-6 lg:gap-y-0 items-center">
+      <!-- identity -->
+      <div class="hero-id">
         <div class="flex items-center gap-4 sm:gap-5 reveal">
-          <img data-src="site.logo" src="assets/logo.png" alt="ตราสัญลักษณ์เทศกิจพัทยา" class="w-[72px] sm:w-24 lg:w-28 drop-shadow-[0_18px_30px_rgba(0,0,0,.6)]">
+          <img data-src="site.logo" src="assets/logo.png" alt="ตราสัญลักษณ์เทศกิจพัทยา" class="w-[64px] sm:w-24 lg:w-28 drop-shadow-[0_18px_30px_rgba(0,0,0,.6)]">
           <div>
             <p class="font-head text-gold-300 text-sm sm:text-base font-medium tracking-wide" data-bind="hero.eyebrow">Welcome to Pattaya</p>
-            <p class="font-head text-white/70 text-[11px] sm:text-sm uppercase tracking-[.25em] mt-1" data-bind="site.englishName">Pattaya City Law Enforcement</p>
+            <p class="font-head text-white/70 text-[11px] sm:text-sm uppercase tracking-[.22em] mt-1" data-bind="site.englishName">Pattaya City Law Enforcement</p>
           </div>
         </div>
-        <h1 class="title-xl font-head font-extrabold mt-5 sm:mt-6 reveal" style="--d:120ms">
+        <h1 class="title-xl font-head font-extrabold mt-4 sm:mt-6 reveal" style="--d:120ms">
           <span data-bind="site.namePart1">เทศกิจ</span><span class="gold-text" data-bind="site.namePart2">พัทยา</span>
         </h1>
-        <p class="mt-3 sm:mt-4 max-w-2xl text-balance font-head font-light text-2xl sm:text-3xl lg:text-[2.1rem] text-white leading-snug reveal" style="--d:220ms" data-bind="hero.tagline">ดูแลความเป็นระเบียบเรียบร้อย เพื่อพัทยาที่น่าอยู่และปลอดภัย</p>
-        <p class="mt-4 max-w-xl text-base sm:text-lg text-white/70 reveal" style="--d:300ms" data-bind="hero.description"></p>
-        <div class="mt-7 flex flex-col sm:flex-row gap-3 reveal" style="--d:380ms">
+        <p class="mt-1 font-head text-white/75 text-sm sm:text-lg reveal" style="--d:180ms" data-bind="site.subtitle">ส่วนปกครอง สำนักปลัดเมืองพัทยา</p>
+      </div>
+      <!-- น้องอัศวิน: ตัวละครมีชีวิตใน hero -->
+      <div id="heroBot" data-feat="heroMascot" class="hero-bot relative reveal" style="--d:260ms">
+        <div class="hb-wrap">
+          <div class="hb-bubble" aria-live="polite"><span id="heroBotSay">สวัสดีฮะ 👋</span></div>
+          <button type="button" id="heroBotFig" class="hb-stage" aria-label="กดเพื่อคุยกับน้องอัศวิน">
+            <span class="hb-aura" aria-hidden="true"></span>
+            <span class="hb-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="hb-body" id="heroBotBody"></span>
+          </button>
+          <div class="hb-side">
+            <p class="font-head font-bold text-white text-lg lg:text-xl leading-tight">คุยกับ<span class="text-gold-300 bot-name">น้องอัศวิน</span> <span class="inline-flex align-middle items-center gap-1 rounded-full bg-emerald-400/15 ring-1 ring-emerald-300/30 px-2 py-0.5 text-[11px] font-semibold text-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>AI 24 ชม.</span></p>
+            <div id="heroAsk" class="mt-2.5 flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+      </div>
+      <!-- tagline + CTA -->
+      <div class="hero-cta">
+        <p class="max-w-2xl text-balance font-head font-light text-xl sm:text-3xl lg:text-[2.1rem] text-white leading-snug reveal" style="--d:220ms" data-bind="hero.tagline">ดูแลความเป็นระเบียบเรียบร้อย เพื่อพัทยาที่น่าอยู่และปลอดภัย</p>
+        <p class="mt-3 max-w-xl text-base sm:text-lg text-white/70 reveal" style="--d:300ms" data-bind="hero.description"></p>
+        <div class="mt-6 flex flex-col sm:flex-row gap-3 reveal" style="--d:380ms">
           <a data-href="hero.ctaPrimaryLink" href="#complaint" class="group inline-flex items-center justify-center gap-2.5 rounded-full bg-gold-500 hover:bg-gold-400 text-navy-950 font-head font-semibold text-lg px-7 py-3.5 shadow-glow transition">
             <span data-icon="edit" class="w-6 h-6"></span><span data-bind="hero.ctaPrimary">แจ้งเรื่องร้องเรียน</span>
             <svg class="w-5 h-5 transition group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
-          <a id="heroCall" href="#contact" class="glass inline-flex items-center justify-center gap-3 rounded-full hover:bg-white/15 font-head font-semibold text-lg px-7 py-3.5 transition">
+          <a id="heroCall" href="tel:1337" class="glass inline-flex items-center justify-center gap-3 rounded-full hover:bg-white/15 font-head font-semibold text-lg px-7 py-3.5 transition">
             <span data-icon="phone" class="w-6 h-6 text-gold-400"></span>
-            <span>โทรสายด่วน <span class="tracking-wider text-gold-300" data-bind="site.hotline">0X-XXX-XXXX</span></span>
+            <span>โทรสายด่วน <span class="tracking-wider text-gold-300" data-bind="site.hotline">1337</span> <span class="text-white/60 text-sm font-normal">24 ชม.</span></span>
           </a>
         </div>
-        <p class="mt-3 text-xs text-white/50 hotline-ph-note">* หมายเลขโทรศัพท์เป็นตัวยึดตำแหน่ง (placeholder)</p>
       </div>
-      <!-- right: talk to น้องอัศวิน -->
-      <aside id="heroBotCard" data-feat="chatbot" class="reveal relative rounded-[30px] bg-gradient-to-br from-white/[.14] to-white/[.04] ring-1 ring-white/15 backdrop-blur-md shadow-[0_30px_80px_-30px_rgba(0,0,0,.7)] p-5 sm:p-6 overflow-hidden" style="--d:300ms" aria-label="คุยกับน้องอัศวิน">
-        <div class="absolute -top-24 -right-20 w-64 h-64 rounded-full bg-cyan-400/20 blur-3xl pointer-events-none"></div>
-        <div class="relative flex items-center justify-between gap-3">
-          <span class="inline-flex items-center gap-2 rounded-full bg-white/10 ring-1 ring-white/15 px-3 py-1 text-xs font-head font-semibold text-white/90"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>ผู้ช่วย AI · ออนไลน์ 24 ชม.</span>
-          <span class="text-[11px] font-head text-white/60 tracking-wide">TH · EN · 中文 · РУС</span>
-        </div>
-        <div class="relative mt-3 flex items-end gap-3 sm:gap-4">
-          <button type="button" id="heroBotFig" class="shrink-0 w-[112px] h-[133px] sm:w-[150px] sm:h-[178px] -mb-1 drop-shadow-[0_18px_24px_rgba(0,0,0,.45)]" aria-label="เปิดแชทกับน้องอัศวิน" data-open-chat></button>
-          <div class="flex-1 min-w-0 pb-3">
-            <p class="font-head font-bold text-2xl sm:text-[1.7rem] leading-tight">คุยกับ<span class="text-gold-300 bot-name">น้องอัศวิน</span></p>
-            <div class="mt-2 relative rounded-2xl rounded-bl-md bg-white text-navy-900 px-4 py-3 text-[15px] leading-relaxed shadow-lg">
-              <span id="heroBotSay">สวัสดีฮะ 👋 ถามเรื่องข้อบัญญัติ ค่าปรับ หรือการแจ้งเรื่องได้เลยฮะ</span>
-            </div>
-          </div>
-        </div>
-        <div id="heroAsk" class="relative mt-4 flex flex-wrap gap-2"></div>
-        <button type="button" data-open-chat class="relative mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full bg-white text-navy-950 hover:bg-gold-100 font-head font-semibold py-3 transition">
-          <span data-icon="chat" class="w-5 h-5"></span>เริ่มคุยกับน้องอัศวิน <span class="text-slate-500 font-normal text-sm">· พิมพ์หรือพูดก็ได้</span>
-        </button>
-      </aside>
     </div>
     <!-- info strip -->
     <div class="mt-8 lg:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 reveal" style="--d:460ms">
-      <a href="#contact" class="glass rounded-2xl p-4 flex items-center gap-4 hover:bg-white/15 transition">
+      <a href="tel:1337" class="glass rounded-2xl p-4 flex items-center gap-4 hover:bg-white/15 transition">
         <span class="w-11 h-11 rounded-xl bg-gold-500 text-navy-950 flex items-center justify-center shrink-0"><span data-icon="phone" class="w-6 h-6"></span></span>
-        <span><span class="block text-xs text-white/60" data-bind="site.hotlineLabel">สายด่วนเทศกิจ</span><span class="block font-head font-semibold text-lg tracking-wide" data-bind="site.hotline">0X-XXX-XXXX</span></span>
+        <span><span class="block text-xs text-white/60" data-bind="site.hotlineLabel">Pattaya Contact Center (24 ชม.)</span><span class="block font-head font-semibold text-lg tracking-wide" data-bind="site.hotline">1337</span></span>
       </a>
-      <div class="glass rounded-2xl p-4 flex items-center gap-4">
+      <a href="tel:038253143" class="glass rounded-2xl p-4 flex items-center gap-4 hover:bg-white/15 transition">
         <span class="w-11 h-11 rounded-xl bg-white/15 text-gold-300 flex items-center justify-center shrink-0"><span data-icon="clock" class="w-6 h-6"></span></span>
-        <span><span class="block text-xs text-white/60">เวลาทำการ</span><span class="block font-head font-semibold text-lg" data-bind="site.hours">จันทร์–ศุกร์ 08:30–16:30 น.</span></span>
-      </div>
+        <span><span class="block text-xs text-white/60"><span data-bind="site.contacts.1.label">ฝ่ายนโยบายและแผนงานเทศกิจ</span> · <span data-bind="site.contacts.1.note">วันจันทร์–ศุกร์</span></span><span class="block font-head font-semibold text-lg tracking-wide" data-bind="site.contacts.1.value">038-253143</span></span>
+      </a>
       <a href="#track" class="glass rounded-2xl p-4 flex items-center gap-4 hover:bg-white/15 transition">
         <span class="w-11 h-11 rounded-xl bg-sea-500 text-white flex items-center justify-center shrink-0"><span data-icon="search" class="w-6 h-6"></span></span>
         <span><span class="block text-xs text-white/60">มีเลขรับเรื่องแล้ว?</span><span class="block font-head font-semibold text-lg">ติดตามสถานะเรื่อง</span></span>
@@ -241,43 +270,6 @@ tailwind.config = {
   </div>
 </section>
 
-<!-- ROYAL TRIBUTE -->
-<section id="royal" data-sec="royal" class="hidden relative royal-bg overflow-hidden scroll-mt-20" aria-labelledby="royalHeading">
-  <div class="absolute inset-0 thai-pattern opacity-70"></div>
-  <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-gold-600 via-gold-300 to-gold-600"></div>
-  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
-    <div class="divider-orn max-w-md mx-auto reveal"><span class="font-head text-sm tracking-[.3em]">✦ ✦ ✦</span></div>
-    <h2 id="royalHeading" class="mt-5 font-head font-extrabold text-5xl sm:text-7xl lg:text-8xl leading-tight whitespace-nowrap reveal" style="--d:100ms">
-      <span class="bg-gradient-to-b from-gold-500 via-gold-600 to-gold-700 bg-clip-text text-transparent drop-shadow-[0_2px_0_rgba(255,255,255,.6)]" data-bind="royal.heading">ทรงพระเจริญ</span>
-    </h2>
-    <div class="mt-10 sm:mt-14 grid grid-cols-2 gap-4 sm:gap-10 max-w-3xl mx-auto">
-      <figure class="reveal" style="--d:180ms">
-        <div class="royal-frame"><div class="inner"><div class="pic">
-          <div class="absolute inset-0 flex flex-col items-center justify-center text-gold-700 p-4">
-            <svg class="w-10 h-10 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4L4.2 7.7l5.4-.8z"/></svg>
-            <span class="mt-2 font-head text-sm sm:text-base">พระบรมฉายาลักษณ์</span>
-          </div>
-          <img data-src="royal.kingImage" src="assets/king.jpg" alt="พระบรมฉายาลักษณ์ พระบาทสมเด็จพระวชิรเกล้าเจ้าอยู่หัว" class="absolute inset-0 w-full h-full object-cover object-top" loading="lazy" onerror="this.style.display='none'">
-        </div></div></div>
-        <figcaption class="mt-4 font-head font-semibold text-navy-900 text-sm sm:text-lg leading-snug" data-bind="royal.kingName">พระบาทสมเด็จพระวชิรเกล้าเจ้าอยู่หัว</figcaption>
-      </figure>
-      <figure class="reveal" style="--d:260ms">
-        <div class="royal-frame"><div class="inner"><div class="pic">
-          <div class="absolute inset-0 flex flex-col items-center justify-center text-gold-700 p-4">
-            <svg class="w-10 h-10 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4L4.2 7.7l5.4-.8z"/></svg>
-            <span class="mt-2 font-head text-sm sm:text-base">พระบรมฉายาลักษณ์</span>
-          </div>
-          <img data-src="royal.queenImage" src="assets/queen.jpg" alt="พระบรมฉายาลักษณ์ สมเด็จพระนางเจ้าสุทิดา พัชรสุธาพิมลลักษณ พระบรมราชินี" class="absolute inset-0 w-full h-full object-cover object-top" loading="lazy" onerror="this.style.display='none'">
-        </div></div></div>
-        <figcaption class="mt-4 font-head font-semibold text-navy-900 text-sm sm:text-lg leading-snug" data-bind="royal.queenName">สมเด็จพระนางเจ้าสุทิดา พัชรสุธาพิมลลักษณ พระบรมราชินี</figcaption>
-      </figure>
-    </div>
-    <div class="divider-orn max-w-xl mx-auto mt-12 reveal"><span>❖</span></div>
-    <p class="mt-6 max-w-4xl mx-auto text-balance font-head text-lg sm:text-2xl text-navy-900 leading-relaxed reveal" data-bind="royal.dedication">ด้วยเกล้าด้วยกระหม่อม ข้าพระพุทธเจ้า คณะผู้บริหารและเจ้าหน้าที่เทศกิจเมืองพัทยา</p>
-    <p class="mt-6 text-[11px] text-gold-700/80" data-bind="royal.imageCredit"></p>
-  </div>
-  <div class="absolute inset-x-0 bottom-0 h-1.5 bg-gradient-to-r from-gold-600 via-gold-300 to-gold-600"></div>
-</section>
 
 <!-- SERVICES -->
 <section id="services" data-sec="services" class="py-16 sm:py-24 scroll-mt-20">
@@ -297,13 +289,10 @@ tailwind.config = {
   <div class="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-5 gap-10 lg:gap-14 items-start lg:items-center">
     <div id="about" data-feat="about" class="lg:col-span-2 scroll-mt-28 reveal">
       <p class="font-head text-gold-600 font-semibold tracking-wide">เกี่ยวกับเรา</p>
-      <h2 class="mt-2 font-head font-bold text-3xl sm:text-4xl xl:text-5xl text-navy-900 leading-tight text-balance">เมืองท่องเที่ยวระดับโลก ที่เป็นระเบียบและปลอดภัย</h2>
-      <p class="mt-5 text-lg leading-relaxed text-slate-600"><span data-bind="site.name">เทศกิจพัทยา</span> ปฏิบัติหน้าที่ตามกฎหมายและข้อบัญญัติเมืองพัทยา ดูแลทางเท้า พื้นที่สาธารณะ และชายหาด ให้ประชาชนและนักท่องเที่ยวใช้ชีวิตได้อย่างสะดวกและปลอดภัย</p>
-      <ul class="mt-6 space-y-3 text-slate-700">
-        <li class="flex gap-3"><span class="mt-0.5 w-7 h-7 shrink-0 rounded-full bg-gold-500/20 text-gold-700 flex items-center justify-center"><span data-icon="check" class="w-4 h-4"></span></span>จัดระเบียบทางเท้า หาบเร่ แผงลอย</li>
-        <li class="flex gap-3"><span class="mt-0.5 w-7 h-7 shrink-0 rounded-full bg-gold-500/20 text-gold-700 flex items-center justify-center"><span data-icon="check" class="w-4 h-4"></span></span>ดูแลความสะอาดและความเป็นระเบียบในที่สาธารณะ</li>
-        <li class="flex gap-3"><span class="mt-0.5 w-7 h-7 shrink-0 rounded-full bg-gold-500/20 text-gold-700 flex items-center justify-center"><span data-icon="check" class="w-4 h-4"></span></span>ตรวจตราพื้นที่ชายหาดและแหล่งท่องเที่ยว</li>
-      </ul>
+      <h2 id="aboutHeading" class="mt-2 font-head font-bold text-3xl sm:text-4xl xl:text-5xl text-navy-900 leading-tight text-balance">ดูแลความสงบเรียบร้อย ความสะอาด และความเป็นระเบียบของเมืองพัทยา</h2>
+      <p id="aboutText" class="mt-5 text-lg leading-relaxed text-slate-600"></p>
+      <ul id="aboutList" class="mt-6 space-y-3 text-slate-700"></ul>
+      <p id="aboutOrg" class="mt-5 text-sm text-slate-500 leading-relaxed"></p>
     </div>
     <div id="trackCards" class="lg:col-span-3 grid sm:grid-cols-5 gap-4 reveal" style="--d:120ms">
       <!-- compact report card -->
@@ -352,7 +341,7 @@ tailwind.config = {
         <p class="font-head text-gold-600 font-semibold">ข่าวสารและประกาศ · News</p>
         <h2 class="mt-1 font-head font-bold text-3xl sm:text-5xl text-navy-900">ข่าวล่าสุด</h2>
       </div>
-      <a href="#news" class="font-head font-semibold text-navy-800 hover:text-gold-600 inline-flex items-center gap-1">ดูทั้งหมด <span data-icon="arrow" class="w-5 h-5"></span></a>
+      <a href="https://pattaya.go.th/" target="_blank" rel="noopener" class="font-head font-semibold text-navy-800 hover:text-gold-600 inline-flex items-center gap-1">ข่าวทั้งหมดที่ pattaya.go.th <span data-icon="arrow" class="w-5 h-5"></span></a>
     </div>
     <div id="newsGrid" class="mt-10 grid md:grid-cols-3 gap-6"></div>
   </div>
@@ -410,30 +399,29 @@ tailwind.config = {
     </div>
     <div>
       <h3 class="font-head font-semibold text-white text-lg">ติดต่อเรา</h3>
-      <ul class="mt-4 space-y-3 text-sm">
-        <li class="flex gap-2.5"><span data-icon="pin" class="w-5 h-5 text-gold-400 shrink-0"></span><span data-bind="site.address"></span></li>
-        <li class="flex gap-2.5"><span data-icon="phone" class="w-5 h-5 text-gold-400 shrink-0"></span><span>โทร <span data-bind="site.hotline"></span></span></li>
-        <li class="flex gap-2.5"><span data-icon="mail" class="w-5 h-5 text-gold-400 shrink-0"></span><span>อีเมล <span data-bind="site.email"></span></span></li>
-        <li class="flex gap-2.5"><span data-icon="clock" class="w-5 h-5 text-gold-400 shrink-0"></span><span data-bind="site.hours"></span></li>
-      </ul>
+      <ul id="footerContacts" class="mt-4 space-y-3 text-sm"></ul>
     </div>
     <div>
       <h3 class="font-head font-semibold text-white text-lg">ลิงก์ด่วน</h3>
       <ul id="footerLinks" class="mt-4 space-y-2 text-sm"></ul>
     </div>
     <div>
-      <h3 class="font-head font-semibold text-white text-lg">LINE Official Account</h3>
-      <div class="mt-4 flex items-center gap-4 rounded-2xl bg-white/5 ring-1 ring-white/10 p-4">
-        <div class="w-20 h-20 rounded-lg bg-white p-1.5 shrink-0 overflow-hidden">
-          <img id="lineQrImg" alt="QR Code LINE OA" class="hidden w-full h-full object-contain">
-          <svg id="lineQrPh" viewBox="0 0 21 21" class="w-full h-full" shape-rendering="crispEdges" role="img" aria-label="ตัวอย่าง QR (placeholder)"><path fill="#0B2545" d="M0 0h7v7H0zM14 0h7v7h-7zM0 14h7v7H0z"/><path fill="#fff" d="M1 1h5v5H1zM15 1h5v5h-5zM1 15h5v5H1z"/><path fill="#0B2545" d="M2 2h3v3H2zM16 2h3v3h-3zM2 16h3v3H2zM9 1h2v2H9zM8 4h1v3H8zM10 8h3v1h-3zM9 10h2v2H9zM14 9h2v2h-2zM17 10h3v1h-3zM12 13h2v2h-2zM15 14h1v3h-1zM18 13h2v3h-2zM9 15h3v1H9zM10 17h2v3h-2zM13 18h3v2h-3zM17 18h3v2h-3zM1 9h3v2H1zM5 10h2v1H5z"/></svg>
-        </div>
-        <div class="text-sm">
-          <div class="inline-flex items-center gap-1.5 rounded-full bg-[#06C755] text-white font-semibold px-3 py-1">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5s6-3.5 8.2-6C21.4 14.1 22 12.6 22 11c0-4.4-4.5-8-10-8z"/></svg>LINE OA
-          </div>
-          <p class="mt-2 text-white/80" data-bind="site.lineId"></p>
-        </div>
+      <h3 class="font-head font-semibold text-white text-lg">ช่องทางออนไลน์</h3>
+      <div class="mt-4 space-y-3 text-sm">
+        <div id="lineQrBox" class="hidden w-24 h-24 rounded-lg bg-white p-1.5"><img id="lineQrImg" alt="QR Code LINE OA" class="hidden w-full h-full object-contain"></div>
+        <a id="lineBtn" href="https://line.me/R/ti/p/@pattayaconnect" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 hover:bg-white/10 p-3 transition">
+          <span class="w-10 h-10 rounded-xl bg-[#06C755] text-white flex items-center justify-center shrink-0"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5s6-3.5 8.2-6C21.4 14.1 22 12.6 22 11c0-4.4-4.5-8-10-8z"/></svg></span>
+          <span><span class="block text-white/60 text-xs" data-bind="site.lineLabel">LINE Official เมืองพัทยา</span><span class="block font-semibold text-white" data-bind="site.lineId">@pattayaconnect</span></span>
+        </a>
+        <a id="fbBtn" href="https://www.facebook.com/Prpattayacity" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 hover:bg-white/10 p-3 transition">
+          <span class="w-10 h-10 rounded-xl bg-[#1877F2] text-white flex items-center justify-center shrink-0"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 8h3V4h-3c-2.8 0-4 1.8-4 4.3V10H7v4h3v8h4v-8h3l1-4h-4V8.6c0-.4.3-.6.7-.6z"/></svg></span>
+          <span><span class="block text-white/60 text-xs" data-bind="site.facebookLabel">Facebook ประชาสัมพันธ์เมืองพัทยา</span><span class="block font-semibold text-white">Prpattayacity</span></span>
+        </a>
+        <a href="https://pattaya.go.th" target="_blank" rel="noopener" class="flex items-center gap-3 rounded-2xl bg-white/5 ring-1 ring-white/10 hover:bg-white/10 p-3 transition">
+          <span class="w-10 h-10 rounded-xl bg-white/10 text-gold-300 flex items-center justify-center shrink-0"><span data-icon="globe" class="w-6 h-6"></span></span>
+          <span><span class="block text-white/60 text-xs">เว็บไซต์ทางการ</span><span class="block font-semibold text-white">pattaya.go.th</span></span>
+        </a>
+        <p id="lineSrc" class="text-xs text-white/40"></p>
       </div>
     </div>
   </div>
@@ -451,7 +439,7 @@ tailwind.config = {
     <a href="#home" class="flex flex-col items-center justify-center gap-1 text-gold-300"><span data-icon="home" class="w-6 h-6"></span>หน้าแรก</a>
     <a href="#complaint" class="flex flex-col items-center justify-center gap-1 text-white/80"><span data-icon="edit" class="w-6 h-6"></span>แจ้งเรื่อง</a>
     <a href="#track" class="flex flex-col items-center justify-center gap-1 text-white/80"><span data-icon="search" class="w-6 h-6"></span>ติดตาม</a>
-    <a id="barCall" href="#contact" class="flex flex-col items-center justify-center gap-1 text-white/80"><span data-icon="phone" class="w-6 h-6"></span>โทร</a>
+    <a id="barCall" href="tel:1337" class="flex flex-col items-center justify-center gap-1 text-white/80"><span data-icon="phone" class="w-6 h-6"></span>โทร</a>
   </div>
 </nav>
 
@@ -514,7 +502,7 @@ tailwind.config = {
       </div>
       <div>
         <label for="cPhone" class="block font-head text-sm font-medium text-navy-900 mb-1">เบอร์โทรติดต่อกลับ <span class="text-red-600">*</span></label>
-        <input id="cPhone" name="phone" required type="tel" inputmode="tel" autocomplete="tel" placeholder="0X-XXX-XXXX" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 focus:border-navy-800 focus:ring-4 focus:ring-navy-800/10 outline-none">
+        <input id="cPhone" name="phone" required type="tel" inputmode="tel" autocomplete="tel" placeholder="หมายเลขโทรศัพท์ของคุณ" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 focus:border-navy-800 focus:ring-4 focus:ring-navy-800/10 outline-none">
       </div>
       <div class="grid grid-cols-2 gap-3">
         <label for="cPhoto" class="relative flex items-center gap-2 rounded-xl border border-dashed border-slate-300 hover:border-gold-500 hover:bg-gold-100/40 px-3 py-2.5 cursor-pointer text-sm text-slate-600 overflow-hidden">
@@ -554,6 +542,7 @@ tailwind.config = {
 
 <script src="assets/mascot.js"></script>
 <script src="assets/voice.js"></script>
+<script src="assets/hero-mascot.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>

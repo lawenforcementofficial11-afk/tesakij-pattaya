@@ -48,6 +48,8 @@
   // ---------- reveal ----------
   var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }); }, { threshold: .12, rootMargin: '0px 0px -40px 0px' }) : null;
   function observeReveal(root) { $$('.reveal:not(.is-in)', root).forEach(function (el) { io ? io.observe(el) : el.classList.add('is-in'); }); }
+  // above-the-fold hero: reveal right away so it never sits blank on slow devices
+  $$('#home .reveal').forEach(function (el) { el.classList.add('is-in'); });
 
   function fmtDate(iso) { try { return new Date(iso + 'T00:00:00').toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return iso; } }
   var exBadge = function (on, cls) { return on ? '<span class="' + (cls || '') + ' text-[11px] font-semibold rounded-full bg-amber-100 text-amber-800 px-2.5 py-1">เนื้อหาตัวอย่าง</span>' : ''; };
@@ -99,10 +101,11 @@
     var on = {}; secs.forEach(function (x) { on[x.id] = x.enabled !== false; });
     var main = $('#main') || $('main');
     // reorder (hero stays first because it sits under the transparent header)
-    secs.forEach(function (x) { var el = $('[data-sec="' + x.id + '"]'); if (el && x.id !== 'hero') main.appendChild(el); });
+    secs.forEach(function (x) { var el = $('[data-sec="' + x.id + '"]'); if (el && x.id !== 'hero' && x.id !== 'royal') main.appendChild(el); });
     $$('[data-sec]').forEach(function (el) { var id = el.dataset.sec; if (id in on && !on[id]) { el.classList.add('hidden'); el.setAttribute('data-off', '1'); } });
     $$('[data-feat]').forEach(function (el) { if (f[el.dataset.feat] === false) { el.classList.add('hidden'); el.setAttribute('data-off', '1'); } });
     if (!on.hero) document.body.classList.add('no-hero');
+    if (f.heroMascot === false || f.chatbot === false || (c.chatbot || {}).enabled === false) { var hg = $('#heroGrid'); if (hg) hg.classList.add('no-bot'); var hb0 = $('#heroBot'); if (hb0) hb0.classList.add('hidden'); }
     if (f.chatbot === false) c.chatbot = Object.assign({}, c.chatbot, { enabled: false });
     // track section: if both cards are off, let the about text span the row
     if (f.complaint === false && f.trackStatus === false) { var tc = $('#trackCards'); if (tc) tc.classList.add('hidden'); }
@@ -135,11 +138,29 @@
     if (s.favicon) $('link[rel=icon]').href = safeUrl(s.favicon);
     $$('.hotline-ph-note').forEach(function (el) { el.classList.toggle('hidden', !s.hotlineIsPlaceholder); });
     if (!s.hotlineIsPlaceholder && s.hotline) { var tel = 'tel:' + s.hotline.replace(/[^\d+]/g, ''); $('#heroCall').href = tel; $('#barCall').href = tel; }
-    if (s.lineQr) { $('#lineQrImg').src = safeUrl(s.lineQr); $('#lineQrImg').classList.remove('hidden'); $('#lineQrPh').classList.add('hidden'); }
+    if (s.lineQr) { $('#lineQrImg').src = safeUrl(s.lineQr); $('#lineQrImg').classList.remove('hidden'); $('#lineQrBox').classList.remove('hidden'); }
+    var srcLink = function (u) { return u ? ' <a href="' + esc(safeUrl(u)) + '" target="_blank" rel="noopener" class="src-link">ที่มา ↗</a>' : ''; };
+    // ติดต่อ (ข้อมูลจริงพร้อมแหล่งที่มา)
+    var cl = $('#footerContacts');
+    if (cl) {
+      var rows = (s.contacts || []).map(function (x) { return '<li class="flex gap-2.5"><span class="text-gold-400 shrink-0 mt-0.5">' + icon('phone', 'w-5 h-5') + '</span><span><span class="block text-white/60 text-xs">' + esc(x.label) + (x.note ? ' · ' + esc(x.note) : '') + '</span><a class="font-semibold text-white hover:text-gold-300" href="tel:' + esc(x.tel || x.value) + '">' + esc(x.value) + '</a>' + srcLink(x.source) + '</span></li>'; });
+      if (s.address) rows.push('<li class="flex gap-2.5"><span class="text-gold-400 shrink-0 mt-0.5">' + icon('pin', 'w-5 h-5') + '</span><span>' + esc(s.address) + srcLink(s.addressSource) + (s.cityHallAddress ? '<span class="block mt-1 text-white/60">' + esc(s.cityHallAddress) + srcLink(s.cityHallSource) + '</span>' : '') + '</span></li>');
+      if (s.email) rows.push('<li class="flex gap-2.5"><span class="text-gold-400 shrink-0 mt-0.5">' + icon('mail', 'w-5 h-5') + '</span><span>' + (s.emailLabel ? esc(s.emailLabel) + ': ' : '') + '<a class="hover:text-gold-300" href="mailto:' + esc(s.email) + '">' + esc(s.email) + '</a>' + srcLink(s.emailSource) + '</span></li>');
+      if (s.hours) rows.push('<li class="flex gap-2.5"><span class="text-gold-400 shrink-0 mt-0.5">' + icon('clock', 'w-5 h-5') + '</span><span>' + esc(s.hours) + srcLink(s.hoursSource) + '</span></li>');
+      cl.innerHTML = rows.join('');
+    }
+    var lb = $('#lineBtn'); if (lb) { if (s.lineUrl) lb.href = safeUrl(s.lineUrl); lb.classList.toggle('hidden', !s.lineId); }
+    var fb = $('#fbBtn'); if (fb) { if (s.facebook) fb.href = safeUrl(s.facebook); fb.classList.toggle('hidden', !s.facebook); }
+    var ls = $('#lineSrc'); if (ls) ls.innerHTML = srcLink(s.lineSource || s.facebookSource);
+    // เกี่ยวกับเรา (ข้อความทางการ + แหล่งที่มา)
+    var ab = c.about || {};
+    if (ab.heading) $('#aboutHeading').textContent = ab.heading;
+    if (ab.text) $('#aboutText').innerHTML = esc(ab.text) + srcLink(ab.source).replace('src-link', 'src-link src-dark');
+    if (ab.bullets && ab.bullets.length) $('#aboutList').innerHTML = ab.bullets.map(function (b) { return '<li class="flex gap-3"><span class="mt-0.5 w-7 h-7 shrink-0 rounded-full bg-gold-500/20 text-gold-700 flex items-center justify-center">' + icon('check', 'w-4 h-4') + '</span>' + esc(b) + '</li>'; }).join('');
+    if (ab.org) $('#aboutOrg').innerHTML = '<span class="font-semibold text-navy-900">สังกัด:</span> ' + esc(ab.org) + (ab.orgSources || []).map(function (u) { return srcLink(u).replace('src-link', 'src-link src-dark'); }).join('');
 
     var r = c.royal || {};
     $('#royal').classList.toggle('hidden', r.enabled === false);
-    $('#royalRibbon').classList.toggle('hidden', r.enabled === false);
 
     var botOn = (c.features || {}).chatbot !== false && (c.chatbot || {}).enabled !== false;
     var mascotPng = (c.chatbot || {}).mascotStyle === 'robot' ? 'assets/mascot.png' : 'assets/mascot-officer.png';
@@ -173,13 +194,14 @@
       '<svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true"><rect width="400" height="200" fill="#F5C518"/><g fill="#0B2545" fill-opacity=".15"><circle cx="80" cy="150" r="70"/><circle cx="330" cy="40" r="90"/></g><path d="M0 150 C 100 130 200 170 400 140" stroke="#fff" stroke-opacity=".6" stroke-width="5" fill="none"/></svg>'
     ];
     $('#newsGrid').innerHTML = (c.news || []).slice(0, 6).map(function (n, i) {
-      var media = n.image ? '<img src="' + esc(safeUrl(n.image)) + '" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700">' : arts[i % 3];
-      return '<article class="reveal group rounded-3xl bg-white shadow-card ring-1 ring-slate-100 hover:shadow-lift transition overflow-hidden flex flex-col" style="--d:' + (i * 90) + 'ms">' +
+      var media = n.image ? '<img src="' + esc(safeUrl(n.image)) + '" alt="' + esc(n.title) + '""" loading="lazy" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700">' : arts[i % 3];
+      var tag = n.link ? 'a href="' + esc(safeUrl(n.link)) + '" target="_blank" rel="noopener"' : 'article';
+      return '<' + tag + ' class="reveal group rounded-3xl bg-white shadow-card ring-1 ring-slate-100 hover:shadow-lift transition overflow-hidden flex flex-col" style="--d:' + (i * 90) + 'ms">' +
         '<div class="relative h-48 overflow-hidden">' + media + '<span class="absolute top-3 left-3 text-xs font-semibold rounded-full bg-white/95 text-navy-900 px-3 py-1">' + esc(n.category) + '</span>' + exBadge(n.isExample, 'absolute top-3 right-3') + '</div>' +
         '<div class="p-6 flex-1 flex flex-col"><time class="text-sm text-slate-500" datetime="' + esc(n.date) + '">' + esc(fmtDate(n.date)) + '</time>' +
         '<h3 class="mt-2 font-head font-semibold text-xl text-navy-900 leading-snug group-hover:text-gold-700 transition">' + esc(n.title) + '</h3>' +
         '<p class="mt-2 text-slate-600 leading-relaxed flex-1">' + esc(n.excerpt) + '</p>' +
-        '<span class="mt-4 font-head font-semibold text-navy-800 inline-flex items-center gap-1">อ่านต่อ ' + icon('arrow', 'w-4 h-4') + '</span></div></article>';
+        '<span class="mt-4 flex items-center justify-between gap-2"><span class="font-head font-semibold text-navy-800 inline-flex items-center gap-1 group-hover:text-gold-700">' + (n.link ? 'อ่านข่าวต้นฉบับ' : 'อ่านต่อ') + ' ' + icon('arrow', 'w-4 h-4') + '</span>' + (n.source ? '<span class="text-xs text-slate-400">ที่มา: ' + esc(n.source) + '</span>' : '') + '</span></div></' + (n.link ? 'a' : 'article') + '>';
     }).join('');
 
     renderLaws(c.laws || {});
@@ -338,6 +360,9 @@
     if (!useMascot()) return '<span class="w-9 h-9 shrink-0">' + avatarHtml('static') + '</span>';
     return '<span class="w-9 h-9 shrink-0 rounded-full ring-2 ring-cyan-300/70 shadow-sm" role="img" aria-label="" style="background:url(' + esc(bot.mascotStyle === 'robot' ? 'assets/mascot.png' : 'assets/mascot-officer.png') + ') 50% -3px/140% auto no-repeat,linear-gradient(#f0f9ff,#cffafe)"></span>';
   }
+  var heroBot = null;
+  var HERO_LINES = { en: ['Hello! 👋', 'Ask me anything!', 'Tap me to chat!'], zh: ['你好！👋', '有问题尽管问我！', '点我开始聊天！'], ru: ['Привет! 👋', 'Спросите меня!', 'Нажмите, чтобы поговорить!'] };
+  function heroLines() { if (curLang === 'th') return ((bot && bot.heroLines) || ['สวัสดีฮะ 👋', 'ถามน้องได้เลยฮะ', 'กดที่น้องเพื่อคุยกันฮะ']).map(pfx); return HERO_LINES[curLang] || HERO_LINES.en; }
   function figs() { return $$('#chatFabFig .mascot, #chatHeadFig .mascot, #chatHeroFig .mascot, #heroBotFig .mascot'); }
   function talk(on) { figs().forEach(function (m) { m.classList.toggle('talking', !!on); }); }
   function wave() { figs().forEach(function (m) { m.classList.remove('wave'); void m.getBoundingClientRect(); m.classList.add('wave'); setTimeout(function () { m.classList.remove('wave'); }, 2100); }); }
@@ -401,21 +426,28 @@
     $$('.chat-chip').forEach(function (c) { c.addEventListener('click', function () { send(c.textContent); }); });
     var ha = $('#heroAsk');
     if (ha) {
-      ha.innerHTML = chips().slice(0, 3).map(function (q) { return '<button type="button" class="hero-ask rounded-full bg-white/10 hover:bg-white/20 ring-1 ring-white/20 text-white text-sm font-head px-3.5 py-1.5 transition">' + esc(q) + '</button>'; }).join('');
+      ha.innerHTML = chips().slice(0, window.innerWidth < 640 ? 2 : 3).map(function (q) { return '<button type="button" class="hero-ask rounded-full bg-white/10 hover:bg-white/20 ring-1 ring-white/20 text-white text-sm font-head px-3.5 py-1.5 transition">' + esc(q) + '</button>'; }).join('');
       $$('.hero-ask', ha).forEach(function (b) { b.addEventListener('click', function () { openChat(true); setTimeout(function () { send(b.textContent); }, 250); }); });
     }
-    var hs = $('#heroBotSay'); if (hs) { if (!hs.dataset.th) hs.dataset.th = hs.textContent; hs.textContent = curLang === 'th' ? hs.dataset.th : (L('hi') || hs.dataset.th); }
+    if (heroBot) heroBot.refreshLines();
     if (greetEl && !userSpoke) { greetEl.remove(); greetEl = addMsg('bot', greeting()); }
   }
   function initChat(b) {
     bot = b || {};
-    if (bot.enabled === false) { var hb = $('#heroBotCard'); if (hb) hb.classList.add('hidden'); return; }
+    if (bot.enabled === false) { var hb = $('#heroBot'); if (hb) hb.classList.add('hidden'); return; }
     logoUrl = safeUrl(((window.__content || {}).site || {}).logo || 'assets/logo.png');
     $('#chatRoot').classList.remove('hidden');
     $$('.bot-name').forEach(function (el) { el.textContent = bot.name || 'น้องอัศวิน'; });
     $('#chatFabFig').innerHTML = avatarHtml('');
     $('#chatHeadFig').innerHTML = avatarHtml('');
-    var hf = $('#heroBotFig'); if (hf && window.TKPMascot) hf.innerHTML = window.TKPMascot.svg(logoUrl, '', bot.mascotStyle);
+    var hf = $('#heroBotFig'), feats = (window.__content || {}).features || {};
+    if (hf && !heroBot && window.TKPHeroMascot && feats.heroMascot !== false) {
+      heroBot = window.TKPHeroMascot.mount({ el: hf, logo: logoUrl, style: bot.mascotStyle, dance: feats.heroDance !== false, lines: heroLines,
+        onActivate: function () { var wasOpen = !$('#chatPanel').classList.contains('closed'); openChat(true); if (greeted && voiceOn()) { var g = voiceGreeting(); if (g && !wasOpen) speakText(g, greetEl && $('.msg-say', greetEl)); } } });
+      window.__heroBot = heroBot;
+      // while the big hero mascot is on screen, tuck the floating chat mascot away (no duplicate)
+      if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { document.body.classList.toggle('hero-bot-on', es[0].isIntersecting); }, { threshold: .25 }).observe($('#heroBot'));
+    }
     $('#chatDisclaimer').textContent = bot.disclaimer || '';
     if (!chatReady) {
       if (useMascot()) {
