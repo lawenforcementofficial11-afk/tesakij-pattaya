@@ -178,6 +178,28 @@
       <p class="mt-1 text-sm">โหมดปัจจุบัน: <b id="botMode">-</b></p>
       <p class="mt-1 text-xs text-slate-500">ตั้งค่า <code>AI_API_KEY</code>, <code>AI_BASE_URL</code>, <code>AI_MODEL</code> ใน .env เพื่อใช้ LLM (OpenAI / xAI / Gemini แบบ OpenAI-compatible) — ถ้าไม่ตั้ง บอทตอบจากฐานความรู้แบบออฟไลน์ แก้ชื่อบอท คำทักทาย ปุ่มลัด ฐานความรู้ และ system prompt ได้ที่ <button class="underline text-navy-800" data-goto="chatbot">เนื้อหาเว็บไซต์ → แชทบอท</button></p>
     </div>
+    <div class="rounded-2xl bg-white ring-1 ring-slate-200 p-5" id="wsCard">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 class="font-head font-semibold text-lg text-navy-900">🔎 ค้นข้อมูลจากเว็บไซต์ทางราชการ (Google)</h2>
+        <label class="inline-flex items-center gap-2 text-sm font-medium"><input type="checkbox" id="wsOn" class="w-5 h-5 accent-amber-500"> เปิดใช้งาน</label>
+      </div>
+      <p class="mt-1 text-xs text-slate-500">เมื่อฐานความรู้ในเว็บไซต์ตอบไม่ได้ น้องอัศวินจะค้นจาก Google <b>เฉพาะโดเมนที่อนุญาต</b> แล้วตอบพร้อม “ที่มา” · ไม่พบ = แจ้งว่าไม่พบ + ช่องทางติดต่อทางการ (ไม่เดา) · กุญแจตั้งใน Environment ของเซิร์ฟเวอร์เท่านั้น (ไม่ถูกส่งไปหน้าเว็บ)</p>
+      <div id="wsStatus" class="mt-3 grid sm:grid-cols-3 gap-2 text-sm"></div>
+      <div class="mt-4 grid md:grid-cols-[1fr_260px] gap-4">
+        <label class="block"><span class="text-sm font-medium text-navy-900">โดเมนที่เชื่อถือได้ (บรรทัดละ 1 โดเมน · <code>*.go.th</code> = ทุกโดเมนย่อยของ go.th)</span>
+          <textarea id="wsAllow" rows="9" class="inp mt-1 font-mono text-sm"></textarea></label>
+        <div class="space-y-3">
+          <label class="block"><span class="text-sm font-medium text-navy-900">ผู้ให้บริการ</span>
+            <select id="wsProv" class="inp mt-1"><option value="auto">อัตโนมัติ (Gemini ก่อน แล้ว CSE)</option><option value="gemini">Gemini + Google Search</option><option value="cse">Programmable Search (CSE)</option></select></label>
+          <label class="block"><span class="text-sm font-medium text-navy-900">จำกัดการค้นต่อวัน</span><input id="wsDaily" type="number" min="1" class="inp mt-1"></label>
+          <label class="block"><span class="text-sm font-medium text-navy-900">เก็บแคชผลลัพธ์ (ชั่วโมง)</span><input id="wsCache" type="number" min="0" class="inp mt-1"></label>
+          <label class="block"><span class="text-sm font-medium text-navy-900">จำนวนแหล่งที่มาสูงสุด</span><input id="wsMax" type="number" min="1" max="5" class="inp mt-1"></label>
+          <button id="wsSave" class="btn btn-gold w-full">บันทึกการตั้งค่าการค้นหา</button>
+        </div>
+      </div>
+      <form id="wsTest" class="mt-4 flex gap-2"><input id="wsQ" class="inp" placeholder="ทดสอบค้นเว็บ เช่น ขั้นตอนขออนุญาตติดตั้งป้ายโฆษณา เมืองพัทยา"><button class="btn btn-navy shrink-0">ค้นทดสอบ</button></form>
+      <pre id="wsOut" class="mt-3 whitespace-pre-wrap text-sm bg-slate-50 rounded-xl p-4 ring-1 ring-slate-200 min-h-[48px] max-h-[420px] overflow-auto"></pre>
+    </div>
     <div class="rounded-2xl bg-white ring-1 ring-slate-200 p-5">
       <h2 class="font-head font-semibold text-lg text-navy-900">ทดลองถามบอท</h2>
       <form id="testChat" class="mt-3 flex gap-2"><input id="testMsg" class="inp" placeholder="เช่น ค่าปรับทิ้งขยะเท่าไหร่ / office hours?"><button class="btn btn-gold shrink-0">ถาม</button></form>
@@ -349,6 +371,18 @@ $('#cSearch').oninput=renderComplaints; $('#cFilter').onchange=renderComplaints;
 
 // ---------- chat tab ----------
 $('#testChat').onsubmit=function(e){e.preventDefault();var m=$('#testMsg').value.trim();if(!m)return;$('#testOut').textContent='…';fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:m})}).then(function(r){return r.json()}).then(function(j){$('#testOut').textContent='['+(j.mode||'?')+(j.matched?' · ตรงกับ: '+j.matched:'')+(j.score!=null?' · score '+j.score:'')+']\n\n'+(j.reply||j.error)})};
+// ---- web search (Google) settings ----
+function wsCfg(){content.chatbot=content.chatbot||{};var w=content.chatbot.webSearch=content.chatbot.webSearch||{};return w}
+function wsBadge(ok,t,sub){return '<div class="rounded-xl px-3 py-2 ring-1 '+(ok?'bg-emerald-50 ring-emerald-200 text-emerald-800':'bg-slate-50 ring-slate-200 text-slate-500')+'"><b>'+(ok?'✔ ':'✕ ')+esc(t)+'</b><br><span class="text-xs">'+esc(sub)+'</span></div>'}
+function wsLoad(){var w=wsCfg();$('#wsOn').checked=w.enabled!==false;$('#wsProv').value=w.provider||'auto';$('#wsAllow').value=(w.allowlist||[]).join('\n');$('#wsDaily').value=w.dailyLimit||150;$('#wsCache').value=w.cacheHours!=null?w.cacheHours:24;$('#wsMax').value=w.maxSources||3;
+  api('/api/websearch/status').then(function(st){if(!w.allowlist||!w.allowlist.length)$('#wsAllow').value=st.allowlist.join('\n');
+    $('#wsStatus').innerHTML=wsBadge(st.keys.gemini,'GEMINI_API_KEY','Gemini + Google Search ('+st.geminiModel+')')+wsBadge(st.keys.cse,'GOOGLE_CSE_KEY + CX','Programmable Search (ปิดรับรายใหม่)')+wsBadge(!!st.provider&&st.enabled,'ใช้งานอยู่: '+(st.provider||'— (ยังไม่มีกุญแจ)'),'ใช้ไปวันนี้ '+st.usedToday+'/'+st.dailyLimit+' · แคช '+st.cacheSize+' รายการ')})}
+$('#wsSave').onclick=function(){var w=wsCfg();w.enabled=$('#wsOn').checked;w.provider=$('#wsProv').value;w.allowlist=$('#wsAllow').value.split(/\n+/).map(function(x){return x.trim()}).filter(Boolean);w.dailyLimit=+$('#wsDaily').value||150;w.cacheHours=+$('#wsCache').value;w.maxSources=+$('#wsMax').value||3;
+  api('/api/content',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(content)}).then(function(){toast('✔ บันทึกการตั้งค่าการค้นหาแล้ว');wsLoad()}).catch(function(e){toast('บันทึกไม่สำเร็จ: '+e.message,true)})};
+$('#wsTest').onsubmit=function(e){e.preventDefault();var q=$('#wsQ').value.trim();if(!q)return;$('#wsOut').textContent='กำลังค้น…';
+  api('/api/websearch/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:q,noCache:true,allowlist:$('#wsAllow').value.split(/\n+/).map(function(x){return x.trim()}).filter(Boolean)})}).then(function(j){
+    if(!j.result){$('#wsOut').textContent='ยังค้นไม่ได้ — '+(j.status.provider?'เกินโควตา/เกิดข้อผิดพลาด (ดู log เซิร์ฟเวอร์)':'ยังไม่ได้ตั้งกุญแจ GEMINI_API_KEY หรือ GOOGLE_CSE_KEY + GOOGLE_CSE_CX');return}
+    $('#wsOut').textContent='['+j.result.provider+' · '+j.ms+' ms'+(j.result.notFound?' · ไม่พบแหล่งที่เชื่อถือได้':'')+((j.result.queries||[]).length?' · คำค้น: '+j.result.queries.join(' | '):'')+']\n\n'+j.result.reply;wsLoad()}).catch(function(e){$('#wsOut').textContent='ผิดพลาด: '+e.message})};
 $('#loadPrompt').onclick=function(){api('/api/chat/system-prompt').then(function(t){$('#promptOut').textContent=t;$('#promptOut').classList.remove('hidden')})};
 $$('[data-goto]').forEach(function(b){b.onclick=function(){current=b.dataset.goto;switchTab('content');renderNav();renderEditor()}});
 
@@ -430,7 +464,7 @@ function switchTab(t){$$('.tab').forEach(function(b){b.classList.toggle('active'
   if(t==='complaints')loadComplaints();
   if(t==='layout')renderLayout();
   if(t==='alerts')initAlertsTab();
-  if(t==='chat'){$('#botNameH').textContent=(content.chatbot||{}).name||'';api('/api/chat/mode').then(function(m){$('#botMode').textContent=m.mode==='llm'?'LLM ('+m.model+' @ '+m.baseUrl+')':'ออฟไลน์ (ฐานความรู้ใน content.json)'})}}
+  if(t==='chat'){wsLoad();$('#botNameH').textContent=(content.chatbot||{}).name||'';api('/api/chat/mode').then(function(m){$('#botMode').textContent=m.mode==='llm'?'LLM ('+m.model+' @ '+m.baseUrl+')':'ออฟไลน์ (ฐานความรู้ใน content.json)'})}}
 $$('.tab').forEach(function(b){b.onclick=function(){switchTab(b.dataset.tab)}});
 function showLogin(){$('#appView').classList.add('hidden');$('#loginView').classList.remove('hidden');setTimeout(function(){$('#pw').focus()},50)}
 function showApp(){$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');

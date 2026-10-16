@@ -501,11 +501,15 @@
     $('#chatLog').appendChild(typing); $('#chatLog').scrollTop = 1e9;
     talk(true);
     var started = Date.now();
+    // ค้นเว็บไซต์ทางราชการอาจใช้เวลาหลายวินาที → บอกผู้ใช้ว่ากำลังค้นหา
+    var SEARCHING = { th: 'กำลังค้นข้อมูลจากเว็บไซต์ทางราชการ…', en: 'Searching official websites…', zh: '正在检索官方网站…', ru: 'Ищу на официальных сайтах…' };
+    var slowT = setTimeout(function () { var b = typing.querySelector('.typing'); if (b) { var p = document.createElement('p'); p.className = 'ml-1 text-xs text-slate-500 self-center'; p.textContent = SEARCHING[curLang] || SEARCHING.th; b.parentNode.appendChild(p); } }, 2200);
     fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, history: history.slice(-10), lang: curLang }) })
       .then(function (r) { return r.json(); })
       .then(function (j) { return j.reply || j.error || '…'; })
       .catch(function () { return L('off'); })
       .then(function (reply) {
+        clearTimeout(slowT);
         setTimeout(function () {
           typing.remove(); var w = addMsg('bot', reply); history.push({ role: 'user', content: text }, { role: 'assistant', content: reply });
           if (!speakText(reply, $('.msg-say', w))) setTimeout(function () { talk(false); }, Math.min(2600, 500 + reply.length * 12));

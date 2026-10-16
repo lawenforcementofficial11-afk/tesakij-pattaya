@@ -193,6 +193,17 @@ app.post('/api/tts', rateLimit(30, 60 * 1000), async (req, res) => {
     res.set({ 'Content-Type': 'audio/mpeg', 'Cache-Control': 'private, max-age=3600' }).send(audio);
   } catch (e) { console.warn('[tts]', e.message); res.status(502).json({ error: 'tts failed' }); }
 });
+const websearch = require('./websearch');
+app.get('/api/websearch/status', requireAdmin, async (req, res) => res.json(websearch.status(await readJson(CONTENT_FILE, {}))));
+app.post('/api/websearch/test', requireAdmin, rateLimit(10, 60 * 1000), async (req, res) => {
+  const q = clean(req.body && req.body.q, 500); if (!q) return res.status(400).json({ error: 'กรุณาพิมพ์คำถาม' });
+  const content = await readJson(CONTENT_FILE, {});
+  if (req.body.allowlist && Array.isArray(req.body.allowlist)) { content.chatbot = content.chatbot || {}; content.chatbot.webSearch = { ...(content.chatbot.webSearch || {}), allowlist: req.body.allowlist.map(x => clean(x, 120)).filter(Boolean).slice(0, 60) }; }
+  const lang = chatbot.detectLang(q, 'th');
+  const t0 = Date.now();
+  const r = await websearch.webAnswer(q, content, lang, { force: true, noCache: !!req.body.noCache });
+  res.json({ ms: Date.now() - t0, status: websearch.status(content), result: r ? { ...r, reply: chatbot.applyParticle(r.reply, lang, content) } : null });
+});
 app.get('/api/chat/system-prompt', requireAdmin, async (req, res) => res.type('text/plain').send(chatbot.buildSystemPrompt(await readJson(CONTENT_FILE, {}))));
 app.get('/api/chat/mode', requireAdmin, (req, res) => res.json({ mode: process.env.AI_API_KEY ? 'llm' : 'offline', baseUrl: process.env.AI_API_KEY ? (process.env.AI_BASE_URL || 'https://api.openai.com/v1') : null, model: process.env.AI_API_KEY ? (process.env.AI_MODEL || 'gpt-4o-mini') : null }));
 

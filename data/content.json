@@ -1421,7 +1421,26 @@
       "สวัสดีฮะ 👋",
       "ถามน้องได้เลยฮะ",
       "กดที่น้องเพื่อคุยกันฮะ"
-    ]
+    ],
+    "webSearch": {
+      "enabled": true,
+      "provider": "auto",
+      "allowlist": [
+        "*.go.th",
+        "pattaya.go.th",
+        "info.pattaya.go.th",
+        "ratchakitcha.soc.go.th",
+        "krisdika.go.th",
+        "*.police.go.th",
+        "tat.or.th",
+        "tourismthailand.org",
+        "thailand.prd.go.th"
+      ],
+      "maxSources": 3,
+      "cacheHours": 24,
+      "dailyLimit": 150,
+      "perMinute": 10
+    }
   },
   "alerts": {
     "enabled": true,

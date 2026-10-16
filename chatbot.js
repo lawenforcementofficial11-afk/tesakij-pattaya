@@ -6,9 +6,11 @@
  * โหมด 2: ถ้าตั้ง AI_API_KEY จะเรียก LLM แบบ OpenAI-compatible (/chat/completions) — กุญแจอยู่ฝั่งเซิร์ฟเวอร์เท่านั้น
  *   system prompt บังคับให้ใช้เฉพาะฐานความรู้ + แนบ URL แหล่งที่มาเมื่อตอบเรื่องกฎหมาย/ค่าปรับ
  *   AI_BASE_URL  เช่น https://api.openai.com/v1 | https://api.x.ai/v1 | https://generativelanguage.googleapis.com/v1beta/openai
- *   AI_MODEL     เช่น gpt-4o-mini | grok-3-mini | gemini-2.0-flash
+ *   AI_MODEL     เช่น gpt-4o-mini | grok-3-mini | gemini-3.5-flash-lite
+ * โหมด 3 (เสริม): คำถามที่ฐานความรู้ตอบไม่ได้ → ค้นเว็บไซต์ทางราชการผ่าน Google (websearch.js: GEMINI_API_KEY หรือ GOOGLE_CSE_KEY+CX)
  */
 'use strict';
+const web = require('./websearch');
 
 const LANGS = ['th', 'en', 'zh', 'ru'];
 const LANG_NAME = { th: 'ภาษาไทย (Thai)', en: 'English', zh: '简体中文 (Simplified Chinese)', ru: 'Русский (Russian)' };
@@ -174,6 +176,19 @@ async function llmAnswer(message, history, c, lang) {
 
 async function answer(message, history, content, uiLang) {
   const off = offlineAnswer(message, content, uiLang);
+  // 1) ฐานความรู้ในเว็บไซต์ตอบได้อย่างมั่นใจ → ใช้ก่อนเสมอ
+  // 2) ไม่มั่นใจ → ค้นเว็บไซต์ทางราชการที่เชื่อถือได้ (Google) แล้วตอบพร้อม "ที่มา" (websearch.js)
+  // คะแนนจับคู่แบบคำ (lexical) อาจ "ตรงแบบหลวม ๆ" → ถ้าต่ำกว่าเกณฑ์ (ค่าเริ่มต้น 2.0) ให้ลองค้นเว็บก่อน
+  // ถ้าค้นแล้วไม่พบแหล่งที่เชื่อถือได้ แต่ฐานความรู้มีคำตอบที่ใกล้เคียง → ใช้คำตอบจากฐานความรู้ตามเดิม
+  const ws = ((content.chatbot || {}).webSearch) || {};
+  const strong = off.matched && off.score >= (ws.minKbScore != null ? +ws.minKbScore : 2.0);
+  let webNone = null;
+  if (!strong) {
+    const w = await web.webAnswer(message, content, off.lang).catch(e => { console.warn('[chat] web error:', e.message); return null; });
+    if (w && !w.notFound) return { mode: 'web', provider: w.provider, lang: off.lang, reply: applyParticle(w.reply, off.lang, content), sources: w.sources, cached: !!w.cached };
+    if (w && w.notFound && !off.matched) webNone = { mode: 'web-none', provider: w.provider, lang: off.lang, reply: applyParticle(w.reply, off.lang, content), sources: [] };
+  }
+  if (webNone && !process.env.AI_API_KEY) return webNone;
   if (process.env.AI_API_KEY) {
     try {
       let reply = await llmAnswer(message, history, content, off.lang);
