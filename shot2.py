@@ -7,7 +7,7 @@ D = '/workspace/tesakij-pattaya/'
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:3000/'
 PW = os.environ.get('ADMIN_PASSWORD', 'demo1234')
 PREP = "() => document.querySelectorAll('.reveal').forEach(e => e.classList.add('is-in'))"
-MASCOT_CARD = """()=>{const M=(c)=>TKPMascot.svg('assets/logo.png',c);
+MASCOT_CARD = """()=>{const M=(c)=>TKPMascot.svg('assets/logo.png',c,'robot');
 const st=(h,t)=>'<div style="text-align:center"><div style="width:150px;height:178px;margin:auto">'+h+'</div><p style="margin:6px 0 0;font:600 15px Prompt;color:#0b2545">'+t+'</p></div>';
 document.body.innerHTML='<div style="height:100vh;display:flex;align-items:center;gap:40px;padding:0 60px;box-sizing:border-box;background:radial-gradient(circle at 28% 50%,#e0fbff 0,#d5ecf8 35%,#b9d7ec 100%);font-family:Sarabun">'+
 '<div style="width:470px;height:560px;flex:none">'+M('static')+'</div>'+

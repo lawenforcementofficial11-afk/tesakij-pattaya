@@ -21,6 +21,7 @@ def main():
     c = json.load(open(P, encoding='utf-8'))
     b = c.setdefault('chatbot', {})
     pt = b.setdefault('particle', 'ฮะ')
+    b.setdefault('mascotStyle', 'officer')  # มาสคอตเริ่มต้น: หุ่นยนต์ชุดเจ้าหน้าที่เทศกิจ
     b['greeting'] = 'สวัสดีฮะ 👋 น้องอัศวินยินดีให้บริการฮะ ถามเรื่องการแจ้งร้องเรียน ติดตามสถานะ ข้อบัญญัติและค่าปรับ (มีลิงก์แหล่งข้อมูลทางราชการ) หรือข้อมูลนักท่องเที่ยวได้เลยฮะ'
     b.setdefault('greetings', {})['th'] = b['greeting']
     b['fallback'] = particle(re.sub(r'ขออภัย(ครับ|ค่ะ)', 'ขออภัยฮะ', b.get('fallback', '')), pt)

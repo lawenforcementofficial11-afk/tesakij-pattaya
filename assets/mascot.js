@@ -231,6 +231,7 @@
           '</g></g>' +
       '</g></svg>';
   }
-  function render(logo, cls, style) { return style === 'officer' ? officer(logo, cls) : svg(logo, cls); }
+  // ค่าเริ่มต้น = หุ่นยนต์ชุดเจ้าหน้าที่เทศกิจ · ส่ง 'robot' เพื่อใช้หุ่นยนต์แบบเดิม
+  function render(logo, cls, style) { return style === 'robot' ? svg(logo, cls) : officer(logo, cls); }
   window.TKPMascot = { css: CSS, svg: render, robot: svg, officer: officer, png: 'assets/mascot.png', pngOfficer: 'assets/mascot-officer.png' };
 })();

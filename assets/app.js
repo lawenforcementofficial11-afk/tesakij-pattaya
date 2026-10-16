@@ -351,7 +351,7 @@
   // อวาตาร์ในบับเบิลแชท: ภาพนิ่ง assets/mascot.png (เบา) · ถ้าปิดมาสคอตใช้รูปที่อัปโหลดเอง/โลโก้
   function bubbleAvatar() {
     if (!useMascot()) return '<span class="w-9 h-9 shrink-0">' + avatarHtml('static') + '</span>';
-    return '<span class="w-9 h-9 shrink-0 rounded-full ring-2 ring-cyan-300/70 shadow-sm" role="img" aria-label="" style="background:url(' + esc(bot.mascotStyle === 'officer' ? 'assets/mascot-officer.png' : 'assets/mascot.png') + ') 50% -3px/140% auto no-repeat,linear-gradient(#f0f9ff,#cffafe)"></span>';
+    return '<span class="w-9 h-9 shrink-0 rounded-full ring-2 ring-cyan-300/70 shadow-sm" role="img" aria-label="" style="background:url(' + esc(bot.mascotStyle === 'robot' ? 'assets/mascot.png' : 'assets/mascot-officer.png') + ') 50% -3px/140% auto no-repeat,linear-gradient(#f0f9ff,#cffafe)"></span>';
   }
   function figs() { return $$('#chatFabFig .mascot, #chatHeadFig .mascot, #chatHeroFig .mascot'); }
   function talk(on) { figs().forEach(function (m) { m.classList.toggle('talking', !!on); }); }

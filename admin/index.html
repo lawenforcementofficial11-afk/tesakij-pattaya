@@ -406,14 +406,14 @@ function renderLayout(){
       swHtml('data-lsw',x.enabled,'แสดง '+x.label)+'</li>'}).join('');
   var fl=FEAT_DEF.map(function(d){return '<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">'+esc(d[1])+'</p><p class="text-xs text-slate-500">'+esc(d[2])+'</p></div>'+swHtml('data-fsw="'+d[0]+'"',content.features[d[0]]!==false,d[1])+'</div>'}).join('');
   fl+='<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">มาสคอตน้องอัศวิน (แอนิเมชัน)</p><p class="text-xs text-slate-500">ปิดเพื่อใช้รูปอวตารที่อัปโหลดเอง (เนื้อหาเว็บไซต์ → แชทบอท → รูปอวตาร)</p></div>'+swHtml('data-msw',content.chatbot.mascot!==false,'มาสคอต')+'</div>';
-  var ms=content.chatbot.mascotStyle==='officer'?'officer':'robot';
-  fl+='<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">แบบมาสคอต</p><p class="text-xs text-slate-500">หุ่นยนต์ (ค่าเริ่มต้น) หรือ หุ่นยนต์ชุดเจ้าหน้าที่เทศกิจ (ตัวอย่าง)</p></div><select data-mstyle class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm"><option value="robot"'+(ms==='robot'?' selected':'')+'>หุ่นยนต์</option><option value="officer"'+(ms==='officer'?' selected':'')+'>เจ้าหน้าที่</option></select></div>';
+  var ms=content.chatbot.mascotStyle==='robot'?'robot':'officer';
+  fl+='<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">แบบมาสคอต</p><p class="text-xs text-slate-500">หุ่นยนต์ชุดเจ้าหน้าที่เทศกิจ (ค่าเริ่มต้น) หรือ หุ่นยนต์สีขาวแบบเดิม</p></div><select data-mstyle class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm"><option value="robot"'+(ms==='robot'?' selected':'')+'>หุ่นยนต์</option><option value="officer"'+(ms==='officer'?' selected':'')+'>เจ้าหน้าที่</option></select></div>';
   $('#featList').innerHTML=fl;
   renderVoice();
   $$('#layList [data-lsw]').forEach(function(cb){cb.onchange=function(){var id=cb.closest('li').dataset.id;secs.find(function(x){return x.id===id}).enabled=cb.checked;layDirty(true);renderLayout()}});
   $$('#layList [data-lmv]').forEach(function(b){b.onclick=function(){var id=b.closest('li').dataset.id,i=secs.findIndex(function(x){return x.id===id}),j=i+(+b.dataset.lmv);if(j<1||j>=secs.length)return;var t=secs[i];secs[i]=secs[j];secs[j]=t;secs.forEach(function(x,k){x.order=k+1});layDirty(true);renderLayout();var el=$('#layList [data-id="'+id+'"] [data-lmv="'+b.dataset.lmv+'"]');if(el)el.focus()}});
   $$('#featList [data-fsw]').forEach(function(cb){cb.onchange=function(){content.features[cb.dataset.fsw]=cb.checked;layDirty(true)}});
-  var m=$('#featList [data-msw]');if(m)m.onchange=function(){content.chatbot.mascot=m.checked;layDirty(true)};var mst=$('#featList [data-mstyle]');if(mst)mst.onchange=function(){if(mst.value==='robot')delete content.chatbot.mascotStyle;else content.chatbot.mascotStyle=mst.value;layDirty(true)};
+  var m=$('#featList [data-msw]');if(m)m.onchange=function(){content.chatbot.mascot=m.checked;layDirty(true)};var mst=$('#featList [data-mstyle]');if(mst)mst.onchange=function(){content.chatbot.mascotStyle=mst.value;layDirty(true)};
   // drag & drop
   var dragEl=null,list=$('#layList');
   $$('#layList li[draggable]').forEach(function(li){
