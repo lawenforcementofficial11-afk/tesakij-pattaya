@@ -236,10 +236,39 @@ app.get('/api/complaints.csv', requireAdmin, async (req, res) => {
 mountAlerts(app, { ROOT, DATA, readJson, writeJson, requireAdmin, rateLimit, clean, CONTENT_FILE, SESSION_SECRET });
 
 // Static files (เฉพาะโฟลเดอร์ที่เป็นสาธารณะ — ไม่เปิด data/ ทั้งโฟลเดอร์)
-app.use('/assets', express.static(path.join(ROOT, 'assets'), { maxAge: '7d' }));
+// Cache-busting: ทุก URL ของ assets ใน HTML ได้ ?v=<build> → เบราว์เซอร์ไม่ใช้ JS/CSS เก่าค้างหลัง deploy
+// (สาเหตุบั๊ก "น้องอัศวินไม่ขึ้น": เดิม assets แคช 7 วัน แต่ index.html ใหม่ → โหลด app.js เวอร์ชันเก่าที่ไม่รู้จักโครงหน้าใหม่)
+const BUILD = (() => {
+  const c = process.env.RENDER_GIT_COMMIT || process.env.SOURCE_VERSION;
+  if (c) return c.slice(0, 10);
+  const h = crypto.createHash('sha1');
+  const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) { const p = path.join(d, f.name); if (f.isDirectory()) walk(p); else if (/\.(js|css|svg|png|jpe?g|webp|geojson)$/i.test(f.name)) { h.update(f.name); h.update(fs.readFileSync(p)); } } };
+  try { walk(path.join(ROOT, 'assets')); h.update(fs.readFileSync(path.join(ROOT, 'index.html'))); } catch (e) { h.update(String(Date.now())); }
+  return h.digest('hex').slice(0, 10);
+})();
+const versionHtml = html => html.replace(/((?:src|href)=")(\/?assets\/[^"?#]+\.(?:js|css|svg|png|jpe?g|webp))(")/g, `$1$2?v=${BUILD}$3`)
+  .replace('<head>', `<head>\n<meta name="tkp-build" content="${BUILD}">`);
+const htmlCache = {};
+const sendHtml = (file) => (req, res) => {
+  try {
+    if (!htmlCache[file] || process.env.NODE_ENV !== 'production') htmlCache[file] = versionHtml(fs.readFileSync(path.join(ROOT, file), 'utf8'));
+    res.set({ 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache, must-revalidate' });
+    if (file.startsWith('admin')) res.set('X-Robots-Tag', 'noindex, nofollow');
+    res.send(htmlCache[file]);
+  } catch (e) { res.status(500).send('error'); }
+};
+app.get('/api/build', (req, res) => { res.set('Cache-Control', 'no-store'); res.json({ build: BUILD }); });
+app.use('/assets', express.static(path.join(ROOT, 'assets'), {
+  setHeaders: (res, file) => {
+    // ?v=… (มีเวอร์ชันกำกับ) → แคชยาวได้ · ไม่มีเวอร์ชัน → JS/CSS/SVG ต้องตรวจซ้ำทุกครั้ง (ETag/304) · รูปอื่นแคช 1 วัน
+    if (res.req && res.req.query && res.req.query.v) res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    else if (/\.(js|css|svg|json|geojson)$/i.test(file)) res.set('Cache-Control', 'no-cache');
+    else res.set('Cache-Control', 'public, max-age=86400');
+  }
+}));
 app.use('/uploads', express.static(UPLOADS, { maxAge: '7d' }));
-app.get(['/admin', '/admin/'], (req, res) => { res.set('X-Robots-Tag', 'noindex, nofollow'); res.sendFile(path.join(ROOT, 'admin', 'index.html')); });
-app.get(['/', '/index.html'], (req, res) => res.sendFile(path.join(ROOT, 'index.html')));
+app.get(['/admin', '/admin/'], sendHtml('admin/index.html'));
+app.get(['/', '/index.html'], sendHtml('index.html'));
 app.use('/api', (req, res) => res.status(404).json({ error: 'not found' }));
 app.use((err, req, res, next) => { console.error(err); res.status(err.code === 'LIMIT_FILE_SIZE' ? 413 : 500).json({ error: err.code === 'LIMIT_FILE_SIZE' ? 'ไฟล์มีขนาดใหญ่เกินไป' : 'เกิดข้อผิดพลาดภายในระบบ' }); });
 app.use((req, res) => res.status(404).send('Not found'));

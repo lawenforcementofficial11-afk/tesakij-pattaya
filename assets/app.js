@@ -351,9 +351,13 @@
     zh: { ph: '请输入您的问题…', hint: '有问题问我吧！', typing: '正在输入', off: '抱歉，助手暂时无法连接，请稍后再试。', sub: '在线 · 依据官方来源回答', dis: '仅根据本网站及官方来源回答 · 紧急情况拨打 191 / 1155 / 1669', hi: '您好，我是阿萨温，芭提雅市执法小助手', tease: '您好！👋', listen: '正在聆听…请说', spkOn: '关闭语音', spkOff: '开启语音', replay: '再听一次', mic: '语音提问', noVoice: '此设备没有中文语音。', micErr: '无法使用麦克风，请在浏览器中允许麦克风权限。' },
     ru: { ph: 'Введите вопрос…', hint: 'Спросите меня!', typing: 'печатает', off: 'Извините, помощник сейчас недоступен. Попробуйте позже.', sub: 'Онлайн · ответы по официальным источникам', dis: 'Ответы только по данным сайта и официальным источникам · Экстренно 191 / 1155 / 1669', hi: 'Привет! Я Нонг Ассавин, помощник инспекции Паттайи', tease: 'Привет! 👋', listen: 'Слушаю… говорите', spkOn: 'Выключить голос', spkOff: 'Включить голос', replay: 'Прослушать снова', mic: 'Спросить голосом', noVoice: 'На этом устройстве нет русского голоса.', micErr: 'Микрофон недоступен. Разрешите доступ к микрофону.' }
   };
+  // ภาพนิ่งสำรอง (ถ้า SVG/JS ของมาสคอตโหลดไม่ได้ ต้องยังเห็นน้องอัศวินเสมอ)
+  function mascotImg(cls) { return '<img src="' + (bot.mascotStyle === 'robot' ? 'assets/mascot.png' : 'assets/mascot-officer.png') + '" alt="' + esc(bot.name || 'น้องอัศวิน') + '" class="mascot-fallback ' + (cls || '') + '" style="display:block;width:100%;height:100%;object-fit:contain" draggable="false">'; }
   function useMascot() { return bot.mascot !== false; }
   function avatarHtml(cls) {
-    return useMascot() ? window.TKPMascot.svg(logoUrl, cls, bot.mascotStyle) : '<img src="' + esc(safeUrl(bot.avatar || logoUrl)) + '" alt="" class="w-full h-full object-contain rounded-full bg-gradient-to-br from-gold-300 to-gold-500 p-1">';
+    if (useMascot() && window.TKPMascot) { try { return window.TKPMascot.svg(logoUrl, cls, bot.mascotStyle); } catch (e) { console.error(e); } }
+    if (useMascot()) return mascotImg('');
+    return '<img src="' + esc(safeUrl(bot.avatar || logoUrl)) + '" alt="" class="w-full h-full object-contain rounded-full bg-gradient-to-br from-gold-300 to-gold-500 p-1">';
   }
   // อวาตาร์ในบับเบิลแชท: ภาพนิ่ง assets/mascot.png (เบา) · ถ้าปิดมาสคอตใช้รูปที่อัปโหลดเอง/โลโก้
   function bubbleAvatar() {
@@ -434,26 +438,39 @@
   }
   function initChat(b) {
     bot = b || {};
-    if (bot.enabled === false) { var hb = $('#heroBot'); if (hb) hb.classList.add('hidden'); return; }
+    if (bot.enabled === false) { window.__tkpChatOff = true; var hb = $('#heroBot'); if (hb) hb.classList.add('hidden'); return; }
     logoUrl = safeUrl(((window.__content || {}).site || {}).logo || 'assets/logo.png');
     $('#chatRoot').classList.remove('hidden');
     $$('.bot-name').forEach(function (el) { el.textContent = bot.name || 'น้องอัศวิน'; });
     $('#chatFabFig').innerHTML = avatarHtml('');
     $('#chatHeadFig').innerHTML = avatarHtml('');
     var hf = $('#heroBotFig'), feats = (window.__content || {}).features || {};
-    if (hf && !heroBot && window.TKPHeroMascot && feats.heroMascot !== false) {
+    if (hf && !heroBot && feats.heroMascot !== false) {
+      try {
+      if (!window.TKPHeroMascot || !window.TKPMascot) throw new Error('hero mascot script not loaded');
       heroBot = window.TKPHeroMascot.mount({ el: hf, logo: logoUrl, style: bot.mascotStyle, dance: feats.heroDance !== false, lines: heroLines,
         onActivate: function () { var wasOpen = !$('#chatPanel').classList.contains('closed'); openChat(true); if (greeted && voiceOn()) { var g = voiceGreeting(); if (g && !wasOpen) speakText(g, greetEl && $('.msg-say', greetEl)); } } });
       window.__heroBot = heroBot;
-      // while the big hero mascot is on screen, tuck the floating chat mascot away (no duplicate)
-      if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { document.body.classList.toggle('hero-bot-on', es[0].isIntersecting); }, { threshold: .25 }).observe($('#heroBot'));
+      if (!hf.querySelector('svg')) throw new Error('hero mascot did not render');
+      // while the big hero mascot is on screen, tuck the floating chat mascot away (no duplicate).
+      // Only when he really rendered and is visible — otherwise the floating button always stays.
+      if ('IntersectionObserver' in window) new IntersectionObserver(function (es) {
+        var e = es[0], ok = e.isIntersecting && e.boundingClientRect.width > 40 && !!hf.querySelector('svg') && getComputedStyle($('#heroBot')).display !== 'none';
+        document.body.classList.toggle('hero-bot-on', ok);
+      }, { threshold: .25 }).observe($('#heroBot'));
+      } catch (err) {
+        console.error('[hero mascot] fallback to static image:', err);
+        heroBot = null; document.body.classList.remove('hero-bot-on');
+        var hbBody = $('#heroBotBody') || hf; hbBody.innerHTML = mascotImg('');
+        if (!hf.__fb) { hf.__fb = true; hf.addEventListener('click', function () { openChat(true); }); }
+      }
     }
     $('#chatDisclaimer').textContent = bot.disclaimer || '';
     if (!chatReady) {
       if (useMascot()) {
         var hero = document.createElement('div');
         hero.className = 'flex flex-col items-center text-center pt-1 pb-2';
-        hero.innerHTML = '<span id="chatHeroFig" class="block w-32 h-36" style="background:radial-gradient(circle at 50% 58%,rgba(103,232,249,.35) 0,rgba(186,230,253,.25) 38%,transparent 66%)">' + window.TKPMascot.svg(logoUrl, '', bot.mascotStyle) + '</span><p class="mt-1 font-head font-semibold text-navy-900 bot-name">' + esc(bot.name || 'น้องอัศวิน') + '</p><p id="chatHeroHi" class="text-xs text-slate-500"></p>';
+        hero.innerHTML = '<span id="chatHeroFig" class="block w-32 h-36" style="background:radial-gradient(circle at 50% 58%,rgba(103,232,249,.35) 0,rgba(186,230,253,.25) 38%,transparent 66%)">' + avatarHtml('') + '</span><p class="mt-1 font-head font-semibold text-navy-900 bot-name">' + esc(bot.name || 'น้องอัศวิน') + '</p><p id="chatHeroHi" class="text-xs text-slate-500"></p>';
         $('#chatLog').appendChild(hero);
       }
       greetEl = addMsg('bot', greeting()); chatReady = true;
@@ -521,6 +538,13 @@
   paintIcons(document);
   fetch('/api/content').then(function (r) { if (!r.ok) throw 0; return r.json(); })
     .catch(function () { return fetch('data/content.json').then(function (r) { return r.json(); }); })
-    .then(function (c) { window.__content = c; render(c); })
-    .catch(function () { observeReveal(document); console.warn('content.json not available — run `npm start` and open http://localhost:3000'); });
+    .then(function (c) {
+      window.__content = c;
+      try { render(c); } catch (e) {
+        // ส่วนใดส่วนหนึ่งพัง ต้องไม่ทำให้น้องอัศวิน/ปุ่มแชทหายไปทั้งหมด
+        console.error('[render]', e); observeReveal(document);
+        try { if (!chatReady) initChat(c.chatbot || {}); } catch (e2) { console.error('[chat]', e2); }
+      }
+    })
+    .catch(function () { observeReveal(document); try { if (!chatReady) initChat({}); } catch (e) {} console.warn('content.json not available — run `npm start` and open http://localhost:3000'); });
 })();

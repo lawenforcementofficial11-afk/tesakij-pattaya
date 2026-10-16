@@ -68,6 +68,8 @@ tailwind.config = {
   .hero-grid { grid-template-columns: minmax(0,1fr); grid-template-areas: "id" "bot" "cta"; }
   .hero-id { grid-area:id } .hero-bot { grid-area:bot } .hero-cta { grid-area:cta }
   @media (min-width:1024px){ .hero-grid { grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr); grid-template-areas: "id bot" "cta bot"; align-items:end; } .hero-cta{align-self:start;margin-top:1.25rem} }
+  /* hero mascot layout (static copy so the stage keeps its size even if hero-mascot.js fails) */
+  .hb-wrap{display:grid;grid-template-columns:172px minmax(0,1fr);grid-template-areas:"stage bubble" "stage side";column-gap:12px;row-gap:10px;align-items:end}.hb-stage{grid-area:stage;position:relative;display:block;width:172px;height:206px;border:0;background:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}.hb-stage:focus-visible{outline:3px solid #F5C518;outline-offset:4px;border-radius:24px}.hb-bubble{grid-area:bubble;justify-self:start;position:relative;max-width:100%;background:#fff;color:#0B2545;border-radius:18px 18px 18px 6px;padding:.55rem .95rem;font:600 15px/1.35 Prompt,Sarabun,sans-serif;box-shadow:0 14px 30px -12px rgba(0,0,0,.55)}.hb-bubble::after{content:"";position:absolute;left:-7px;bottom:8px;border:8px solid transparent;border-right-color:#fff;border-left:0}.hb-bubble span{display:inline-block;transition:opacity .35s ease,transform .35s ease}.hb-bubble span.out{opacity:0;transform:translateY(6px)}.hb-side{grid-area:side;align-self:start}@media (min-width:640px){.hb-wrap{grid-template-columns:200px minmax(0,1fr)}.hb-stage{width:200px;height:238px}}@media (min-width:1024px){.hb-wrap{grid-template-columns:minmax(0,1fr);grid-template-areas:"bubble" "stage" "side";justify-items:center;text-align:center;row-gap:6px}  .hb-stage{width:min(380px,100%);height:430px}.hb-bubble{justify-self:center;font-size:18px;padding:.7rem 1.2rem;border-radius:22px;transform:translateX(-70px)}  .hb-bubble::after{left:30px;bottom:-8px;border:9px solid transparent;border-top-color:#fff;border-bottom:0}.hb-side #heroAsk{justify-content:center}}.hb-body{position:absolute;inset:0;display:block}.hb-bubble:empty,.hb-bubble span:empty{display:none}
   #chatFab { transition: opacity .35s, transform .35s; } body.hero-bot-on #chatFab { opacity:0; transform:translateY(16px) scale(.85); pointer-events:none; }
   .hero-grid.no-bot { grid-template-areas: "id" "cta"; grid-template-columns:minmax(0,1fr); }
   .src-link { margin-left:.35rem; font-size:11px; color:rgba(255,255,255,.45); text-decoration:underline; text-underline-offset:2px; white-space:nowrap; }
@@ -544,5 +546,25 @@ tailwind.config = {
 <script src="assets/voice.js"></script>
 <script src="assets/hero-mascot.js"></script>
 <script src="assets/app.js"></script>
+<script>
+/* Safety net (ไม่พึ่ง app.js): ถ้า JS ของมาสคอต/แชทโหลดไม่ได้หรือเป็นเวอร์ชันเก่า น้องอัศวินและปุ่มแชทต้องยังแสดงเสมอ */
+(function () {
+  function img(alt) { return '<img src="assets/mascot-officer.png" alt="' + alt + '" style="display:block;width:100%;height:100%;object-fit:contain" draggable="false">'; }
+  function check() {
+    var hb = document.getElementById('heroBot'), hf = document.getElementById('heroBotFig'), body = document.getElementById('heroBotBody') || hf;
+    var root = document.getElementById('chatRoot'), fabFig = document.getElementById('chatFabFig'), fab = document.getElementById('chatFab');
+    var heroOk = hf && hf.querySelector('svg,img');
+    if (hf && !heroOk && hb && !hb.classList.contains('hidden') && !window.__tkpChatOff) { body.innerHTML = img('น้องอัศวิน'); hf.addEventListener('click', function () { if (window.__openChat) window.__openChat(true); else location.hash = '#contact'; }); }
+    if (!(hf && hf.querySelector('svg'))) document.body.classList.remove('hero-bot-on');
+    if (!window.__openChat) { document.documentElement.classList.remove('js'); }  /* app.js failed → never leave reveal-on-scroll content stuck invisible */
+    if (root && root.classList.contains('hidden') && !window.__tkpChatOff) {
+      root.classList.remove('hidden');
+      if (fabFig && !fabFig.firstElementChild) fabFig.innerHTML = img('แชทกับน้องอัศวิน');
+      if (fab && !window.__openChat) fab.addEventListener('click', function () { location.hash = '#contact'; });
+    }
+  }
+  if (document.readyState === 'complete') setTimeout(check, 3000); else window.addEventListener('load', function () { setTimeout(check, 3000); });
+})();
+</script>
 </body>
 </html>
