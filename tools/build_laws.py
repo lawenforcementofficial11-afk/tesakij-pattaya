@@ -242,3 +242,7 @@ for k in b['kb']:
 json.dump(c, open(P, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
 
 print('laws items:', len(items), 'with amounts:', sum(1 for i in items if i['fineAmount']))
+
+# บุคลิกน้องAI (ลงท้าย 'ฮะ') + ค่าเสียงพูด
+import subprocess, sys
+subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'apply_persona.py')], check=True)

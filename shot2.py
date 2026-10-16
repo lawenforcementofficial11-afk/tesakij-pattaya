@@ -1,5 +1,7 @@
 """Screenshots for laws / chatbot mascot / admin layout. Requires server: ADMIN_PASSWORD=demo1234 PORT=3000 npm start"""
 import asyncio, sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tools'))
+from shot_voice import MOCK  # จำลองเสียงพูด (headless ไม่มีเสียงในเครื่อง), sys, os
 from playwright.async_api import async_playwright
 D = '/workspace/tesakij-pattaya/'
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:3000/'
@@ -18,7 +20,8 @@ document.querySelectorAll('.mascot.talking .m-talk').forEach(e=>{e.style.animati
 }"""
 async def main():
     async with async_playwright() as p:
-        b = await p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'])
+        _l = p.chromium.launch
+        b = await _l(executable_path='/usr/bin/google-chrome', args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'])
         errs = []
         # laws (desktop)
         pg = await b.new_page(viewport={'width': 1440, 'height': 900})
@@ -35,6 +38,7 @@ async def main():
         await pg.close()
         # chatbot (mobile 390, mascot, Chinese then Thai legal Q)
         pg = await b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
+        await pg.add_init_script(MOCK)
         pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL, wait_until='networkidle'); await pg.evaluate('document.fonts.ready')
         await pg.evaluate("localStorage.setItem('tkpLang','th')"); await pg.reload(wait_until='networkidle'); await pg.evaluate('document.fonts.ready')
@@ -55,6 +59,7 @@ async def main():
         await pg.screenshot(path=D + 'preview-mascot.png'); await pg.close()
         # desktop chatbot with mascot + English
         pg = await b.new_page(viewport={'width': 1280, 'height': 860})
+        await pg.add_init_script(MOCK)
         await pg.goto(URL, wait_until='networkidle'); await pg.evaluate('document.fonts.ready')
         await pg.evaluate("document.querySelector('.lang-opt[data-lang=EN]').click()"); await pg.wait_for_timeout(300)
         await pg.evaluate("window.__openChat(true)"); await pg.wait_for_timeout(500)

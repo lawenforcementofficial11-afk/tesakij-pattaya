@@ -10,6 +10,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="/assets/vendor/leaflet/leaflet.css">
 <script src="/assets/vendor/leaflet/leaflet.js"></script>
+<script src="/assets/voice.js"></script>
 <script>tailwind.config={theme:{extend:{colors:{navy:{950:'#050f1f',900:'#0B2545',800:'#13315C',700:'#1d4377'},gold:{100:'#FFF6D6',300:'#FBE38A',400:'#F8D347',500:'#F5C518',600:'#C99A06',700:'#8F6B00'}}}}}</script>
 <style>
   body{font-family:'Sarabun',sans-serif} h1,h2,h3,h4,.font-head{font-family:'Prompt',sans-serif}
@@ -113,6 +114,11 @@
         <h2 class="font-head font-semibold text-lg text-navy-900 mb-3">ฟีเจอร์ย่อย</h2>
         <div id="featList" class="divide-y divide-slate-100"></div>
         <p class="mt-3 text-xs text-slate-400">ปิด “แชทบอท” จะปิด API /api/chat ด้วย · ปิด “แจ้งเหตุบนถนน” จะซ่อนปุ่ม/รายการแจ้งเหตุและหมุดบนแผนที่</p>
+      </section>
+      <section class="rounded-2xl bg-white ring-1 ring-slate-200 p-4 mt-4" id="voiceBox">
+        <h2 class="font-head font-semibold text-lg text-navy-900 mb-1">🔊 เสียงพูดของน้องAI</h2>
+        <p class="text-xs text-slate-500 mb-2">ใช้เสียงในเบราว์เซอร์ (ฟรี) · เสียงภาษาไทยขึ้นกับอุปกรณ์ผู้ใช้ · <span id="ttsStatus">กำลังตรวจสอบเสียงฝั่งเซิร์ฟเวอร์…</span></p>
+        <div id="voiceList" class="divide-y divide-slate-100"></div>
       </section>
     </div>
   </main>
@@ -219,7 +225,7 @@ var L={name:'ชื่อ',namePart1:'ชื่อส่วนที่ 1 (ส�
  icon:'ไอคอน',title:'หัวข้อ',desc:'คำอธิบาย',link:'ลิงก์',headingTh:'หัวข้อภาษาไทย',intro:'คำนำ',languages:'ภาษาที่รองรับ',tips:'เคล็ดลับ',titleEn:'หัวข้อภาษาอังกฤษ',zones:'พื้นที่บนแผนที่',nameEn:'ชื่อภาษาอังกฤษ',x:'ตำแหน่ง X (%)',y:'ตำแหน่ง Y (%)',
  isExample:'เป็นข้อมูลตัวอย่าง (แสดงป้าย)',items:'รายการ',value:'ตัวเลข',suffix:'หน่วย',label:'ป้ายกำกับ',date:'วันที่',category:'หมวดหมู่',excerpt:'เนื้อหาย่อ',note:'หมายเหตุ',fine:'ค่าปรับ',ref:'อ้างอิงกฎหมาย',q:'คำถาม',a:'คำตอบ',aEn:'คำตอบภาษาอังกฤษ',about:'ข้อความเกี่ยวกับหน่วยงาน',links:'ลิงก์',href:'ลิงก์ (URL หรือ #section)',
  avatar:'รูปอวตาร',greeting:'คำทักทาย',quickReplies:'ปุ่มตอบด่วน',fallback:'คำตอบเมื่อไม่พบข้อมูล (ไทย)',fallbackEn:'คำตอบเมื่อไม่พบข้อมูล (อังกฤษ)',disclaimer:'ข้อความกำกับ',systemPrompt:'System prompt สำหรับ LLM',kb:'ฐานความรู้ (Q&A)',keywords:'คำสำคัญ (ใช้จับคู่คำถาม)',googleMapsApiKey:'Google Maps API key',googleMapsMapId:'Map ID (Vector, เปิด Tilt/Rotation)',enablePhotorealistic:'เปิดปุ่ม Photorealistic 3D (ต้องเปิด Map Tiles API)',center:'จุดศูนย์กลาง',lat:'ละติจูด',lng:'ลองจิจูด',zoom:'ระดับซูม',tilt:'มุมเอียง (0–67)',heading:'ทิศทาง (องศา)',refreshSeconds:'รีเฟรชข้อมูลทุก (วินาที)',orbitSpeed:'ความเร็วหมุนอัตโนมัติ',fallbackNotice:'ข้อความเมื่อยังไม่มี API key',spots:'จุดลัดบนแผนที่',reportButton:'ข้อความปุ่มแจ้งเหตุ',types:'ประเภทเหตุ',key:'รหัส (ภาษาอังกฤษ ห้ามซ้ำ)',labelEn:'ชื่อภาษาอังกฤษ',emoji:'อีโมจิ',color:'สี (#hex)',ttlHours:'แสดงนาน (ชั่วโมง) ก่อนหมดอายุ',voteExtendRatio:'กด 👍 ต่ออายุ (สัดส่วนของอายุประเภท)',downvotesToRemove:'จำนวน 👎 ที่ทำให้เหตุหายไป',maxPhotoMB:'ขนาดรูปสูงสุด (MB)',maxNoteLength:'ความยาวข้อความสูงสุด',bounds:'ขอบเขตพื้นที่ที่รับแจ้ง',south:'ใต้ (lat ต่ำสุด)',north:'เหนือ (lat สูงสุด)',west:'ตะวันตก (lng ต่ำสุด)',east:'ตะวันออก (lng สูงสุด)',nearbyNotifyKm:'รัศมีแจ้งเตือนเหตุใกล้ฉัน (กม.)',tileUrl:'URL แผ่นแผนที่ (tile)',tileAttribution:'เครดิตแผนที่ (ต้องมี)',fallbackZoom:'ระดับซูมโหมดสำรอง',fallbackStyleUrl:'สไตล์แผนที่ 3D โหมดไม่มี key (MapLibre)',simulation:'แสดงรถ 3 มิติ (ภาพจำลอง) เป็นค่าเริ่มต้น',cameras:'กล้อง',credit:'เครดิตภาพ (ต้องแสดง)',officialUrl:'ลิงก์เว็บไซต์กล้องทางการ',allowOfficialEmbed:'ฝังเว็บทางการเมื่อโฮสต์บน *.pattaya.go.th',linkNotice:'ข้อความเมื่อเปิดได้เฉพาะเว็บทางการ',exampleNotice:'หมายเหตุตำแหน่งตัวอย่าง',approx:'ตำแหน่งโดยประมาณ',type:'ชนิดสตรีม: link / hls / youtube / iframe',src:'URL สตรีม (.m3u8 / YouTube / https iframe)',url:'ลิงก์หน้าเว็บทางการของกล้อง',id:'รหัส'};
-L.category='หมวดหมู่';L.summary='สรุปสาระสำคัญ';L.fineAmount='ค่าปรับสูงสุด (ตัวเลขบาท · เว้นว่างถ้าไม่ระบุ)';L.legalRef='ฐานกฎหมาย (ชื่อกฎหมาย/มาตรา)';L.year='ปี พ.ศ. ที่ประกาศ/มีผล';L.source='ชื่อแหล่งที่มา';L.url='ลิงก์แหล่งที่มาทางการ (URL)';L.url2='ลิงก์สำรอง/ตัวบท (URL)';L.lastChecked='วันที่ตรวจสอบล่าสุด (YYYY-MM-DD)';L.sources='แหล่งข้อมูลทางราชการ';L.titleZh='หัวข้อภาษาจีน';L.titleRu='หัวข้อภาษารัสเซีย';L.greetings='คำทักทายแยกภาษา';L.quickRepliesI18n='ปุ่มตอบด่วนแยกภาษา';L.fallbackI18n='คำตอบเมื่อไม่พบข้อมูล (แยกภาษา)';L.mascot='ใช้มาสคอตแอนิเมชัน (ปิด = ใช้รูปอวตาร)';L.mascotStyle='แบบมาสคอต (robot / officer)';L.th='ไทย';L.en='English';L.zh='中文';L.ru='Русский';L.aZh='คำตอบภาษาจีน';L.aRu='คำตอบภาษารัสเซีย';L.source='ชื่อแหล่งที่มา / URL';L.fine='ค่าปรับ (ข้อความที่แสดง)';
+L.category='หมวดหมู่';L.summary='สรุปสาระสำคัญ';L.fineAmount='ค่าปรับสูงสุด (ตัวเลขบาท · เว้นว่างถ้าไม่ระบุ)';L.legalRef='ฐานกฎหมาย (ชื่อกฎหมาย/มาตรา)';L.year='ปี พ.ศ. ที่ประกาศ/มีผล';L.source='ชื่อแหล่งที่มา';L.url='ลิงก์แหล่งที่มาทางการ (URL)';L.url2='ลิงก์สำรอง/ตัวบท (URL)';L.lastChecked='วันที่ตรวจสอบล่าสุด (YYYY-MM-DD)';L.sources='แหล่งข้อมูลทางราชการ';L.titleZh='หัวข้อภาษาจีน';L.titleRu='หัวข้อภาษารัสเซีย';L.greetings='คำทักทายแยกภาษา';L.quickRepliesI18n='ปุ่มตอบด่วนแยกภาษา';L.fallbackI18n='คำตอบเมื่อไม่พบข้อมูล (แยกภาษา)';L.mascot='ใช้มาสคอตแอนิเมชัน (ปิด = ใช้รูปอวตาร)';L.mascotStyle='แบบมาสคอต (robot / officer)';L.voice='เสียงพูด';L.particle='คำลงท้ายภาษาไทย';L.autoGreet='พูดทักทายเมื่อเปิดแชท';L.serverTts='ใช้เสียงฝั่งเซิร์ฟเวอร์';L.gender='เพศเสียง (male/female)';L.rate='ความเร็วเสียง';L.pitch='ระดับเสียง';L.mic='ปุ่มไมค์';L.th='ไทย';L.en='English';L.zh='中文';L.ru='Русский';L.aZh='คำตอบภาษาจีน';L.aRu='คำตอบภาษารัสเซีย';L.source='ชื่อแหล่งที่มา / URL';L.fine='ค่าปรับ (ข้อความที่แสดง)';
 var LONG=/^(summary|legalRef|fallbackNotice|desc|description|excerpt|a|aEn|greeting|systemPrompt|dedication|intro|fallback|fallbackEn|about|tagline|note|disclaimer)$/;
 var IMG=/(image|logo|avatar|favicon|qr|imageMobile)$/i;
 var ICONS=['chat','clipboard','store','scale','megaphone','pin','phone','clock','mail','search','check','globe','edit','shield','trash','tag','doc','image','home','help'];
@@ -364,6 +370,29 @@ function ensureLayout(){
   content.chatbot=content.chatbot||{};if(!('mascot' in content.chatbot))content.chatbot.mascot=true;
 }
 function swHtml(attr,on,label){return '<label class="sw" title="'+esc(label)+'"><input type="checkbox" '+attr+' '+(on?'checked':'')+' aria-label="'+esc(label)+'"><span></span></label>'}
+function renderVoice(){
+  var b=content.chatbot,v=b.voice=b.voice||{};
+  ['enabled','autoGreet','mic','serverTts'].forEach(function(k){if(!(k in v))v[k]=true});
+  if(!v.gender)v.gender='male';if(!v.rate)v.rate=1;if(!v.pitch)v.pitch=1.1;v.greetings=v.greetings||{};
+  var row=function(t,d,ctl){return '<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">'+t+'</p>'+(d?'<p class="text-xs text-slate-500">'+d+'</p>':'')+'</div>'+ctl+'</div>'};
+  var sel=function(k,opts){return '<select data-vsel="'+k+'" class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(v[k])===String(o[0])?' selected':'')+'>'+o[1]+'</option>'}).join('')+'</select>'};
+  var h=row('เปิดเสียงพูด','อ่านคำตอบของบอท + ปุ่ม 🔊/🔇 บนหัวแชท และปุ่มฟังซ้ำในแต่ละข้อความ',swHtml('data-vsw="enabled"',v.enabled!==false,'เสียงพูด'))+
+    row('พูดทักทายเมื่อเปิดแชท','มาสคอตโบกมือ/วันทยหัตถ์ และพูดคำทักทายด้านล่าง (เริ่มหลังผู้ใช้คลิก ตามกฎ autoplay)',swHtml('data-vsw="autoGreet"',v.autoGreet!==false,'ทักทาย'))+
+    row('ปุ่มไมค์ (พูดเพื่อถาม)','ใช้ได้ใน Chrome / Edge / Android / Safari — เบราว์เซอร์ที่ไม่รองรับจะซ่อนปุ่ม',swHtml('data-vsw="mic"',v.mic!==false,'ไมค์'))+
+    row('ใช้เสียงฝั่งเซิร์ฟเวอร์ (ถ้าตั้งค่า)','TTS_PROVIDER=openai หรือ google ใน .env — ไม่ได้ตั้ง = ใช้เสียงเบราว์เซอร์',swHtml('data-vsw="serverTts"',v.serverTts!==false,'server TTS'))+
+    row('เสียง','ค่าเริ่มต้น: ผู้ชาย (ถ้าเครื่องมีแต่เสียงผู้หญิง จะลดระดับเสียงให้นุ่มขึ้น)',sel('gender',[['male','ผู้ชาย'],['female','ผู้หญิง']]))+
+    row('ความเร็ว','',sel('rate',[['0.85','ช้า'],['0.95','ค่อนข้างช้า'],['1','ปกติ'],['1.1','เร็วขึ้น'],['1.2','เร็ว']]))+
+    row('ระดับเสียง (pitch)','สูงขึ้น = ฟังเด็กลง',sel('pitch',[['0.9','ต่ำ'],['1','ปกติ'],['1.1','สูงเล็กน้อย'],['1.2','สูง'],['1.3','สูงมาก']]))+
+    row('คำลงท้ายภาษาไทย','ใช้ในคำตอบ/คำทักทายภาษาไทย (ค่าเริ่มต้น “ฮะ”)','<input data-vpart class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm w-24" value="'+esc(b.particle==null?'ฮะ':b.particle)+'" maxlength="8">')+
+    '<div class="py-3"><p class="font-head font-medium text-navy-900 mb-2">คำทักทายด้วยเสียง</p>'+[['th','ไทย'],['en','English'],['zh','中文'],['ru','Русский']].map(function(l){return '<label class="flex items-center gap-2 mb-2"><span class="w-16 text-xs text-slate-500 shrink-0">'+l[1]+'</span><input data-vgreet="'+l[0]+'" class="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm" value="'+esc(v.greetings[l[0]]||'')+'"><button type="button" class="btn btn-ghost !px-2 !py-1" data-vtest="'+l[0]+'" title="ทดลองฟัง">▶</button></label>'}).join('')+'</div>';
+  $('#voiceList').innerHTML=h;
+  $$('#voiceList [data-vsw]').forEach(function(cb){cb.onchange=function(){v[cb.dataset.vsw]=cb.checked;layDirty(true)}});
+  $$('#voiceList [data-vsel]').forEach(function(se){se.onchange=function(){var k=se.dataset.vsel;v[k]=k==='gender'?se.value:Number(se.value);layDirty(true)}});
+  var pi=$('#voiceList [data-vpart]');pi.oninput=function(){b.particle=pi.value.trim();layDirty(true)};
+  $$('#voiceList [data-vgreet]').forEach(function(inp){inp.oninput=function(){v.greetings[inp.dataset.vgreet]=inp.value;layDirty(true)}});
+  $$('#voiceList [data-vtest]').forEach(function(bt){bt.onclick=function(){var t=v.greetings[bt.dataset.vtest]||'';if(!window.TKPVoice||!t)return;TKPVoice.speak(t,{lang:bt.dataset.vtest,gender:v.gender,rate:v.rate,pitch:v.pitch,serverTts:v.serverTts!==false},{onnovoice:function(){toast('เครื่องนี้ไม่มีเสียงสำหรับภาษานี้')}})}});
+  fetch('/api/tts/status').then(function(r){return r.json()}).then(function(j){$('#ttsStatus').textContent=j.enabled?'เสียงฝั่งเซิร์ฟเวอร์: เปิดใช้งาน ✓':'เสียงฝั่งเซิร์ฟเวอร์: ยังไม่ได้ตั้งค่า (ใช้เสียงเบราว์เซอร์)'}).catch(function(){});
+}
 function renderLayout(){
   ensureLayout();
   var secs=content.sections;
@@ -380,6 +409,7 @@ function renderLayout(){
   var ms=content.chatbot.mascotStyle==='officer'?'officer':'robot';
   fl+='<div class="flex items-center gap-3 py-3"><div class="flex-1 min-w-0"><p class="font-head font-medium text-navy-900">แบบมาสคอต</p><p class="text-xs text-slate-500">หุ่นยนต์ (ค่าเริ่มต้น) หรือ หุ่นยนต์ชุดเจ้าหน้าที่เทศกิจ (ตัวอย่าง)</p></div><select data-mstyle class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm"><option value="robot"'+(ms==='robot'?' selected':'')+'>หุ่นยนต์</option><option value="officer"'+(ms==='officer'?' selected':'')+'>เจ้าหน้าที่</option></select></div>';
   $('#featList').innerHTML=fl;
+  renderVoice();
   $$('#layList [data-lsw]').forEach(function(cb){cb.onchange=function(){var id=cb.closest('li').dataset.id;secs.find(function(x){return x.id===id}).enabled=cb.checked;layDirty(true);renderLayout()}});
   $$('#layList [data-lmv]').forEach(function(b){b.onclick=function(){var id=b.closest('li').dataset.id,i=secs.findIndex(function(x){return x.id===id}),j=i+(+b.dataset.lmv);if(j<1||j>=secs.length)return;var t=secs[i];secs[i]=secs[j];secs[j]=t;secs.forEach(function(x,k){x.order=k+1});layDirty(true);renderLayout();var el=$('#layList [data-id="'+id+'"] [data-lmv="'+b.dataset.lmv+'"]');if(el)el.focus()}});
   $$('#featList [data-fsw]').forEach(function(cb){cb.onchange=function(){content.features[cb.dataset.fsw]=cb.checked;layDirty(true)}});

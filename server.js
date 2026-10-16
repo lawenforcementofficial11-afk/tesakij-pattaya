@@ -13,6 +13,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const chatbot = require('./chatbot');
+const tts = require('./tts');
 const mountAlerts = require('./alerts');
 
 // ---- load .env (no extra dependency) ----
@@ -177,6 +178,20 @@ app.post('/api/chat', rateLimit(20, 60 * 1000), async (req, res) => {
   const content = await readJson(CONTENT_FILE, {});
   if ((content.chatbot && content.chatbot.enabled === false) || (content.features && content.features.chatbot === false)) return res.status(503).json({ error: 'chatbot disabled' });
   res.json(await chatbot.answer(message, req.body?.history, content, req.body?.lang));
+});
+// Public: เสียงพูดของบอท (server TTS ถ้าตั้งค่า มิฉะนั้นหน้าเว็บใช้เสียงในเบราว์เซอร์)
+app.get('/api/tts/status', (req, res) => res.json({ enabled: !!tts.provider() }));
+app.post('/api/tts', rateLimit(30, 60 * 1000), async (req, res) => {
+  if (!tts.provider()) return res.status(503).json({ error: 'tts not configured' });
+  const content = await readJson(CONTENT_FILE, {});
+  const v = (content.chatbot && content.chatbot.voice) || {};
+  if (v.enabled === false || v.serverTts === false || (content.chatbot && content.chatbot.enabled === false)) return res.status(503).json({ error: 'voice disabled' });
+  const text = clean(req.body?.text, 600);
+  if (!text) return res.status(400).json({ error: 'empty text' });
+  try {
+    const audio = await tts.synth(text, req.body?.lang, req.body?.gender || v.gender, req.body?.rate || v.rate);
+    res.set({ 'Content-Type': 'audio/mpeg', 'Cache-Control': 'private, max-age=3600' }).send(audio);
+  } catch (e) { console.warn('[tts]', e.message); res.status(502).json({ error: 'tts failed' }); }
 });
 app.get('/api/chat/system-prompt', requireAdmin, async (req, res) => res.type('text/plain').send(chatbot.buildSystemPrompt(await readJson(CONTENT_FILE, {}))));
 app.get('/api/chat/mode', requireAdmin, (req, res) => res.json({ mode: process.env.AI_API_KEY ? 'llm' : 'offline', baseUrl: process.env.AI_API_KEY ? (process.env.AI_BASE_URL || 'https://api.openai.com/v1') : null, model: process.env.AI_API_KEY ? (process.env.AI_MODEL || 'gpt-4o-mini') : null }));

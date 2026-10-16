@@ -339,10 +339,10 @@
   // ---------- chatbot (มาสคอต + หลายภาษา) ----------
   var chatReady = false, history = [], bot = {}, userSpoke = false, greetEl = null, logoUrl = 'assets/logo.png';
   var CUI = {
-    th: { ph: 'พิมพ์คำถาม…', hint: 'ถามน้องAIได้เลย!', typing: 'กำลังพิมพ์', off: 'ขออภัยครับ ขณะนี้ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่อีกครั้ง', sub: 'ออนไลน์ · ตอบจากแหล่งข้อมูลทางราชการ', dis: '', hi: 'สวัสดีครับ ผมน้องAIเทศกิจพัทยา' },
-    en: { ph: 'Type your question…', hint: 'Ask me anything!', typing: 'typing', off: 'Sorry, the assistant is offline right now. Please try again.', sub: 'Online · answers from official sources', dis: 'Answers only from this website and official sources · Emergency 191 / 1155 / 1669', hi: 'Hi, I’m your Pattaya City helper' },
-    zh: { ph: '请输入您的问题…', hint: '有问题问我吧！', typing: '正在输入', off: '抱歉，助手暂时无法连接，请稍后再试。', sub: '在线 · 依据官方来源回答', dis: '仅根据本网站及官方来源回答 · 紧急情况拨打 191 / 1155 / 1669', hi: '您好，我是芭提雅市执法小助手' },
-    ru: { ph: 'Введите вопрос…', hint: 'Спросите меня!', typing: 'печатает', off: 'Извините, помощник сейчас недоступен. Попробуйте позже.', sub: 'Онлайн · ответы по официальным источникам', dis: 'Ответы только по данным сайта и официальным источникам · Экстренно 191 / 1155 / 1669', hi: 'Привет! Я помощник инспекции Паттайи' }
+    th: { ph: 'พิมพ์คำถาม…', hint: 'ถามน้องAIได้เลย!', typing: 'กำลังพิมพ์', off: 'ขออภัยฮะ ขณะนี้ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่อีกครั้งนะฮะ', sub: 'ออนไลน์ · ตอบจากแหล่งข้อมูลทางราชการ', dis: '', hi: 'สวัสดีฮะ ผมน้องAIเทศกิจพัทยา', tease: 'สวัสดีฮะ 👋', listen: 'กำลังฟัง… พูดได้เลยฮะ', spkOn: 'ปิดเสียงพูด', spkOff: 'เปิดเสียงพูด', replay: 'ฟังอีกครั้ง', mic: 'พูดเพื่อถาม', noVoice: 'อุปกรณ์นี้ยังไม่มีเสียงอ่านภาษาไทย (ลองใช้ Chrome/Edge หรือเพิ่มเสียงภาษาไทยในการตั้งค่าเครื่อง)', micErr: 'ใช้ไมโครโฟนไม่ได้ กรุณาอนุญาตการใช้ไมโครโฟนในเบราว์เซอร์' },
+    en: { ph: 'Type your question…', hint: 'Ask me anything!', typing: 'typing', off: 'Sorry, the assistant is offline right now. Please try again.', sub: 'Online · answers from official sources', dis: 'Answers only from this website and official sources · Emergency 191 / 1155 / 1669', hi: 'Hi, I’m your Pattaya City helper', tease: 'Hello! 👋', listen: 'Listening… go ahead', spkOn: 'Mute voice', spkOff: 'Unmute voice', replay: 'Play again', mic: 'Speak to ask', noVoice: 'No English voice is available on this device.', micErr: 'Microphone unavailable. Please allow microphone access.' },
+    zh: { ph: '请输入您的问题…', hint: '有问题问我吧！', typing: '正在输入', off: '抱歉，助手暂时无法连接，请稍后再试。', sub: '在线 · 依据官方来源回答', dis: '仅根据本网站及官方来源回答 · 紧急情况拨打 191 / 1155 / 1669', hi: '您好，我是芭提雅市执法小助手', tease: '您好！👋', listen: '正在聆听…请说', spkOn: '关闭语音', spkOff: '开启语音', replay: '再听一次', mic: '语音提问', noVoice: '此设备没有中文语音。', micErr: '无法使用麦克风，请在浏览器中允许麦克风权限。' },
+    ru: { ph: 'Введите вопрос…', hint: 'Спросите меня!', typing: 'печатает', off: 'Извините, помощник сейчас недоступен. Попробуйте позже.', sub: 'Онлайн · ответы по официальным источникам', dis: 'Ответы только по данным сайта и официальным источникам · Экстренно 191 / 1155 / 1669', hi: 'Привет! Я помощник инспекции Паттайи', tease: 'Привет! 👋', listen: 'Слушаю… говорите', spkOn: 'Выключить голос', spkOff: 'Включить голос', replay: 'Прослушать снова', mic: 'Спросить голосом', noVoice: 'На этом устройстве нет русского голоса.', micErr: 'Микрофон недоступен. Разрешите доступ к микрофону.' }
   };
   function useMascot() { return bot.mascot !== false; }
   function avatarHtml(cls) {
@@ -356,11 +356,59 @@
   function figs() { return $$('#chatFabFig .mascot, #chatHeadFig .mascot, #chatHeroFig .mascot'); }
   function talk(on) { figs().forEach(function (m) { m.classList.toggle('talking', !!on); }); }
   function wave() { figs().forEach(function (m) { m.classList.remove('wave'); void m.getBoundingClientRect(); m.classList.add('wave'); setTimeout(function () { m.classList.remove('wave'); }, 2100); }); }
-  function L(k) { return (CUI[curLang] || CUI.th)[k]; }
-  function greeting() { var g = bot.greetings || {}; return g[curLang] || (curLang === 'th' ? bot.greeting : g.en) || bot.greeting || 'สวัสดีครับ'; }
+  function pfx(t) { var p = bot.particle; return (p == null || p === 'ฮะ') ? t : String(t).replace(/ฮะ(?=$|[\s.!?,…👋🙏])/gu, p); }
+  function L(k) { var v = (CUI[curLang] || CUI.th)[k]; return curLang === 'th' && typeof v === 'string' ? pfx(v) : v; }
+  /* ---- เสียงพูด/ฟัง (assets/voice.js) ---- */
+  var V = window.TKPVoice, LANGBCP = { th: 'th', en: 'en', zh: 'zh', ru: 'ru' }, greeted = false, stopMic = null, noVoiceShown = {};
+  function vcfg() { return bot.voice || {}; }
+  function voiceAllowed() { return !!V && vcfg().enabled !== false && (V.supported.tts || vcfg().serverTts !== false); }
+  function voiceOn() { return voiceAllowed() && localStorage.getItem('tkpVoice') !== 'off'; }
+  function say() { figs().forEach(function (m) { m.classList.add('say'); clearTimeout(m.__say); m.__say = setTimeout(function () { m.classList.remove('say'); }, 110); }); }
+  function speakText(text, btn) {
+    if (!voiceOn()) return false;
+    var v = vcfg();
+    $$('.msg-say.on').forEach(function (b) { b.classList.remove('on'); });
+    if (btn) btn.classList.add('on');
+    V.speak(text, { lang: V.detectLang(text), gender: v.gender || 'male', rate: Number(v.rate) || 1, pitch: Number(v.pitch) || 1.1, serverTts: v.serverTts !== false }, {
+      onstart: function () { talk(true); },
+      onboundary: say,
+      onend: function () { talk(false); if (btn) btn.classList.remove('on'); },
+      onnovoice: function (lg) { if (!noVoiceShown[lg]) { noVoiceShown[lg] = 1; var n = document.createElement('p'); n.className = 'text-center text-[11px] text-slate-400 px-6'; n.textContent = '🔇 ' + L('noVoice'); $('#chatLog').appendChild(n); $('#chatLog').scrollTop = 1e9; } }
+    });
+    return true;
+  }
+  function paintSpk() {
+    var b = $('#chatSpk'); if (!b) return;
+    var ok = voiceAllowed(); b.classList.toggle('hidden', !ok); b.classList.toggle('flex', ok);
+    var on = voiceOn(); b.setAttribute('aria-pressed', String(on)); b.title = on ? L('spkOn') : L('spkOff'); b.setAttribute('aria-label', b.title);
+    $('.spk-on', b).classList.toggle('hidden', !on); $('.spk-off', b).classList.toggle('hidden', on);
+    $$('.msg-say').forEach(function (x) { x.classList.toggle('hidden', !on); x.title = L('replay'); x.setAttribute('aria-label', L('replay')); });
+    var m = $('#chatMic'); if (m) { var mok = !!V && V.supported.stt && vcfg().enabled !== false && vcfg().mic !== false; m.classList.toggle('hidden', !mok); m.classList.toggle('flex', mok); m.title = L('mic'); m.setAttribute('aria-label', L('mic')); }
+  }
+  function micState(on) {
+    var m = $('#chatMic'), inp = $('#chatInput');
+    m.classList.toggle('mic-on', on); m.setAttribute('aria-pressed', String(on));
+    inp.classList.toggle('listening', on); inp.placeholder = on ? L('listen') : L('ph');
+    figs().forEach(function (f) { f.classList.toggle('listening', on); });
+  }
+  function toggleMic() {
+    if (stopMic) { stopMic(); return; }
+    if (V) V.stop();
+    stopMic = V.listen(curLang, {
+      onstart: function () { micState(true); },
+      oninterim: function (t) { $('#chatInput').value = t; },
+      onfinal: function (t) { send(t); },
+      onerror: function (e) { if (e === 'not-allowed' || e === 'service-not-allowed' || e === 'audio-capture') toast('🎤', L('micErr')); },
+      onend: function () { stopMic = null; micState(false); }
+    });
+    if (!stopMic) micState(false);
+  }
+  function voiceGreeting() { var g = vcfg().greetings || {}; return pfx(g[curLang] || (curLang === 'th' ? 'สวัสดีฮะ ยินดีต้อนรับสู่เทศกิจพัทยาฮะ น้องAIยินดีช่วยเหลือฮะ' : g.en) || ''); }
+  function greeting() { var g = bot.greetings || {}; return pfx(g[curLang] || (curLang === 'th' ? bot.greeting : g.en) || bot.greeting || 'สวัสดีฮะ'); }
   function chips() { var q = bot.quickRepliesI18n || {}; return q[curLang] || (curLang === 'th' ? bot.quickReplies : q.en) || bot.quickReplies || []; }
   function paintChat() {
-    $('#chatInput').placeholder = L('ph'); $('#chatHintText').textContent = L('hint');
+    $('#chatInput').placeholder = stopMic ? L('listen') : L('ph'); $('#chatHintText').textContent = L('tease') + ' ' + L('hint');
+    paintSpk();
     $('#chatSub').textContent = L('sub');
     $('#chatDisclaimer').textContent = L('dis') || bot.disclaimer || '';
     var hh = $('#chatHeroHi'); if (hh) hh.textContent = L('hi');
@@ -387,7 +435,8 @@
       greetEl = addMsg('bot', greeting()); chatReady = true;
     }
     paintChat();
-    setTimeout(function () { var h = $('#chatHint'); if (h) h.classList.add('sm:hidden'); }, 9000);
+    var hint = $('#chatHint'); if (hint) { hint.classList.remove('hidden'); hint.classList.add('inline-flex'); }
+    setTimeout(function () { var h = $('#chatHint'); if (h) { h.classList.add('hidden'); h.classList.remove('inline-flex', 'sm:inline-flex'); } }, 9000);
   }
   document.addEventListener('tkp:lang', function () { if (chatReady) paintChat(); });
   function addMsg(who, text) {
@@ -395,14 +444,16 @@
     wrap.className = who === 'user' ? 'flex justify-end' : 'flex gap-2 items-end';
     wrap.innerHTML = who === 'user'
       ? '<div class="max-w-[82%] rounded-2xl rounded-br-md bg-navy-900 text-white px-4 py-2.5 text-[15px] leading-relaxed">' + esc(text).replace(/\n/g, '<br>') + '</div>'
-      : bubbleAvatar() + '<div class="max-w-[84%] min-w-0 rounded-2xl rounded-bl-md bg-white ring-1 ring-slate-200 text-slate-800 px-4 py-2.5 text-[15px] leading-relaxed shadow-sm break-words">' + linkify(text) + '</div>';
+      : bubbleAvatar() + '<div class="max-w-[84%] min-w-0 rounded-2xl rounded-bl-md bg-white ring-1 ring-slate-200 text-slate-800 px-4 py-2.5 text-[15px] leading-relaxed shadow-sm break-words">' + linkify(text) +
+        (voiceAllowed() ? '<div class="flex justify-end -mb-1 -mr-2"><button type="button" class="msg-say' + (voiceOn() ? '' : ' hidden') + ' w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500" title="' + esc(L('replay')) + '" aria-label="' + esc(L('replay')) + '"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linejoin="round" d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path stroke-linecap="round" d="M15.5 9a4 4 0 010 6M18.2 6.5a7.5 7.5 0 010 11"/></svg></button></div>' : '') + '</div>';
     $('#chatLog').appendChild(wrap); $('#chatLog').scrollTop = 1e9;
     $$('.chat-link', wrap).forEach(function (a) { a.addEventListener('click', function () { if (window.innerWidth < 640) openChat(false); }); });
+    var sb = $('.msg-say', wrap); if (sb) sb.addEventListener('click', function () { if (sb.classList.contains('on')) { V.stop(); return; } speakText(text, sb); });
     return wrap;
   }
   function send(text) {
     text = String(text || '').trim(); if (!text) return;
-    userSpoke = true;
+    userSpoke = true; if (V) V.stop();
     addMsg('user', text); $('#chatInput').value = '';
     var typing = document.createElement('div'); typing.className = 'flex gap-2 items-end';
     typing.innerHTML = '<span class="w-9 h-10 shrink-0 -mb-1">' + avatarHtml('static talking') + '</span><div class="rounded-2xl rounded-bl-md bg-white ring-1 ring-slate-200 px-4 py-3.5 typing flex gap-1" aria-label="' + esc(L('typing')) + '"><span></span><span></span><span></span></div>';
@@ -415,8 +466,8 @@
       .catch(function () { return L('off'); })
       .then(function (reply) {
         setTimeout(function () {
-          typing.remove(); addMsg('bot', reply); history.push({ role: 'user', content: text }, { role: 'assistant', content: reply });
-          setTimeout(function () { talk(false); }, Math.min(2600, 500 + reply.length * 12));
+          typing.remove(); var w = addMsg('bot', reply); history.push({ role: 'user', content: text }, { role: 'assistant', content: reply });
+          if (!speakText(reply, $('.msg-say', w))) setTimeout(function () { talk(false); }, Math.min(2600, 500 + reply.length * 12));
         }, Math.max(0, 900 - (Date.now() - started)));
       });
   }
@@ -426,11 +477,17 @@
     $('#chatFab').classList.toggle('opacity-0', open && small); $('#chatFab').classList.toggle('pointer-events-none', open && small);
     var h = $('#chatHint'); if (h && open) h.classList.add('sm:hidden');
     if (open) setTimeout(wave, 120);
+    if (!open && V) V.stop();
+    if (!open && stopMic) stopMic();
+    // ผู้ใช้คลิกเปิดแชท = มี user gesture → พูดทักทายได้ (นโยบาย autoplay ของเบราว์เซอร์)
+    if (open && !greeted && voiceOn() && vcfg().autoGreet !== false) { greeted = true; var g = voiceGreeting(); if (g) setTimeout(function () { speakText(g, greetEl && $('.msg-say', greetEl)); }, 350); }
     if (open && !small) setTimeout(function () { $('#chatInput').focus({ preventScroll: true }); }, 200);
   }
   window.__openChat = openChat; window.__chatSend = send;
   $('#chatFab').addEventListener('click', function () { openChat($('#chatPanel').classList.contains('closed')); });
   $('#chatClose').addEventListener('click', function () { openChat(false); });
+  $('#chatSpk').addEventListener('click', function () { var on = !voiceOn(); localStorage.setItem('tkpVoice', on ? 'on' : 'off'); if (!on && V) V.stop(); paintSpk(); });
+  $('#chatMic').addEventListener('click', toggleMic);
   $('#chatForm').addEventListener('submit', function (e) { e.preventDefault(); send($('#chatInput').value); });
   $('#chatInput').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(this.value); } });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') openChat(false); });

@@ -52,7 +52,7 @@ const fmtNum = n => Number(n).toLocaleString('en-US');
 function lawAnswer(l, lang) {
   const src = [l.url, l.url2].filter(Boolean);
   const has = l.fineAmount != null && l.fineAmount !== '';
-  if (lang === 'th') return `⚖️ ${l.title}\n• โทษ: ${has ? 'ปรับ' + l.fine : l.fine}\n• กฎหมาย: ${l.legalRef}${l.summary ? '\n• สรุป: ' + l.summary : ''}\n📎 แหล่งที่มา (ทางราชการ): ${src.join(' , ')}\nหมายเหตุ: ${has ? 'เป็นอัตราสูงสุดตามตัวบท จำนวนที่ต้องชำระจริงเจ้าหน้าที่เป็นผู้กำหนด · ' : ''}ข้อมูลทางการในแหล่งอ้างอิงถูกต้องที่สุด 👉 #laws`;
+  if (lang === 'th') return `⚖️ ${l.title}\n• โทษ: ${has ? 'ปรับ' + l.fine : l.fine}\n• กฎหมาย: ${l.legalRef}${l.summary ? '\n• สรุป: ' + l.summary : ''}\n📎 แหล่งที่มา (ทางราชการ): ${src.join(' , ')}\nหมายเหตุ: ${has ? 'เป็นอัตราสูงสุดตามตัวบท จำนวนที่ต้องชำระจริงเจ้าหน้าที่เป็นผู้กำหนด · ' : ''}ข้อมูลทางการในแหล่งอ้างอิงถูกต้องที่สุดฮะ 👉 #laws`;
   const T = { en: l.titleEn, zh: l.titleZh, ru: l.titleRu }[lang] || l.titleEn || l.title;
   const ref = trRef(l.legalRef, lang);
   if (lang === 'zh') return `⚖️ ${T}\n• 处罚：${has ? '罚款最高 ' + fmtNum(l.fineAmount) + ' 泰铢' : '详见官方来源'}\n• 法律依据：${ref}\n📎 官方来源（泰文）：${src.join(' , ')}\n注：${has ? '此为法定最高金额，实际金额由主管官员决定。' : ''}以官方原文为准。👉 #laws`;
@@ -109,10 +109,19 @@ function offlineAnswer(message, c, uiLang) {
       reply = best.a[lang] || (lang !== 'th' && best.a.en) || best.a.th;
       if (best.sources.length && !/https?:\/\//.test(reply)) reply += `\n📎 ${best.sources.join(' , ')}`;
     }
-    return { reply: fill(reply, c), lang, matched: best.q[0], sources: best.sources, score: +bestScore.toFixed(2) };
+    return { reply: applyParticle(fill(reply, c), lang, c), lang, matched: best.q[0], sources: best.sources, score: +bestScore.toFixed(2) };
   }
   const fb = (bot.fallbackI18n || {})[lang] || (lang === 'th' ? bot.fallback : bot.fallbackEn) || bot.fallback;
-  return { reply: fill(fb, c), lang, matched: null, sources: [], score: +bestScore.toFixed(2) };
+  return { reply: applyParticle(fill(fb, c), lang, c), lang, matched: null, sources: [], score: +bestScore.toFixed(2) };
+}
+
+// คำลงท้ายภาษาไทยของน้องAI (ค่าเริ่มต้น "ฮะ" แก้ได้ในหลังบ้าน chatbot.particle) — เปลี่ยนเฉพาะคำลงท้ายประโยค ไม่แตะเนื้อหากฎหมาย
+const PARTICLE_RE = /(ครับ|ค่ะ|ฮะ)(?=$|[\s.!?,)…👉🙏—:]|\n)/gu;
+function applyParticle(text, lang, c) {
+  if (lang !== 'th') return text;
+  const p = (c.chatbot || {}).particle;
+  if (p == null || p === 'ฮะ') return String(text).replace(/(ครับ|ค่ะ)(?=$|[\s.!?,)…👉🙏—:]|\n)/gu, 'ฮะ');
+  return String(text).replace(PARTICLE_RE, p);
 }
 
 function buildSystemPrompt(c, lang) {
@@ -137,7 +146,7 @@ function buildSystemPrompt(c, lang) {
   ].join('\n\n');
   return String(bot.systemPrompt || '')
     .replace(/\{botName\}/g, bot.name || '').replace(/\{siteName\}/g, s.name || '').replace(/\{englishName\}/g, s.englishName || '')
-    .replace(/\{subtitle\}/g, s.subtitle || '').replace(/\{lang\}/g, LANG_NAME[lang || 'th']).replace(/\{knowledge\}/g, knowledge);
+    .replace(/\{subtitle\}/g, s.subtitle || '').replace(/\{lang\}/g, LANG_NAME[lang || 'th']).replace(/\{particle\}/g, bot.particle == null ? 'ฮะ' : bot.particle).replace(/\{knowledge\}/g, knowledge);
 }
 
 async function llmAnswer(message, history, c, lang) {
@@ -170,10 +179,11 @@ async function answer(message, history, content, uiLang) {
       let reply = await llmAnswer(message, history, content, off.lang);
       // กันพลาด: ถ้าเป็นคำถามกฎหมายที่จับคู่แหล่งที่มาได้ แต่ LLM ไม่ใส่ลิงก์ → แนบลิงก์ทางการให้
       if (off.sources.length && !/https?:\/\//.test(reply)) reply += `\n📎 ${off.sources.join(' , ')}`;
+      reply = applyParticle(reply, off.lang, content);
       return { mode: 'llm', lang: off.lang, reply, sources: off.sources };
     } catch (e) { console.warn('[chat] LLM error, fallback to offline:', e.message); }
   }
   return { mode: 'offline', ...off };
 }
 
-module.exports = { answer, offlineAnswer, buildSystemPrompt, detectLang, LANGS };
+module.exports = { answer, offlineAnswer, buildSystemPrompt, detectLang, applyParticle, LANGS };
